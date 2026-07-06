@@ -8,13 +8,25 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from claude_client import ClaudeClient
+import shutil
+import subprocess
+
+import autodev
+import idea_store
+import proposal_store
+import secrets_store
+from claude_client import ClaudeClient, run_oneshot
 
 load_dotenv()
 
 app = FastAPI()
 
 WORKSPACES = [Path.home() / "private-dev", Path.home() / "hennyujuku"]
+
+
+@app.on_event("startup")
+async def _startup():
+    asyncio.create_task(autodev.autodev_loop())
 
 
 # ── ワークスペースアイコン ────────────────────────────
@@ -456,6 +468,174 @@ mermaid.run({{ nodes: document.querySelectorAll('.mermaid') }}).then(() => {{
 </html>""")
 
 
+# ── 要件定義モード: アイデアDB ───────────────────────
+@app.get("/api/ideas")
+async def get_ideas():
+    return JSONResponse(idea_store.list_ideas())
+
+
+@app.post("/api/ideas/star")
+async def star_idea(data: dict):
+    idea = idea_store.update_meta(data["id"], starred=bool(data.get("starred")))
+    if idea is None:
+        return JSONResponse({"error": "アイデアが見つかりません"}, status_code=404)
+    return JSONResponse(idea)
+
+
+@app.delete("/api/ideas/{idea_id}")
+async def delete_idea(idea_id: str):
+    if not idea_store.delete_idea(idea_id):
+        return JSONResponse({"error": "アイデアが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+@app.post("/api/ideas/implement")
+async def implement_idea(data: dict):
+    """アイデアからアプリディレクトリを自動作成して実装を開始する"""
+    result = idea_store.get_idea(data["id"])
+    if result is None:
+        return JSONResponse({"error": "アイデアが見つかりません"}, status_code=404)
+    idea, body = result
+
+    ws_path = Path.home() / data.get("workspace", "private-dev")
+    if not ws_path.exists():
+        return JSONResponse({"error": "ワークスペースが見つかりません"}, status_code=404)
+
+    # 既に実装開始済みならそのディレクトリを返す
+    if idea["app_dir"] and Path(idea["app_dir"]).exists():
+        app_dir = Path(idea["app_dir"])
+    else:
+        dir_name = idea_store.dir_name_for(idea["id"], idea["title"])
+        app_dir = ws_path / dir_name
+        n = 2
+        while app_dir.exists():
+            app_dir = ws_path / f"{dir_name}-{n}"
+            n += 1
+        app_dir.mkdir(parents=True)
+        subprocess.run(["git", "init"], cwd=str(app_dir), capture_output=True, timeout=15)
+
+    req_dir = app_dir / "requirements"
+    req_dir.mkdir(exist_ok=True)
+    req_file = req_dir / "要件定義書.md"
+    req_file.write_text(body, encoding="utf-8")
+
+    idea_store.update_meta(idea["id"], status="実装中", app_dir=str(app_dir))
+    return JSONResponse({
+        "name": app_dir.name, "path": str(app_dir), "plan_file": str(req_file),
+    })
+
+
+# ── 秘密情報ストア ───────────────────────────────────
+@app.get("/api/secrets")
+async def get_secrets(app_name: str):
+    try:
+        return JSONResponse(secrets_store.list_keys(app_name))
+    except ValueError as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.post("/api/secrets")
+async def set_secret(data: dict):
+    try:
+        secrets_store.set_key(data["app_name"], data["key"], data["value"])
+        return JSONResponse({"ok": True})
+    except ValueError as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.delete("/api/secrets")
+async def delete_secret(app_name: str, key: str):
+    if not secrets_store.delete_key(app_name, key):
+        return JSONResponse({"error": "キーが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+# ── 本番接続テスト ───────────────────────────────────
+@app.post("/api/test/line")
+async def test_line(data: dict):
+    """秘密ストアのLINEトークンでプッシュ送信テストを行う"""
+    import httpx
+    env = secrets_store.load_env(data["app_name"])
+    token = env.get("LINE_CHANNEL_ACCESS_TOKEN")
+    user_id = env.get("LINE_USER_ID")
+    if not token or not user_id:
+        return JSONResponse({
+            "error": "秘密情報に LINE_CHANNEL_ACCESS_TOKEN と LINE_USER_ID を登録してください"
+        }, status_code=400)
+    message = data.get("message") or f"✅ {data['app_name']} からの送信テストです（Voice Dev）"
+    async with httpx.AsyncClient(timeout=15) as client:
+        res = await client.post(
+            "https://api.line.me/v2/bot/message/push",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"to": user_id, "messages": [{"type": "text", "text": message}]},
+        )
+    if res.status_code == 200:
+        return JSONResponse({"ok": True, "detail": "LINE送信に成功しました"})
+    return JSONResponse({"error": f"LINE API エラー ({res.status_code}): {res.text[:300]}"},
+                        status_code=502)
+
+
+@app.post("/api/test/gcloud")
+async def test_gcloud():
+    """gcloud CLI の認証・プロジェクト設定を確認する"""
+    if shutil.which("gcloud") is None:
+        return JSONResponse({"error": "gcloud CLI がインストールされていません"}, status_code=400)
+    try:
+        auth = subprocess.run(
+            ["gcloud", "auth", "list", "--format=value(account,status)"],
+            capture_output=True, text=True, timeout=30)
+        proj = subprocess.run(
+            ["gcloud", "config", "get-value", "project"],
+            capture_output=True, text=True, timeout=30)
+        return JSONResponse({
+            "ok": True,
+            "accounts": auth.stdout.strip() or "(認証済みアカウントなし)",
+            "project": proj.stdout.strip() or "(未設定)",
+        })
+    except subprocess.TimeoutExpired:
+        return JSONResponse({"error": "gcloud コマンドがタイムアウトしました"}, status_code=504)
+
+
+# ── 追加提案蓄積モード ───────────────────────────────
+@app.get("/api/proposals")
+async def get_proposals(app_path: str):
+    return JSONResponse(proposal_store.load(app_path))
+
+
+@app.post("/api/proposals/toggle")
+async def toggle_proposal(data: dict):
+    ok = proposal_store.set_checked(data["app_path"], int(data["id"]), bool(data["checked"]))
+    if not ok:
+        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+@app.get("/api/autodev")
+async def get_autodev():
+    return JSONResponse(autodev.status())
+
+
+@app.post("/api/autodev")
+async def set_autodev(data: dict):
+    cfg = autodev.set_config(
+        enabled=data.get("enabled"),
+        interval_min=data.get("interval_min"),
+        model=data.get("model"),
+    )
+    # ONにした直後は次のtick（60秒以内）で1件目が動くよう last_run をクリア
+    if data.get("enabled"):
+        cfg = autodev.set_config(last_run="")
+    return JSONResponse(autodev.status())
+
+
+@app.get("/api/autodev/log")
+async def autodev_log():
+    if not autodev.LOG_FILE.exists():
+        return JSONResponse({"content": ""})
+    content = autodev.LOG_FILE.read_text(encoding="utf-8")
+    return JSONResponse({"content": content[-8000:]})
+
+
 # ── セッションストア ─────────────────────────────────
 sessions: dict[str, ClaudeClient] = {}
 
@@ -513,10 +693,13 @@ async def _run_chat(
 ) -> None:
     """Claude処理をバックグラウンドで実行し、結果をQueueに積む"""
     queue = task_manager.get_or_create_queue(session_id)
+    # 秘密ストアの接続情報を注入（本番接続テストをAIが実行できるように）
+    extra_env = secrets_store.load_env(Path(project_path).name) if project_path else {}
     try:
         async for chunk in client.send_message(
             text, project_path, model,
             plan_file=plan_file, context_files=context_files,
+            extra_env=extra_env,
         ):
             if chunk.get("_break"):
                 continue
@@ -527,6 +710,94 @@ async def _run_chat(
     finally:
         await queue.put({"type": "done"})
         await queue.put(None)  # 終了sentinel
+
+
+IDEA_PROMPT = """あなたはアプリ企画の専門家です。以下のユーザーの発話（アイデア）を、構造化された要件定義書に書き起こしてください。
+
+【出力ルール】
+- ツールは一切使わず、Markdownの要件定義書のみを出力すること（前置き・後書き禁止）
+- 必ず `# <アプリ名>` の見出しで始めること（アプリ名は内容から適切に命名）
+- 以下のセクションを含めること:
+  ## 概要 / ## ターゲットユーザー / ## 解決する課題 / ## 主要機能（表: # | 機能名 | 説明 | 優先度）/ ## 画面構成 / ## データ / ## 技術スタック案 / ## MVPスコープ / ## 元のアイデア（原文）
+- 発話に含まれない部分は、アイデアの意図を汲んで具体的に補完すること
+- 「元のアイデア（原文）」セクションにはユーザーの発話を引用としてそのまま記載すること
+
+【ユーザーの発話】
+{text}
+"""
+
+
+async def _run_idea(session_id: str, text: str, model: str) -> None:
+    """要件定義モード: 1送信を要件定義書MDに変換してアイデアDBに保存する"""
+    queue = task_manager.get_or_create_queue(session_id)
+    buf: list[str] = []
+    try:
+        idea_store.IDEAS_DIR.mkdir(parents=True, exist_ok=True)
+        async for chunk in run_oneshot(
+            IDEA_PROMPT.format(text=text), model,
+            work_dir=str(idea_store.IDEAS_DIR),
+        ):
+            if chunk.get("type") == "text":
+                buf.append(chunk["content"])
+            await queue.put(chunk)
+        content = "".join(buf).strip()
+        if content:
+            idea = idea_store.save_idea(content, text)
+            await queue.put({"type": "idea_saved", "idea": idea})
+        else:
+            await queue.put({"type": "error", "content": "要件定義書の生成に失敗しました"})
+    except Exception as e:
+        print(f"[要件定義エラー] session={session_id}: {e}")
+        await queue.put({"type": "error", "content": str(e)})
+    finally:
+        await queue.put({"type": "done"})
+        await queue.put(None)
+
+
+PROPOSE_PROMPT = """あなたはこのアプリ（{app_name}）の改善提案の専門家です。コードベースを読み、改善提案を10件程度生成してください。
+
+【出力ルール】
+- 分析後、最終出力は以下のフォーマットの箇条書き「のみ」を出力すること（1行1提案、前置き・見出し・後書き禁止）:
+
+- 【カテゴリ/規模】タイトル — 説明（1文）
+
+- カテゴリは 機能 / UI/UX / 性能 / セキュリティ / テスト / 運用 から選び、様々な角度をバランスよく含めること
+- 規模は 小 / 中 / 大 で、1タスク30分以内で実装可能な粒度に分割すること（大きい提案は分割する）
+- ファイルの変更・作成は一切行わないこと（読み取りのみ）
+{existing_section}{user_hint}"""
+
+
+async def _run_propose(session_id: str, text: str, project_path: str, model: str) -> None:
+    """追加提案蓄積モード: アプリを解析して改善提案を生成・蓄積する"""
+    queue = task_manager.get_or_create_queue(session_id)
+    app_name = Path(project_path).name
+    buf: list[str] = []
+    try:
+        existing = proposal_store.load(project_path)["tasks"]
+        existing_section = ""
+        if existing:
+            titles = "\n".join(f"- {t['title']}" for t in existing)
+            existing_section = f"\n【既存の提案（重複を避けること）】\n{titles}\n"
+        user_hint = f"\n【ユーザーからの観点指示】\n{text}\n" if text.strip() else ""
+
+        prompt = PROPOSE_PROMPT.format(
+            app_name=app_name, existing_section=existing_section, user_hint=user_hint)
+
+        async for chunk in run_oneshot(prompt, model, add_dir=project_path):
+            if chunk.get("type") == "text":
+                buf.append(chunk["content"])
+            await queue.put(chunk)
+
+        tasks = proposal_store.parse_generated("".join(buf))
+        added = proposal_store.add_tasks(project_path, tasks) if tasks else 0
+        await queue.put({"type": "proposals_updated", "added": added,
+                         "app_path": project_path})
+    except Exception as e:
+        print(f"[提案生成エラー] session={session_id}: {e}")
+        await queue.put({"type": "error", "content": str(e)})
+    finally:
+        await queue.put({"type": "done"})
+        await queue.put(None)
 
 
 async def _drain_queue(session_id: str, websocket: WebSocket) -> None:
@@ -590,16 +861,21 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 model = message.get("model", "claude-sonnet-4-6")
                 plan_file = message.get("plan_file")
                 context_files = message.get("context_files", [])
+                mode = message.get("mode", "dev")
 
-                print(f"[受信] [{model}] {text[:80]}")
+                print(f"[受信] [{mode}/{model}] {text[:80]}")
 
                 await websocket.send_text(json.dumps({"type": "thinking"}))
 
-                # バックグラウンドタスクとして起動
-                task_manager.create_task(
-                    session_id,
-                    _run_chat(session_id, client, text, project_path, model, plan_file, context_files),
-                )
+                # モードに応じたバックグラウンドタスクとして起動
+                if mode == "idea":
+                    coro = _run_idea(session_id, text, model)
+                elif mode == "propose":
+                    coro = _run_propose(session_id, text, project_path, model)
+                else:
+                    coro = _run_chat(session_id, client, text, project_path, model,
+                                     plan_file, context_files)
+                task_manager.create_task(session_id, coro)
 
                 # タスク完了または切断まで配信
                 await _drain_queue(session_id, websocket)

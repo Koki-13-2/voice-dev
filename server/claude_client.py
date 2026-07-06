@@ -36,6 +36,7 @@ class ClaudeClient:
         self, user_text: str, project_path: str, model: str = DEFAULT_MODEL,
         plan_file: str | None = None,
         context_files: list[str] | None = None,
+        extra_env: dict[str, str] | None = None,
     ) -> AsyncGenerator[dict, None]:
         if plan_file:
             try:
@@ -77,6 +78,9 @@ class ClaudeClient:
 
         # ANTHROPIC_API_KEY を除外してサブスクリプション認証を使わせる
         env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+        if extra_env:
+            # 秘密ストアの接続情報（LINEトークン等）をAIから参照可能にする
+            env.update(extra_env)
 
         proc = await asyncio.create_subprocess_exec(
             *cmd,
@@ -154,3 +158,85 @@ class ClaudeClient:
             err_text = stderr_data.decode().strip()
             if err_text:
                 yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}
+
+
+async def run_oneshot(
+    prompt: str, model: str = DEFAULT_MODEL,
+    work_dir: str | None = None,
+    add_dir: str | None = None,
+    system_prompt: str | None = None,
+) -> AsyncGenerator[dict, None]:
+    """セッション継続なしのワンショット実行（要件定義書生成・提案生成用）。
+    send_message と同じチャンク形式を yield する。
+    """
+    cmd = [
+        "claude", "-p", prompt,
+        "--output-format", "stream-json",
+        "--verbose",
+        "--model", model,
+        "--dangerously-skip-permissions",
+    ]
+    if add_dir:
+        cmd += ["--add-dir", add_dir]
+    if system_prompt:
+        cmd += ["--append-system-prompt", system_prompt]
+
+    env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+    cwd = work_dir or add_dir or str(Path.home())
+
+    proc = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        cwd=cwd,
+        env=env,
+        limit=8 * 1024 * 1024,
+    )
+
+    pending_tools: dict[str, str] = {}
+    try:
+        async for raw_line in proc.stdout:
+            line = raw_line.decode().strip()
+            if not line:
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            etype = event.get("type")
+            if etype == "assistant":
+                for block in event.get("message", {}).get("content", []):
+                    btype = block.get("type")
+                    if btype == "text" and block.get("text"):
+                        yield {"type": "text", "content": block["text"]}
+                    elif btype == "tool_use":
+                        pending_tools[block.get("id", "")] = block.get("name", "")
+                        yield {"type": "tool_start", "tool": block.get("name", ""),
+                               "input": block.get("input", {})}
+            elif etype == "user":
+                for block in event.get("message", {}).get("content", []):
+                    if block.get("type") == "tool_result":
+                        tool_name = pending_tools.pop(block.get("tool_use_id", ""), "")
+                        content = block.get("content", "")
+                        if isinstance(content, list):
+                            content = "\n".join(
+                                b.get("text", "") for b in content if b.get("type") == "text"
+                            )
+                        yield {"type": "tool_end", "tool": tool_name,
+                               "result": str(content)[:500]}
+            elif etype == "result":
+                if event.get("subtype") != "success":
+                    yield {"type": "error",
+                           "content": event.get("error", "Claude CLIエラーが発生しました")}
+    except Exception as e:
+        yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
+    finally:
+        proc.kill()
+
+    rc = await proc.wait()
+    if rc != 0:
+        stderr_data = await proc.stderr.read()
+        err_text = stderr_data.decode().strip()
+        if err_text:
+            yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}

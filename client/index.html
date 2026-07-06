@@ -770,6 +770,53 @@
 
   .mode-btn.dev.active  { color: var(--accent); }
   .mode-btn.plan.active { color: var(--yellow); }
+  .mode-btn.idea.active { color: #bc8cff; }
+  .mode-btn.propose.active { color: #f0883e; }
+
+  /* ===== アイデアDB ===== */
+  .idea-card { background: var(--surface); border: 1px solid #30363d; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 8px; }
+  .idea-card-top { display: flex; align-items: center; gap: 8px; }
+  .idea-title { font-weight: 700; font-size: 14px; }
+  .idea-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .idea-status { font-size: 11px; border-radius: 10px; padding: 2px 8px; white-space: nowrap; flex-shrink: 0; }
+  .idea-status.s0 { background: #21262d; color: #8b949e; }
+  .idea-status.s1 { background: #0d2a1a; color: #3fb950; }
+  .idea-status.s2 { background: #1a2035; color: #58a6ff; }
+  .star-btn { background: none; border: none; font-size: 18px; cursor: pointer;
+    opacity: .3; padding: 2px; flex-shrink: 0; color: #e3b341; transition: opacity .15s; }
+  .star-btn.on { opacity: 1; }
+  .idea-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .idea-hint { font-size: 12px; color: var(--muted); padding: 4px 0 14px; line-height: 1.6; }
+
+  /* ===== 提案モード ===== */
+  .proposal-row { display: flex; gap: 10px; align-items: flex-start; background: var(--surface);
+    border: 1px solid #30363d; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+  .proposal-row.done { opacity: .5; }
+  .proposal-row.done .proposal-title { text-decoration: line-through; }
+  .proposal-row input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px;
+    accent-color: #f0883e; flex-shrink: 0; cursor: pointer; }
+  .proposal-angle { font-size: 11px; color: #f0883e; }
+  .proposal-title { font-size: 13px; font-weight: 600; }
+  .proposal-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .proposal-done-at { font-size: 11px; color: #3fb950; margin-top: 2px; }
+
+  /* ===== 自動開発バー ===== */
+  .autodev-bar { background: #161006; border: 1px solid #6a4a00; border-radius: 10px;
+    padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center;
+    gap: 10px; flex-wrap: wrap; }
+  .autodev-toggle { width: 44px; height: 24px; border-radius: 12px; background: #30363d;
+    border: none; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+  .autodev-toggle.on { background: #238636; }
+  .autodev-toggle::after { content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .2s; }
+  .autodev-toggle.on::after { left: 23px; }
+  .autodev-info { font-size: 12px; color: var(--muted); flex: 1; min-width: 140px; line-height: 1.5; }
+
+  /* ===== 秘密情報モーダル ===== */
+  .secret-input { flex: 1; min-width: 0; background: #0d1117; border: 1px solid #30363d;
+    border-radius: 6px; color: var(--text); padding: 8px 10px; font-size: 13px; }
+  .secret-input:focus { outline: none; border-color: var(--accent); }
 
   /* ===== トースト通知 ===== */
   .toast {
@@ -1212,12 +1259,32 @@
   </div>
 </div>
 
+<!-- 秘密情報（環境変数・接続情報）モーダル -->
+<div id="secrets-overlay" class="fp-overlay" style="display:none" onclick="if(event.target===this)closeSecretsModal()">
+  <div class="fp-sheet">
+    <div class="fp-header">
+      <span class="fp-title">🔐 環境変数・接続情報 <span id="secrets-app-label" style="color:var(--muted);font-weight:400"></span></span>
+      <button class="fp-close" onclick="closeSecretsModal()">×</button>
+    </div>
+    <div class="fp-list" id="secrets-list">
+      <div class="fp-empty">読み込み中...</div>
+    </div>
+    <div style="padding:12px;display:flex;gap:6px;border-top:1px solid #30363d;flex-wrap:wrap">
+      <input id="secret-key" class="secret-input" placeholder="KEY（例: LINE_CHANNEL_ACCESS_TOKEN）" />
+      <input id="secret-value" class="secret-input" placeholder="値" type="password" />
+      <button class="fp-add-btn" onclick="addSecret()" style="flex-shrink:0">保存</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-left">
     <div class="status-dot" id="status-dot"></div>
     <div class="mode-toggle">
-      <button class="mode-btn dev active" onclick="switchMode('dev')">⚡ 開発</button>
+      <button class="mode-btn idea" onclick="switchMode('idea')">💡 定義</button>
+      <button class="mode-btn dev active" onclick="switchMode('dev')">⚡ 実装</button>
       <button class="mode-btn plan" onclick="switchMode('plan')">📝 企画</button>
+      <button class="mode-btn propose" onclick="switchMode('propose')">🔧 提案</button>
     </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
@@ -1244,6 +1311,10 @@
     <button class="qa-btn" onclick="quickSend('変更をgit add -A して適切なメッセージでgit commitして')">📝 commit</button>
     <button class="qa-btn" onclick="quickSend('プロジェクトのディレクトリ構成と主要ファイルを教えて')">🔍 構成確認</button>
     <button class="qa-btn" onclick="quickSend('エラーや警告を確認して修正して')">🔧 エラー修正</button>
+    <button class="qa-btn" onclick="quickSend('このアプリをHTTPSで起動して、スマホからアクセスできるURL（LAN/TailscaleのIP）を教えて')">📱 スマホ確認</button>
+    <button class="qa-btn" onclick="testLine()">📤 LINEテスト</button>
+    <button class="qa-btn" onclick="testGcloud()">☁ GCloud確認</button>
+    <button class="qa-btn" onclick="openSecretsModal()">🔐 環境変数</button>
   </div>
   <div id="ctx-chips-bar" class="ctx-chips-bar" style="display:none"></div>
   <div class="text-row">
@@ -1256,16 +1327,18 @@
 
 <script>
 // ---- モード管理 ----
-let currentMode = localStorage.getItem('mode') || 'dev'; // 'dev' | 'plan'
+let currentMode = localStorage.getItem('mode') || 'dev'; // 'idea' | 'dev' | 'plan' | 'propose'
 
-function switchMode(mode) {
-  if (currentMode === mode) return;
-  currentMode = mode;
-  localStorage.setItem('mode', mode);
-
+function setModeButtons(mode) {
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.classList.contains(mode));
   });
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  localStorage.setItem('mode', mode);
+  setModeButtons(mode);
 
   // セッションリセットして初期画面へ
   projectPath = '';
@@ -1275,10 +1348,18 @@ function switchMode(mode) {
   contextFiles = [];
   localStorage.removeItem('projectPath');
   renderContextChips();
-  document.getElementById('proj-badge').style.display = 'none';
+  document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
   if (wsReady) ws.send(JSON.stringify({ type: 'reset' }));
-  showWorkspacePicker();
+  goModeHome();
+}
+
+function goModeHome() {
+  if (currentMode === 'idea') {
+    showIdeaScreen();
+  } else {
+    showWorkspacePicker();
+  }
 }
 
 // ---- 設定 ----
@@ -1441,12 +1522,13 @@ function selectProject(path, name) {
   localStorage.setItem('projectPath', path);
   document.getElementById('project-picker')?.remove();
 
-  // クイックアクション表示
-  document.getElementById('quick-actions').style.display = 'flex';
-
   if (currentMode === 'plan') {
     showPlanScreen(path, name);
+  } else if (currentMode === 'propose') {
+    showProposalScreen(path, name);
   } else {
+    // クイックアクション表示（実装モードのみ）
+    document.getElementById('quick-actions').style.display = 'flex';
     const icon = PROJ_ICONS[name] || '📁';
     addMessage('ai', `${icon} **${name}** で作業します。何をしますか？`);
     setInputEnabled(true);
@@ -2032,6 +2114,317 @@ function clearPlanFile() {
   if (currentPlanProjectPath) showPlanScreen(currentPlanProjectPath, currentPlanProjectName);
 }
 
+// ===== 要件定義モード（アイデアDB）=====
+const IDEA_STATUS_CLASS = { '未着手': 's0', '実装中': 's1', '実装済み': 's2' };
+
+async function showIdeaScreen() {
+  setInputEnabled(true);
+  document.getElementById('quick-actions').style.display = 'none';
+  let ideas = [];
+  try { ideas = await fetch('/api/ideas').then(r => r.json()); } catch(e) {}
+  if (currentMode !== 'idea') return;
+
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+  const screen = document.createElement('div');
+  screen.className = 'plan-screen';
+  screen.id = 'idea-screen';
+
+  let inner = `<div class="plan-screen-header">
+    <span class="plan-screen-title">💡 アプリアイデアDB <span class="plan-folder-count">${ideas.length}</span></span>
+  </div>
+  <div class="idea-hint">🎤 アイデアを話す（or 入力する）と、1送信ごとにAIが要件定義書を書き起こして蓄積します。<br>★ = 優先マーク、🚀 実装 でフォルダを自動作成して開発を開始できます。</div>`;
+
+  if (!ideas.length) {
+    inner += `<div class="plan-empty">まだアイデアがありません<br><small>マイクをタップしてアイデアを話してください</small></div>`;
+  }
+
+  for (const idea of ideas) {
+    const sc = IDEA_STATUS_CLASS[idea.status] || 's0';
+    const appName = idea.app_dir ? idea.app_dir.split('/').pop() : '';
+    inner += `<div class="idea-card" id="idea-${escAttr(idea.id)}">
+      <div class="idea-card-top">
+        <button class="star-btn${idea.starred ? ' on' : ''}" onclick="toggleStar('${escAttr(idea.id)}', ${!idea.starred})" title="優先マーク">★</button>
+        <div style="flex:1;min-width:0">
+          <div class="idea-title">${escHtml(idea.title)}</div>
+          <div class="idea-meta">${escHtml(idea.created)}${appName ? ' · 📁 ' + escHtml(appName) : ''}</div>
+        </div>
+        <span class="idea-status ${sc}">${escHtml(idea.status)}</span>
+      </div>
+      <div class="idea-actions">
+        <a class="plan-action-btn" href="/md-view?path=${encodeURIComponent(idea.path)}" target="_blank">👁 閲覧</a>
+        <button class="plan-action-btn" onclick="implementIdea('${escAttr(idea.id)}')">🚀 実装</button>
+        <button class="plan-action-btn danger" onclick="deleteIdea('${escAttr(idea.id)}','${escAttr(idea.title)}')" title="削除">🗑</button>
+      </div>
+    </div>`;
+  }
+
+  screen.innerHTML = inner;
+  messagesEl.appendChild(screen);
+  messagesEl.scrollTop = 0;
+}
+
+async function toggleStar(id, starred) {
+  try {
+    await fetch('/api/ideas/star', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, starred }),
+    });
+  } catch(e) { showToast('更新に失敗しました', 'error'); }
+  showIdeaScreen();
+}
+
+async function deleteIdea(id, title) {
+  if (!confirm(`「${title}」を削除しますか？\nこの操作は元に戻せません。`)) return;
+  await fetch(`/api/ideas/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  showToast(`「${title}」を削除しました`, 'success');
+  showIdeaScreen();
+}
+
+async function implementIdea(id) {
+  const card = document.getElementById(`idea-${id}`);
+  const existing = card?.querySelector('.ws-choose');
+  if (existing) { existing.remove(); return; }
+  const workspaces = await loadProjects();
+  const row = document.createElement('div');
+  row.className = 'idea-actions ws-choose';
+  row.innerHTML = `<span style="font-size:12px;color:var(--muted);align-self:center">作成先:</span>` +
+    workspaces.map(ws =>
+      `<button class="plan-action-btn" onclick="doImplementIdea('${escAttr(id)}','${escAttr(ws.workspace)}')">📂 ${escHtml(ws.workspace)}</button>`
+    ).join('');
+  card.appendChild(row);
+}
+
+async function doImplementIdea(id, workspace) {
+  showToast('アプリフォルダを作成中...', 'info');
+  let res;
+  try {
+    res = await fetch('/api/ideas/implement', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, workspace }),
+    }).then(r => r.json());
+  } catch(e) { showToast('作成に失敗しました', 'error'); return; }
+  if (res.error) { showToast(res.error, 'error'); return; }
+
+  _projectsCache = null; // 新フォルダを反映
+
+  // 実装モードへ切り替えて開発チャットを開始
+  currentMode = 'dev';
+  localStorage.setItem('mode', 'dev');
+  setModeButtons('dev');
+  projectPath = res.path;
+  localStorage.setItem('projectPath', res.path);
+  contextFiles = [{ path: res.plan_file, name: '要件定義書.md' }];
+  renderContextChips();
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('quick-actions').style.display = 'flex';
+  addMessage('ai', `🚀 **${res.name}** を作成しました（要件定義書を requirements/ にコピー済み）。実装を開始します。`);
+  send('requirements/要件定義書.md を読み込み、実装計画を簡潔に提示してからMVPの実装を開始してください。');
+}
+
+// ===== 追加提案蓄積モード =====
+async function showProposalScreen(projPath, projName) {
+  setInputEnabled(true);
+  document.getElementById('quick-actions').style.display = 'none';
+  let data = { tasks: [] }, ad = {};
+  try {
+    [data, ad] = await Promise.all([
+      fetch(`/api/proposals?app_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
+      fetch('/api/autodev').then(r => r.json()),
+    ]);
+  } catch(e) {}
+  if (currentMode !== 'propose' || projectPath !== projPath) return;
+
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+  const screen = document.createElement('div');
+  screen.className = 'plan-screen';
+  screen.id = 'proposal-screen';
+
+  const pending = data.tasks.filter(t => !t.done);
+  const doneTasks = data.tasks.filter(t => t.done);
+
+  let inner = `<div class="plan-screen-header">
+    <span class="plan-screen-title">🔧 ${escHtml(projName)} 改善提案 <span class="plan-folder-count">${data.tasks.length}</span></span>
+    <button class="btn-new-file" onclick="generateProposals()">🤖 提案を生成</button>
+  </div>
+  <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
+  <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>`;
+
+  if (!data.tasks.length) {
+    inner += `<div class="plan-empty">提案がまだありません<br><small>「🤖 提案を生成」でAIがコードを解析して改善案を提案します</small></div>`;
+  }
+
+  for (const t of pending) inner += proposalRowHtml(t);
+  if (doneTasks.length) {
+    inner += `<div class="plan-screen-header" style="margin-top:16px"><span class="plan-screen-title" style="font-size:13px;color:var(--muted)">✅ 実装済み ${doneTasks.length}</span></div>`;
+    for (const t of doneTasks) inner += proposalRowHtml(t);
+  }
+
+  screen.innerHTML = inner;
+  messagesEl.appendChild(screen);
+  messagesEl.scrollTop = 0;
+}
+
+function proposalRowHtml(t) {
+  return `<div class="proposal-row${t.done ? ' done' : ''}">
+    <input type="checkbox" ${t.checked ? 'checked' : ''} ${t.done ? 'disabled' : ''}
+      onchange="toggleProposal(${t.id}, this.checked)" />
+    <div style="flex:1;min-width:0">
+      <div class="proposal-angle">【${escHtml(t.angle)}】#${t.id}</div>
+      <div class="proposal-title">${escHtml(t.title)}</div>
+      ${t.desc ? `<div class="proposal-desc">${escHtml(t.desc)}</div>` : ''}
+      ${t.done ? `<div class="proposal-done-at">✅ ${escHtml(t.done)} 実装済み</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function generateProposals() {
+  send('このアプリの改善提案を生成してください。');
+}
+
+async function toggleProposal(id, checked) {
+  try {
+    await fetch('/api/proposals/toggle', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, id, checked }),
+    });
+    refreshAutodevBar();
+  } catch(e) { showToast('更新に失敗しました', 'error'); }
+}
+
+function autodevBarHtml(ad) {
+  const statusLine = ad.running
+    ? `⚙ 実行中: ${escHtml(ad.running.app)} #${ad.running.id} ${escHtml(ad.running.title)}（${escHtml(ad.running.started)}〜）`
+    : ad.next_task
+      ? `次のタスク: ${escHtml(ad.next_task.app)} #${ad.next_task.id} ${escHtml(ad.next_task.title)}`
+      : 'キューは空です（実装したい提案にチェックを入れてください）';
+  return `<button class="autodev-toggle${ad.enabled ? ' on' : ''}" onclick="toggleAutodev()" title="自動開発 ON/OFF"></button>
+    <div class="autodev-info">
+      <strong style="color:${ad.enabled ? '#3fb950' : '#8b949e'}">🤖 自動開発 ${ad.enabled ? 'ON' : 'OFF'}</strong>
+      · ${ad.interval_min ?? 30}分おきに1タスク実行<br>${statusLine}
+    </div>
+    ${ad.log_path ? `<a class="plan-action-btn" href="/md-view?path=${encodeURIComponent(ad.log_path)}" target="_blank">📜 ログ</a>` : ''}`;
+}
+
+async function refreshAutodevBar() {
+  const bar = document.getElementById('autodev-bar');
+  if (!bar) return;
+  try {
+    const ad = await fetch('/api/autodev').then(r => r.json());
+    bar.innerHTML = autodevBarHtml(ad);
+  } catch(e) {}
+}
+
+async function toggleAutodev() {
+  try {
+    const cur = await fetch('/api/autodev').then(r => r.json());
+    const res = await fetch('/api/autodev', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: !cur.enabled }),
+    }).then(r => r.json());
+    const bar = document.getElementById('autodev-bar');
+    if (bar) bar.innerHTML = autodevBarHtml(res);
+    showToast(res.enabled
+      ? `自動開発を開始します（${res.interval_min}分おきに1タスク、1分以内に最初のタスクが動きます）`
+      : '自動開発を停止しました', 'success');
+  } catch(e) { showToast('切り替えに失敗しました', 'error'); }
+}
+
+// ===== 秘密情報（環境変数）モーダル =====
+function currentAppName() {
+  return projectPath ? projectPath.split('/').pop() : '';
+}
+
+function openSecretsModal() {
+  if (!projectPath) { showToast('先にプロジェクトを選択してください', 'error'); return; }
+  document.getElementById('secrets-overlay').style.display = 'flex';
+  document.getElementById('secrets-app-label').textContent = '— ' + currentAppName();
+  renderSecrets();
+}
+
+function closeSecretsModal() {
+  document.getElementById('secrets-overlay').style.display = 'none';
+}
+
+async function renderSecrets() {
+  const list = document.getElementById('secrets-list');
+  let keys;
+  try {
+    keys = await fetch(`/api/secrets?app_name=${encodeURIComponent(currentAppName())}`).then(r => r.json());
+  } catch(e) {
+    list.innerHTML = '<div class="fp-empty">読み込みに失敗しました</div>';
+    return;
+  }
+  if (!Array.isArray(keys)) {
+    list.innerHTML = `<div class="fp-empty">${escHtml(keys.error || 'エラー')}</div>`;
+    return;
+  }
+  if (!keys.length) {
+    list.innerHTML = `<div class="fp-empty">未登録です<br><small>LINE_CHANNEL_ACCESS_TOKEN / LINE_USER_ID / GOOGLE_APPLICATION_CREDENTIALS などを登録すると、<br>開発チャット・接続テストで自動的に環境変数として使われます（~/.voice-dev/secrets/ に600権限で保存）</small></div>`;
+    return;
+  }
+  list.innerHTML = keys.map(k => `<div class="fp-file-row" style="cursor:default">
+    <div class="fp-file-info">
+      <div class="fp-file-name">${escHtml(k.key)}</div>
+      <div class="fp-file-path">${escHtml(k.preview)}</div>
+    </div>
+    <button class="plan-action-btn danger" onclick="deleteSecret('${escAttr(k.key)}')">🗑</button>
+  </div>`).join('');
+}
+
+async function addSecret() {
+  const key = document.getElementById('secret-key').value.trim();
+  const value = document.getElementById('secret-value').value;
+  if (!key || !value) { showToast('KEYと値を入力してください', 'error'); return; }
+  const res = await fetch('/api/secrets', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ app_name: currentAppName(), key, value }),
+  }).then(r => r.json());
+  if (res.error) { showToast(res.error, 'error'); return; }
+  document.getElementById('secret-key').value = '';
+  document.getElementById('secret-value').value = '';
+  showToast(`${key} を保存しました`, 'success');
+  renderSecrets();
+}
+
+async function deleteSecret(key) {
+  if (!confirm(`「${key}」を削除しますか？`)) return;
+  await fetch(`/api/secrets?app_name=${encodeURIComponent(currentAppName())}&key=${encodeURIComponent(key)}`, { method: 'DELETE' });
+  renderSecrets();
+}
+
+// ===== 本番接続テスト =====
+async function testLine() {
+  if (!projectPath) { showToast('先にプロジェクトを選択してください', 'error'); return; }
+  showToast('LINE送信テスト中...', 'info');
+  let res;
+  try {
+    res = await fetch('/api/test/line', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_name: currentAppName() }),
+    }).then(r => r.json());
+  } catch(e) { addMessage('error', '⚠ LINE送信テストに失敗しました: ' + e.message); return; }
+  if (res.ok) {
+    addMessage('ai', '📤 **LINE送信テスト成功！** スマホのLINEを確認してください。');
+  } else {
+    addMessage('error', '⚠ ' + (res.error || 'LINE送信に失敗しました') + '\n（🔐 環境変数 から LINE_CHANNEL_ACCESS_TOKEN と LINE_USER_ID を登録してください）');
+  }
+}
+
+async function testGcloud() {
+  showToast('Google Cloud 接続確認中...', 'info');
+  let res;
+  try {
+    res = await fetch('/api/test/gcloud', { method: 'POST' }).then(r => r.json());
+  } catch(e) { addMessage('error', '⚠ 確認に失敗しました: ' + e.message); return; }
+  if (res.ok) {
+    addMessage('ai', `☁ **Google Cloud 接続確認**\n\n- アカウント: \`${res.accounts}\`\n- プロジェクト: \`${res.project}\``);
+  } else {
+    addMessage('error', '⚠ ' + res.error);
+  }
+}
+
 // ---- WebSocket ----
 let ws = null;
 let wsReady = false;
@@ -2144,6 +2537,27 @@ function handleServerMessage(msg) {
   if (msg.type === 'tool_end' && window._lastToolCard) {
     window._lastToolCard._resultEl.textContent = msg.result;
     scrollBottom();
+  }
+
+  if (msg.type === 'idea_saved') {
+    showToast(`要件定義書「${msg.idea.title}」を保存しました`, 'success');
+    currentAiDiv = null;
+    const div = document.createElement('div');
+    div.className = 'message ai';
+    div.innerHTML = `💡 <strong>${escHtml(msg.idea.title)}</strong> をアイデアDBに保存しました。
+      <div class="idea-actions">
+        <a class="plan-action-btn" href="/md-view?path=${encodeURIComponent(msg.idea.path)}" target="_blank">👁 閲覧</a>
+        <button class="plan-action-btn" onclick="showIdeaScreen()">📚 アイデア一覧へ</button>
+      </div>`;
+    document.getElementById('messages').appendChild(div);
+    scrollBottom();
+  }
+
+  if (msg.type === 'proposals_updated') {
+    showToast(msg.added > 0 ? `${msg.added}件の提案を追加しました` : '新しい提案はありませんでした', 'success');
+    if (currentMode === 'propose' && projectPath === msg.app_path) {
+      showProposalScreen(projectPath, projectPath.split('/').pop());
+    }
   }
 
   if (msg.type === 'error') {
@@ -2272,7 +2686,8 @@ function escHtml(s) {
 // ---- 送信 ----
 function send(text) {
   if (!text.trim()) return;
-  if (!projectPath) {
+  // 要件定義モードはプロジェクト選択不要（アイデアDBに直接保存）
+  if (currentMode !== 'idea' && !projectPath) {
     showWorkspacePicker();
     return;
   }
@@ -2285,6 +2700,7 @@ function send(text) {
   ws.send(JSON.stringify({
     type: 'chat',
     text,
+    mode: currentMode,
     project_path: projectPath,
     model: selectedModel,
     plan_file: currentMode === 'plan' ? currentPlanFile : null,
@@ -2314,7 +2730,7 @@ function quickSend(text) {
 }
 
 function switchProject() {
-  document.getElementById('proj-badge').style.display = 'none';
+  document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
   projectPath = '';
   currentPlanFile = null;
@@ -2469,7 +2885,7 @@ function resetSession() {
   contextFiles = [];
   localStorage.removeItem('projectPath');
   renderContextChips();
-  document.getElementById('proj-badge').style.display = 'none';
+  document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
   if (wsReady) ws.send(JSON.stringify({ type: 'reset' }));
   showWorkspacePicker();
@@ -2481,11 +2897,9 @@ document.getElementById('model-select').value = selectedModel;
 
 window.addEventListener('load', async () => {
   // モード状態を反映
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.classList.contains(currentMode));
-  });
+  setModeButtons(currentMode);
   await loadProjects();
-  showWorkspacePicker();
+  goModeHome();
 });
 </script>
 </body>

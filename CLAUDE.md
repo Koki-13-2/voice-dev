@@ -25,9 +25,15 @@ MD更新(着手前) → 実装 → MD更新(完了) → git commit → git push
 音声入力でAIと会話しながらアプリ開発できる環境。FastAPI + バニラJS。ビルドステップなし。
 
 ```
-server/main.py          # FastAPI + WebSocket サーバー
-server/claude_client.py # Claude API ラッパー
-server/tools.py         # ファイル操作・git・シェル実行
-client/index.html       # フロントエンド（単一ファイル）
-docs/                   # 設計・要件ドキュメント
+server/main.py           # FastAPI + WebSocket サーバー
+server/claude_client.py  # Claude CLI ラッパー（セッション継続 + ワンショット生成）
+server/tools.py          # ファイル操作・git・シェル実行
+server/idea_store.py     # アイデアDB（ideas/ のMD管理）
+server/proposal_store.py # 改善提案チェックリスト（proposals/ のMD管理）
+server/secrets_store.py  # 環境変数・接続情報（~/.voice-dev/secrets/）
+server/autodev.py        # 自動開発スケジューラ（30分おきに1タスク）
+client/index.html        # フロントエンド（単一ファイル、4モード: 定義/実装/企画/提案）
+ideas/                   # 要件定義書の蓄積先（1送信 = 1MD）
+proposals/               # アプリ別の改善提案MD + 自動開発ログ
+docs/                    # 設計・要件ドキュメント
 ```
