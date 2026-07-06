@@ -3061,7 +3061,13 @@ function handleServerMessage(msg) {
   }
 
   if (msg.type === 'proposals_updated') {
-    showToast(msg.added > 0 ? `${msg.added}件の提案を追加しました` : '新しい提案はありませんでした', 'success');
+    if (msg.added > 0) {
+      showToast(`${msg.added}件の提案を追加しました`, 'success');
+    } else if (msg.raw_preview) {
+      showToast('提案のパースに失敗しました。Claude出力: ' + msg.raw_preview.slice(0, 120), 'error');
+    } else {
+      showToast('新しい提案はありませんでした', 'success');
+    }
     if (currentMode === 'propose' && projectPath === msg.app_path) {
       showProposalScreen(projectPath, projectPath.split('/').pop());
     }

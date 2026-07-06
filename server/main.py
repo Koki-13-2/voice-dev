@@ -772,6 +772,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
     queue = task_manager.get_or_create_queue(session_id)
     app_name = Path(project_path).name
     buf: list[str] = []
+    result_buf: list[str] = []
     try:
         existing = proposal_store.load(project_path)["tasks"]
         existing_section = ""
@@ -786,12 +787,25 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
         async for chunk in run_oneshot(prompt, model, add_dir=project_path):
             if chunk.get("type") == "text":
                 buf.append(chunk["content"])
+            elif chunk.get("type") == "result_text":
+                result_buf.append(chunk["content"])
+                continue
             await queue.put(chunk)
 
-        tasks = proposal_store.parse_generated("".join(buf))
+        raw_text = "".join(buf)
+        tasks = proposal_store.parse_generated(raw_text)
+
+        if not tasks and result_buf:
+            raw_text = "".join(result_buf)
+            tasks = proposal_store.parse_generated(raw_text)
+            print(f"[提案パース] resultフォールバック使用: {len(tasks)}件")
+
         added = proposal_store.add_tasks(project_path, tasks) if tasks else 0
+        print(f"[提案パース] app={app_name} パース={len(tasks)}件 追加={added}件 buf={len(raw_text)}文字")
+
+        preview = raw_text[:300] if not tasks else ""
         await queue.put({"type": "proposals_updated", "added": added,
-                         "app_path": project_path})
+                         "app_path": project_path, "raw_preview": preview})
     except Exception as e:
         print(f"[提案生成エラー] session={session_id}: {e}")
         await queue.put({"type": "error", "content": str(e)})

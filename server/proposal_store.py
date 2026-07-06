@@ -7,12 +7,21 @@ PROPOSALS_DIR = Path(__file__).parent.parent / "proposals"
 
 # 例: - [x] 【機能/中】CSVエクスポート — 分析結果を保存 <!-- id:2 done:2026-07-06T16:00 -->
 _TASK_RE = re.compile(
-    r"^- \[(?P<check>[ x])\] 【(?P<angle>[^】]+)】(?P<title>[^—\n]+?)"
-    r"(?:\s*—\s*(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
+    r"^- \[(?P<check>[ x])\] 【(?P<angle>[^】]+)】(?P<title>[^—–\-ー\n]+?)"
+    r"(?:\s*[—–\-ー]\s*(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
 )
 
-# AI生成行: - 【機能/中】タイトル — 説明
-_GEN_RE = re.compile(r"^[-*]\s*【(?P<angle>[^】]+)】\s*(?P<title>[^—\n]+?)(?:\s*—\s*(?P<desc>.+))?$")
+_DASH_RE = r"[—–\-ー:：]"
+
+# AI生成行: 番号付き・箇条書き・インデント付きすべて許容
+# 例: - 【機能/中】タイトル — 説明
+#      1. 【機能/中】タイトル — 説明
+#      • 【機能/中】タイトル: 説明
+_GEN_RE = re.compile(
+    r"^(?:\d+[.)]\s*|[-*•·▸►]\s*|\s*)"
+    r"【(?P<angle>[^】]+)】\s*"
+    r"(?P<title>.+?)(?:\s*" + _DASH_RE + r"\s+(?P<desc>.+))?$"
+)
 
 
 def _file_for(app_name: str) -> Path:
@@ -68,13 +77,19 @@ def load(app_path: str) -> dict:
     return {"app": app_name, "app_path": meta.get("app_path", app_path), "tasks": tasks}
 
 
+_FALLBACK_RE = re.compile(r"【(?P<angle>[^】]+)】\s*(?P<rest>.+)")
+
+
 def parse_generated(text: str) -> list[dict]:
-    """AI出力から提案行を抽出する"""
+    """AI出力から提案行を抽出する。正規表現マッチ → フォールバックの2段階。"""
     tasks = []
+    unmatched_lines: list[str] = []
     for line in text.splitlines():
         line = line.strip()
-        if _TASK_RE.match(line):  # 既存フォーマットで出力された場合
-            m = _TASK_RE.match(line)
+        if not line:
+            continue
+        m = _TASK_RE.match(line)
+        if m:
             tasks.append({"angle": m.group("angle"), "title": m.group("title").strip(),
                           "desc": (m.group("desc") or "").strip()})
             continue
@@ -82,6 +97,22 @@ def parse_generated(text: str) -> list[dict]:
         if m:
             tasks.append({"angle": m.group("angle"), "title": m.group("title").strip(),
                           "desc": (m.group("desc") or "").strip()})
+            continue
+        if "【" in line and "】" in line:
+            unmatched_lines.append(line)
+
+    if tasks:
+        return tasks
+
+    for line in unmatched_lines:
+        m = _FALLBACK_RE.search(line)
+        if m:
+            rest = m.group("rest").strip()
+            parts = re.split(r"\s*[—–\-ー:：]\s+", rest, maxsplit=1)
+            title = parts[0].strip()
+            desc = parts[1].strip() if len(parts) > 1 else ""
+            if title:
+                tasks.append({"angle": m.group("angle"), "title": title, "desc": desc})
     return tasks
 
 

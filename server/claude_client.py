@@ -226,7 +226,11 @@ async def run_oneshot(
                         yield {"type": "tool_end", "tool": tool_name,
                                "result": str(content)[:500]}
             elif etype == "result":
-                if event.get("subtype") != "success":
+                if event.get("subtype") == "success":
+                    result_text = event.get("result", "")
+                    if result_text:
+                        yield {"type": "result_text", "content": result_text}
+                else:
                     yield {"type": "error",
                            "content": event.get("error", "Claude CLIエラーが発生しました")}
     except Exception as e:
