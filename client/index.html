@@ -3003,7 +3003,7 @@ function handleServerMessage(msg) {
 
   removeThinking();
 
-  if (msg.type === 'text') {
+  if (msg.type === 'text' || msg.type === 'result_text') {
     if (!currentAiDiv) {
       currentAiDiv = addMessage('ai', '');
       currentAiDiv._raw = '';

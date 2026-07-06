@@ -11,16 +11,16 @@ _TASK_RE = re.compile(
     r"(?:\s*[—–\-ー]\s*(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
 )
 
-_DASH_RE = r"[—–\-ー:：]"
+_DASH_RE = r"[—–:：]"
 
 # AI生成行: 番号付き・箇条書き・インデント付きすべて許容
 # 例: - 【機能/中】タイトル — 説明
 #      1. 【機能/中】タイトル — 説明
 #      • 【機能/中】タイトル: 説明
 _GEN_RE = re.compile(
-    r"^(?:\d+[.)]\s*|[-*•·▸►]\s*|\s*)"
+    r"^(?:\d+[.)]\s*|[-*•·▸►]\s*|\s*)\**"
     r"【(?P<angle>[^】]+)】\s*"
-    r"(?P<title>.+?)(?:\s*" + _DASH_RE + r"\s+(?P<desc>.+))?$"
+    r"(?P<title>.+?)(?:\s*" + _DASH_RE + r"\s*(?P<desc>.+))?$"
 )
 
 
@@ -80,37 +80,42 @@ def load(app_path: str) -> dict:
 _FALLBACK_RE = re.compile(r"【(?P<angle>[^】]+)】\s*(?P<rest>.+)")
 
 
+def _clean_md(s: str) -> str:
+    """Markdown装飾文字（*など）を除去する"""
+    return s.strip().strip("*").strip()
+
+
 def parse_generated(text: str) -> list[dict]:
     """AI出力から提案行を抽出する。正規表現マッチ → フォールバックの2段階。"""
     tasks = []
+    matched_lines: set[int] = set()
     unmatched_lines: list[str] = []
-    for line in text.splitlines():
+    for i, line in enumerate(text.splitlines()):
         line = line.strip()
         if not line:
             continue
         m = _TASK_RE.match(line)
         if m:
-            tasks.append({"angle": m.group("angle"), "title": m.group("title").strip(),
-                          "desc": (m.group("desc") or "").strip()})
+            tasks.append({"angle": m.group("angle"), "title": _clean_md(m.group("title")),
+                          "desc": _clean_md(m.group("desc") or "")})
+            matched_lines.add(i)
             continue
         m = _GEN_RE.match(line)
         if m:
-            tasks.append({"angle": m.group("angle"), "title": m.group("title").strip(),
-                          "desc": (m.group("desc") or "").strip()})
+            tasks.append({"angle": m.group("angle"), "title": _clean_md(m.group("title")),
+                          "desc": _clean_md(m.group("desc") or "")})
+            matched_lines.add(i)
             continue
         if "【" in line and "】" in line:
             unmatched_lines.append(line)
-
-    if tasks:
-        return tasks
 
     for line in unmatched_lines:
         m = _FALLBACK_RE.search(line)
         if m:
             rest = m.group("rest").strip()
-            parts = re.split(r"\s*[—–\-ー:：]\s+", rest, maxsplit=1)
-            title = parts[0].strip()
-            desc = parts[1].strip() if len(parts) > 1 else ""
+            parts = re.split(r"\s*[—–:：]\s*", rest, maxsplit=1)
+            title = _clean_md(parts[0])
+            desc = _clean_md(parts[1]) if len(parts) > 1 else ""
             if title:
                 tasks.append({"angle": m.group("angle"), "title": title, "desc": desc})
     return tasks

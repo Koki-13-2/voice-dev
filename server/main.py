@@ -731,6 +731,7 @@ async def _run_idea(session_id: str, text: str, model: str) -> None:
     """要件定義モード: 1送信を要件定義書MDに変換してアイデアDBに保存する"""
     queue = task_manager.get_or_create_queue(session_id)
     buf: list[str] = []
+    result_buf: list[str] = []
     try:
         idea_store.IDEAS_DIR.mkdir(parents=True, exist_ok=True)
         async for chunk in run_oneshot(
@@ -739,8 +740,13 @@ async def _run_idea(session_id: str, text: str, model: str) -> None:
         ):
             if chunk.get("type") == "text":
                 buf.append(chunk["content"])
+            elif chunk.get("type") == "result_text":
+                result_buf.append(chunk["content"])
             await queue.put(chunk)
         content = "".join(buf).strip()
+        if not content and result_buf:
+            content = "".join(result_buf).strip()
+            print(f"[要件定義] resultフォールバック使用: {len(content)}文字")
         if content:
             idea = idea_store.save_idea(content, text)
             await queue.put({"type": "idea_saved", "idea": idea})
@@ -789,7 +795,6 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
                 buf.append(chunk["content"])
             elif chunk.get("type") == "result_text":
                 result_buf.append(chunk["content"])
-                continue
             await queue.put(chunk)
 
         raw_text = "".join(buf)
