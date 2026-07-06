@@ -5,10 +5,27 @@ from pathlib import Path
 
 PROPOSALS_DIR = Path(__file__).parent.parent / "proposals"
 
+# 出力契約マーカー（プロンプトで義務付け、抽出はこれを最優先）
+PROPOSALS_START = "<<<PROPOSALS_START>>>"
+PROPOSALS_END = "<<<PROPOSALS_END>>>"
+
+
+def extract_block(raw: str) -> tuple[str, str]:
+    """AI生出力から提案リスト部分を抽出する。
+    戻り値: (リストテキスト, 抽出方法)
+    sentinel 区間があればそれを、なければ全文を返す（parse_generated が緩くパース）。
+    """
+    text = raw or ""
+    if PROPOSALS_START in text and PROPOSALS_END in text:
+        return text.split(PROPOSALS_START, 1)[1].split(PROPOSALS_END, 1)[0], "sentinel"
+    return text, "full"
+
 # 例: - [x] 【機能/中】CSVエクスポート — 分析結果を保存 <!-- id:2 done:2026-07-06T16:00 -->
+# 保存形式の区切りは常に「 — 」（スペース+emダッシュ+スペース）。
+# 文字クラスに ー(長音) や -(ハイフン) を含めるとカタカナ語・英単語のタイトルが途中で切れるため使わない。
 _TASK_RE = re.compile(
-    r"^- \[(?P<check>[ x])\] 【(?P<angle>[^】]+)】(?P<title>[^—–\-ー\n]+?)"
-    r"(?:\s*[—–\-ー]\s*(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
+    r"^- \[(?P<check>[ x])\] 【(?P<angle>[^】]+)】(?P<title>.+?)"
+    r"(?:\s+—\s+(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
 )
 
 _DASH_RE = r"[—–:：]"

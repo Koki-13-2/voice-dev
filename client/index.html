@@ -3060,11 +3060,17 @@ function handleServerMessage(msg) {
     scrollBottom();
   }
 
+  if (msg.type === 'notice') {
+    showToast(msg.content, 'info');
+  }
+
   if (msg.type === 'proposals_updated') {
     if (msg.added > 0) {
-      showToast(`${msg.added}件の提案を追加しました`, 'success');
-    } else if (msg.raw_preview) {
-      showToast('提案のパースに失敗しました。Claude出力: ' + msg.raw_preview.slice(0, 120), 'error');
+      showToast(`${msg.added}件の提案を追加しました（${msg.parsed}件読み取り）`, 'success');
+    } else if (msg.parsed > 0) {
+      showToast(`${msg.parsed}件読み取りましたが、すべて既存提案と重複していました`, 'info');
+    } else if (msg.cache_file) {
+      showToast('提案を読み取れませんでした（リトライ済み）。生出力: ' + msg.cache_file, 'error');
     } else {
       showToast('新しい提案はありませんでした', 'success');
     }

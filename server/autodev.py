@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+import gitutil
 import proposal_store
 import secrets_store
 
@@ -16,9 +17,11 @@ DEFAULT_CONFIG = {
     "interval_min": 30,
     "model": "claude-sonnet-4-6",
     "last_run": "",
+    "claim": None,  # 実行中タスクのクレーム {app, id, at} — プロセス跨ぎの多重実行防止
 }
 
 TASK_TIMEOUT_SEC = 25 * 60  # 30分間隔に収まるよう1タスク最大25分
+CLAIM_TTL_SEC = 30 * 60     # クレームの有効期間（プロセス死亡時の自動解放）
 
 # 実行中タスク情報（UI表示用）
 current_task: dict | None = None
@@ -39,9 +42,23 @@ def set_config(**kwargs) -> dict:
     for k in ("enabled", "interval_min", "model", "last_run"):
         if k in kwargs and kwargs[k] is not None:
             cfg[k] = kwargs[k]
+    if "claim" in kwargs:  # None を渡すとクレーム解除
+        cfg["claim"] = kwargs["claim"]
     CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
     CONFIG_FILE.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
     return cfg
+
+
+def _claim_active(cfg: dict) -> bool:
+    """有効なクレーム（=他プロセスが実行中/直近実行）が存在するか"""
+    claim = cfg.get("claim")
+    if not claim:
+        return False
+    try:
+        at = datetime.fromisoformat(claim["at"])
+    except (KeyError, ValueError, TypeError):
+        return False
+    return (datetime.now() - at).total_seconds() < CLAIM_TTL_SEC
 
 
 def _log(app_name: str, task: dict, status: str, detail: str = "") -> None:
@@ -63,11 +80,21 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
     current_task = {"app": app_name, "id": task["id"], "title": task["title"],
                     "started": datetime.now().strftime("%H:%M")}
 
+    # アイデア由来の要件定義書があれば、実装のインプットとして参照させる
+    req_dir = Path(app_path) / "requirements"
+    req_hint = ""
+    if req_dir.exists() and any(req_dir.rglob("*.md")):
+        req_hint = (
+            "- 着手前に requirements/ 配下の要件定義書を読み、"
+            "アプリの目的・要件と整合する実装にすること\n"
+        )
+
     prompt = (
         f"あなたはこのアプリ（{app_name}）の自動開発エージェントです。以下の改善タスクを1件だけ実装してください。\n\n"
         f"【タスク】【{task['angle']}】{task['title']}\n"
         f"【説明】{task.get('desc', '')}\n\n"
         "【ルール】\n"
+        f"{req_hint}"
         "- このタスクのみに集中し、スコープを広げないこと\n"
         "- 既存機能を壊さないこと。可能ならテスト・動作確認を行うこと\n"
         "- 完了したら git add -A && git commit すること（コミットメッセージにタスク内容を含める）\n"
@@ -104,6 +131,11 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
         _log(app_name, task, f"⚠ エラー: {e}")
     finally:
         current_task = None
+        # 提案の完了状態と実行ログを確実に保管（best-effort）
+        await gitutil.commit_and_push(
+            [str(proposal_store._file_for(app_name)), str(LOG_FILE)],
+            f"autodev: {app_name} #{task['id']} {task['title'][:40]} の実行記録",
+        )
 
 
 async def autodev_loop() -> None:
@@ -115,6 +147,9 @@ async def autodev_loop() -> None:
             cfg = get_config()
             if not cfg["enabled"] or current_task is not None:
                 continue
+            # プロセス跨ぎの多重実行防止（uvicorn reload等でループが複数走った場合）
+            if _claim_active(cfg):
+                continue
             last_run = cfg.get("last_run") or ""
             if last_run:
                 elapsed = (datetime.now() - datetime.fromisoformat(last_run)).total_seconds()
@@ -124,9 +159,16 @@ async def autodev_loop() -> None:
             if nxt is None:
                 continue
             app_path, task = nxt
-            set_config(last_run=datetime.now().isoformat(timespec="seconds"))
+            now = datetime.now().isoformat(timespec="seconds")
+            set_config(
+                last_run=now,
+                claim={"app": Path(app_path).name, "id": task["id"], "at": now},
+            )
             print(f"[autodev] タスク実行: {Path(app_path).name} #{task['id']} {task['title']}")
-            await _run_task(app_path, task, cfg["model"])
+            try:
+                await _run_task(app_path, task, cfg["model"])
+            finally:
+                set_config(claim=None)
         except Exception as e:
             print(f"[autodev] ループエラー: {e}")
 

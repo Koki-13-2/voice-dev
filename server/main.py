@@ -12,10 +12,27 @@ import shutil
 import subprocess
 
 import autodev
+import gitutil
 import idea_store
 import proposal_store
 import secrets_store
 from claude_client import ClaudeClient, run_oneshot
+
+# 生成AIの生出力キャッシュ（パース失敗時の復旧・デバッグ用、gitignore対象）
+CACHE_DIR = Path(__file__).parent.parent / "cache"
+
+
+def _save_cache(kind: str, stem: str, text: str) -> str:
+    """AI生出力を必ずキャッシュに保存し、パスを返す（失敗しても本処理は止めない）"""
+    try:
+        d = CACHE_DIR / kind
+        d.mkdir(parents=True, exist_ok=True)
+        f = d / f"{stem}.txt"
+        f.write_text(text or "", encoding="utf-8")
+        return str(f)
+    except Exception as e:
+        print(f"[キャッシュ保存失敗] {kind}/{stem}: {e}")
+        return ""
 
 load_dotenv()
 
@@ -520,6 +537,9 @@ async def implement_idea(data: dict):
     req_file.write_text(body, encoding="utf-8")
 
     idea_store.update_meta(idea["id"], status="実装中", app_dir=str(app_dir))
+    # ステータス変更を確実に保管（best-effort）
+    await gitutil.commit_and_push(
+        [idea["path"]], f"idea: {idea['title']} の実装を開始（{app_dir.name}）")
     return JSONResponse({
         "name": app_dir.name, "path": str(app_dir), "plan_file": str(req_file),
     })
@@ -714,8 +734,16 @@ async def _run_chat(
 
 IDEA_PROMPT = """あなたはアプリ企画の専門家です。以下のユーザーの発話（アイデア）を、構造化された要件定義書に書き起こしてください。
 
-【出力ルール】
-- ツールは一切使わず、Markdownの要件定義書のみを出力すること（前置き・後書き禁止）
+【出力契約（システムが機械的に読み取るため厳守）】
+- ツールは一切使わないこと
+- 返答は次の形式「のみ」とすること。マーカーの外には前置き・後書き・コードフェンスなど一切何も書かないこと:
+
+<<<IDEA_START>>>
+# <アプリ名>
+（要件定義書Markdown本体）
+<<<IDEA_END>>>
+
+【要件定義書の構成】
 - 必ず `# <アプリ名>` の見出しで始めること（アプリ名は内容から適切に命名）
 - 以下のセクションを含めること:
   ## 概要 / ## ターゲットユーザー / ## 解決する課題 / ## 主要機能（表: # | 機能名 | 説明 | 優先度）/ ## 画面構成 / ## データ / ## 技術スタック案 / ## MVPスコープ / ## 元のアイデア（原文）
@@ -726,32 +754,82 @@ IDEA_PROMPT = """あなたはアプリ企画の専門家です。以下のユー
 {text}
 """
 
+IDEA_RETRY_SUFFIX = """
 
-async def _run_idea(session_id: str, text: str, model: str) -> None:
-    """要件定義モード: 1送信を要件定義書MDに変換してアイデアDBに保存する"""
-    queue = task_manager.get_or_create_queue(session_id)
+【重要】前回の返答は出力契約に違反していました（マーカー欠落または構造不足）。
+今回は必ず <<<IDEA_START>>> で始まり <<<IDEA_END>>> で終わる形式で、要件定義書のみを出力してください。
+"""
+
+
+async def _generate_oneshot(queue, prompt: str, model: str, *,
+                            work_dir: str | None = None,
+                            add_dir: str | None = None) -> tuple[str, str]:
+    """ワンショット生成をUIにストリームしつつ、(本文テキスト, resultテキスト) を返す"""
     buf: list[str] = []
     result_buf: list[str] = []
+    async for chunk in run_oneshot(prompt, model, work_dir=work_dir, add_dir=add_dir):
+        if chunk.get("type") == "text":
+            buf.append(chunk["content"])
+        elif chunk.get("type") == "result_text":
+            result_buf.append(chunk["content"])
+            continue  # resultテキストはUIに二重表示しない
+        await queue.put(chunk)
+    return "".join(buf).strip(), "".join(result_buf).strip()
+
+
+def _extract_idea(stream_text: str, result_text: str):
+    """本文→resultの順で要件定義書の抽出を試みる"""
+    for raw in (stream_text, result_text):
+        if not raw:
+            continue
+        extracted = idea_store.extract_document(raw)
+        if extracted:
+            return extracted
+    return None
+
+
+async def _run_idea(session_id: str, text: str, model: str) -> None:
+    """要件定義モード: 1送信を要件定義書MDに変換してアイデアDBに保存する。
+    出力契約(sentinel) → 抽出 → 検証 → 違反時は1回だけ自動再生成。生出力は必ずキャッシュ。
+    """
+    queue = task_manager.get_or_create_queue(session_id)
+    from datetime import datetime
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    cache_file = ""
     try:
         idea_store.IDEAS_DIR.mkdir(parents=True, exist_ok=True)
-        async for chunk in run_oneshot(
-            IDEA_PROMPT.format(text=text), model,
-            work_dir=str(idea_store.IDEAS_DIR),
-        ):
-            if chunk.get("type") == "text":
-                buf.append(chunk["content"])
-            elif chunk.get("type") == "result_text":
-                result_buf.append(chunk["content"])
-            await queue.put(chunk)
-        content = "".join(buf).strip()
-        if not content and result_buf:
-            content = "".join(result_buf).strip()
-            print(f"[要件定義] resultフォールバック使用: {len(content)}文字")
-        if content:
+        prompt = IDEA_PROMPT.format(text=text)
+
+        stream_text, result_text = await _generate_oneshot(
+            queue, prompt, model, work_dir=str(idea_store.IDEAS_DIR))
+        cache_file = _save_cache("idea", ts, stream_text + "\n\n===RESULT===\n\n" + result_text)
+
+        extracted = _extract_idea(stream_text, result_text)
+
+        # 書式違反（抽出不能 or 構造不足）→ 矯正プロンプトで1回だけ再生成
+        if not extracted or not idea_store.validate_document(extracted[0]):
+            await queue.put({"type": "notice",
+                             "content": "書式を検証中: 出力契約違反を検出したため再生成します..."})
+            print(f"[要件定義] 書式違反を検出、リトライ実行 (extracted={bool(extracted)})")
+            stream_text2, result_text2 = await _generate_oneshot(
+                queue, prompt + IDEA_RETRY_SUFFIX, model, work_dir=str(idea_store.IDEAS_DIR))
+            _save_cache("idea", f"{ts}-retry", stream_text2 + "\n\n===RESULT===\n\n" + result_text2)
+            # リトライ結果を優先、ダメなら初回の抽出結果（検証は通らずとも保存を優先）
+            extracted = _extract_idea(stream_text2, result_text2) or extracted
+
+        if extracted:
+            content, method = extracted
             idea = idea_store.save_idea(content, text)
-            await queue.put({"type": "idea_saved", "idea": idea})
+            print(f"[要件定義] 保存: {idea['id']} ({method}抽出, valid={idea_store.validate_document(content)})")
+            await queue.put({"type": "idea_saved", "idea": idea, "method": method})
+            # 蓄積を確実に保管（best-effort git commit + push）
+            await gitutil.commit_and_push(
+                [idea["path"]], f"idea: {idea['title']} を蓄積")
         else:
-            await queue.put({"type": "error", "content": "要件定義書の生成に失敗しました"})
+            await queue.put({
+                "type": "error",
+                "content": f"要件定義書の抽出に失敗しました（リトライ済み）。生出力はキャッシュに保存済み: {cache_file}",
+            })
     except Exception as e:
         print(f"[要件定義エラー] session={session_id}: {e}")
         await queue.put({"type": "error", "content": str(e)})
@@ -762,23 +840,51 @@ async def _run_idea(session_id: str, text: str, model: str) -> None:
 
 PROPOSE_PROMPT = """あなたはこのアプリ（{app_name}）の改善提案の専門家です。コードベースを読み、改善提案を10件程度生成してください。
 
-【出力ルール】
-- 分析後、最終出力は以下のフォーマットの箇条書き「のみ」を出力すること（1行1提案、前置き・見出し・後書き禁止）:
+【出力契約（システムが機械的に読み取るため厳守）】
+- 分析にはツール（ファイル読み取り）を使ってよいが、ファイルの変更・作成は一切行わないこと
+- 最終返答は必ず次の形式で締めくくること。マーカーの間は「1行1提案」の箇条書きのみとし、
+  マーカーの外に提案行を書かないこと:
 
+<<<PROPOSALS_START>>>
 - 【カテゴリ/規模】タイトル — 説明（1文）
+- 【カテゴリ/規模】タイトル — 説明（1文）
+<<<PROPOSALS_END>>>
 
+【提案のルール】
 - カテゴリは 機能 / UI/UX / 性能 / セキュリティ / テスト / 運用 から選び、様々な角度をバランスよく含めること
 - 規模は 小 / 中 / 大 で、1タスク30分以内で実装可能な粒度に分割すること（大きい提案は分割する）
-- ファイルの変更・作成は一切行わないこと（読み取りのみ）
+- タイトルと説明はダッシュ（—）で区切ること
 {existing_section}{user_hint}"""
+
+PROPOSE_RETRY_SUFFIX = """
+
+【重要】前回の返答は出力契約に違反しており、提案を1件も読み取れませんでした。
+今回は必ず <<<PROPOSALS_START>>> と <<<PROPOSALS_END>>> の間に
+`- 【カテゴリ/規模】タイトル — 説明` 形式の行のみを出力してください。ツールは使わず、直前の分析結果から提案リストだけを出力し直してください。
+"""
+
+
+def _parse_proposals(stream_text: str, result_text: str) -> tuple[list, str]:
+    """本文→resultの順で、sentinel抽出→緩いパースを試みる。(tasks, 抽出方法)"""
+    for raw in (stream_text, result_text):
+        if not raw:
+            continue
+        block, method = proposal_store.extract_block(raw)
+        tasks = proposal_store.parse_generated(block)
+        if tasks:
+            return tasks, method
+    return [], "none"
 
 
 async def _run_propose(session_id: str, text: str, project_path: str, model: str) -> None:
-    """追加提案蓄積モード: アプリを解析して改善提案を生成・蓄積する"""
+    """追加提案蓄積モード: アプリを解析して改善提案を生成・蓄積する。
+    出力契約(sentinel) → 抽出 → パース → 0件なら1回だけ自動再生成。生出力は必ずキャッシュ。
+    """
     queue = task_manager.get_or_create_queue(session_id)
     app_name = Path(project_path).name
-    buf: list[str] = []
-    result_buf: list[str] = []
+    from datetime import datetime
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    cache_file = ""
     try:
         existing = proposal_store.load(project_path)["tasks"]
         existing_section = ""
@@ -790,27 +896,40 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
         prompt = PROPOSE_PROMPT.format(
             app_name=app_name, existing_section=existing_section, user_hint=user_hint)
 
-        async for chunk in run_oneshot(prompt, model, add_dir=project_path):
-            if chunk.get("type") == "text":
-                buf.append(chunk["content"])
-            elif chunk.get("type") == "result_text":
-                result_buf.append(chunk["content"])
-            await queue.put(chunk)
+        stream_text, result_text = await _generate_oneshot(
+            queue, prompt, model, add_dir=project_path)
+        cache_file = _save_cache(
+            "propose", f"{app_name}-{ts}",
+            stream_text + "\n\n===RESULT===\n\n" + result_text)
 
-        raw_text = "".join(buf)
-        tasks = proposal_store.parse_generated(raw_text)
+        tasks, method = _parse_proposals(stream_text, result_text)
 
-        if not tasks and result_buf:
-            raw_text = "".join(result_buf)
-            tasks = proposal_store.parse_generated(raw_text)
-            print(f"[提案パース] resultフォールバック使用: {len(tasks)}件")
+        # 1件もパースできない → 矯正プロンプトで1回だけ再生成
+        if not tasks:
+            await queue.put({"type": "notice",
+                             "content": "書式を検証中: 提案を読み取れなかったため再生成します..."})
+            print(f"[提案パース] 0件のためリトライ実行 app={app_name}")
+            stream_text2, result_text2 = await _generate_oneshot(
+                queue, prompt + PROPOSE_RETRY_SUFFIX, model, add_dir=project_path)
+            _save_cache("propose", f"{app_name}-{ts}-retry",
+                        stream_text2 + "\n\n===RESULT===\n\n" + result_text2)
+            tasks, method = _parse_proposals(stream_text2, result_text2)
 
         added = proposal_store.add_tasks(project_path, tasks) if tasks else 0
-        print(f"[提案パース] app={app_name} パース={len(tasks)}件 追加={added}件 buf={len(raw_text)}文字")
+        print(f"[提案パース] app={app_name} 抽出={method} パース={len(tasks)}件 追加={added}件")
 
-        preview = raw_text[:300] if not tasks else ""
-        await queue.put({"type": "proposals_updated", "added": added,
-                         "app_path": project_path, "raw_preview": preview})
+        await queue.put({
+            "type": "proposals_updated",
+            "parsed": len(tasks),
+            "added": added,
+            "app_path": project_path,
+            "cache_file": cache_file if not tasks else "",
+        })
+        if added > 0:
+            # 蓄積を確実に保管（best-effort git commit + push）
+            await gitutil.commit_and_push(
+                [str(proposal_store._file_for(app_name))],
+                f"proposals: {app_name} に{added}件の提案を蓄積")
     except Exception as e:
         print(f"[提案生成エラー] session={session_id}: {e}")
         await queue.put({"type": "error", "content": str(e)})

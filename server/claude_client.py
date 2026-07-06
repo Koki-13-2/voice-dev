@@ -150,7 +150,10 @@ class ClaudeClient:
             print(f"[stdout読み込みエラー] {e}")
             yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
         finally:
-            proc.kill()
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass  # 既に正常終了している場合
 
         rc = await proc.wait()
         if rc != 0:
@@ -236,7 +239,10 @@ async def run_oneshot(
     except Exception as e:
         yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
     finally:
-        proc.kill()
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            pass  # 既に正常終了している場合
 
     rc = await proc.wait()
     if rc != 0:
