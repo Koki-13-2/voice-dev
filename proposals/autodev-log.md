@@ -32,3 +32,26 @@
 
 ```
 
+## 2026-07-07 08:38 — gh_portal #4 未使用テーブルjob_tasks/job_task_comments/job_task_readsの画面実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+プッシュ完了。実装内容を確認します。
+
+実装が完了しました。変更内容のまとめ：
+
+**AdminJob.tsx（管理者側）に追加:**
+- `AdminJobTaskSection` — 案件詳細の下部に表示されるタスク一覧セクション。タスクカード（未読バッジ・ステータスバッジ）、並び替え（↑↓）、「タスクを追加」ボタンを含む
+- `JobTaskThread` — タスクカードタップで開く全画面チャットスレッド。Supabaseリアルタイム購読付き、開いた時点で既読更新（`job_task_reads` upsert）、管理者はステータスをドロップダウンで変更可能
+- `JobTaskFormSheet` — タスク作成・編集・削除フォーム（ボトムシート形式）。削除は確認ダイアログ付き
+
+**Job.tsx（講師側）に追加:**
+- `TeacherJobTaskSection` — 受注確定済み（`isApproved`）の案件のみ表示。閲覧・投稿のみ（作成・削除・並び替えボタンなし）
+- `TeacherJobTaskThread` — 講師用チャットスレッド（既読管理・リアルタイム更新）
+
+要件定義書（`requirements/admin/screens/subscreens/job-tasks.md`）に従い、管理者フローと講師フローを実装しました。TypeScriptビルドも通過し、コミット・プッシュ済みです。
+
+```
+
