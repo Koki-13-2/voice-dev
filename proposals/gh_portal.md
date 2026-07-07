@@ -22,7 +22,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/小】GoalPanelの受験日表示をDBから取得 — Dashboard.tsx:1560で「2027-01-23（土）共通テスト」がハードコードされており、student_profiles.exam_dateから動的に表示すべき <!-- id:15 done:2026-07-07T14:32 -->
 - [ ] 【性能/小】LifePatternContextの楽観的更新ロールバック実装 — addPatternで仮IDによる楽観的更新を行うがDB insert失敗時にロールバックされず、UIに存在しないパターンが残り続ける問題を修正する <!-- id:16 -->
 - [x] 【UI/UX/小】Dashboard生徒画面のスケジュール読み込み中表示追加 — pills配列が空の初期状態と実際にスケジュールがない状態が区別できず、ローディングインジケーターが表示されない問題を修正する <!-- id:17 done:2026-07-07T15:03 -->
-- [x] 【セキュリティ/小】saveLifeSlotsToDbのdelete→insert原子性確保 — Dashboard.tsx:137-162でdelete成功後にinsertが失敗するとスロットデータが消失するため、エラーチェックと失敗時の通知を追加する <!-- id:18 -->
+- [x] 【セキュリティ/小】saveLifeSlotsToDbのdelete→insert原子性確保 — Dashboard.tsx:137-162でdelete成功後にinsertが失敗するとスロットデータが消失するため、エラーチェックと失敗時の通知を追加する <!-- id:18 done:2026-07-07T15:33 -->
 - [x] 【UI/UX/小】Timeline.tsxいいねトグルの失敗時ロールバック追加 — toggleLikeで楽観的更新後にDB同期が失敗してもUIが戻らない問題を修正し、エラー時に元の状態に復元する <!-- id:19 -->
 - [x] 【機能/中】Practice.tsxレーダーチャート・成績推移のDB化 — RADAR_SCORESとSCORE_HISTORYが完全にハードコードされており、auto_score_resultsテーブルの実データから集計表示するよう置き換える <!-- id:20 -->
 - [ ] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 -->

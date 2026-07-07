@@ -291,3 +291,19 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 15:33 — gh_portal #18 saveLifeSlotsToDbのdelete→insert原子性確保
+
+- 結果: ✅ 成功
+
+```
+完了です。
+
+**変更内容:**
+- `saveLifeSlotsToDb` の delete / insert 両操作の戻り値を分割代入で受け取り、エラーがあれば即 `throw`
+- delete 失敗時はデータ消失のリスクなくアーリーリターン
+- **insert が delete 後に失敗した場合**（データ消失シナリオ）にエラーをスロー → 呼び出し元でキャッチ
+- `saveSlotError` state を追加し、エラー時に画面上部へ「スケジュールの保存に失敗しました」バナーを 4 秒間表示
+- push 済み（`main` @ `8e28d72`）
+
+```
+
