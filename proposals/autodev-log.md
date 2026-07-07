@@ -944,3 +944,18 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:28 — gh_portal #51 Chat モックメッセージフォールバックを空状態UIに置換
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+- `teacherChatMessages` / `channelMessages` の初期値を `TEACHER_MESSAGES` / `CHANNEL_MESSAGES` から `[]` に変更
+- `initRoom` / `initChannelRoom` のリセット処理もそれぞれ `[]` に変更
+- Supabase 0件時のフォールバック（`msgs.length > 0 ? ... : MOCK_DATA`）を除去し、素直に `msgs.map(...)` へ
+- 講師チャット（生徒視点）、講師チャット（講師→個別生徒視点）、チャンネルの3箇所に「まだメッセージはありません」の空状態UIを追加
+
+```
+

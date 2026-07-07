@@ -55,6 +55,6 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/小】Dashboard dailyComment死フィールドの除去 — TeacherStudentDataのdailyCommentが常に空文字で設定されUIでも未使用のため、型定義と代入を削除する <!-- id:48 done:2026-07-08T01:09 -->
 - [x] 【機能/小】Chat QUIZ_BANKのDB化 — スレッドクイズ生成で使用する科目別問題テンプレートがChat.tsx内にハードコードされているため、exercise_questionsテーブルから動的取得する <!-- id:49 done:2026-07-08T01:17 -->
 - [x] 【機能/小】Chat threadMessagesデモデータの除去と空状態UI追加 — AIルームa6に毎回ハードコードされたデモスレッドが表示されるため、初期状態を空にしDB保存済みスレッドのみ表示する <!-- id:50 done:2026-07-08T01:23 -->
-- [x] 【機能/小】Chat モックメッセージフォールバックを空状態UIに置換 — Supabase返却0件時にTEACHER_MESSAGES・CHANNEL_MESSAGESをフォールバック表示する処理を「まだメッセージはありません」等の空状態UIに置き換える <!-- id:51 -->
+- [x] 【機能/小】Chat モックメッセージフォールバックを空状態UIに置換 — Supabase返却0件時にTEACHER_MESSAGES・CHANNEL_MESSAGESをフォールバック表示する処理を「まだメッセージはありません」等の空状態UIに置き換える <!-- id:51 done:2026-07-08T01:28 -->
 - [x] 【機能/中】Onboarding志望校入力をuniversitiesテーブルのサジェスト選択に変更 — 志望校が自由テキスト入力だがDBにuniversitiesテーブル（name, sort_order）が存在するため、入力をオートコンプリート付きセレクトに切り替え表記揺れを防止する <!-- id:52 -->
 - [x] 【機能/小】AdminJob CATEGORY_OPTIONSの動的取得 — ジョブカテゴリが5項目ハードコードされているため、jobsテーブルのcategory列のDISTINCT値を取得し動的リスト化する <!-- id:53 -->
