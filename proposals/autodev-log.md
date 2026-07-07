@@ -690,3 +690,33 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 20:14 — gh_portal #37 Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。変更内容をまとめます。
+
+---
+
+**変更内容**
+
+**TeacherPractice.tsx — `PdfPane`**
+- `totalPages` prop を廃止し、`url?: string` prop を追加
+- URL がある場合: `<iframe>` でSupabase Storage の署名付きURLからPDFを直接表示 ＋「別タブで開く」リンク
+- URL がない場合: 従来のグレープレースホルダー
+
+- `PendingItem` / `ReturnedItem` に `studentPdfPath` / `modelPdfPath` フィールドを追加
+- データロード時に `corrections` テーブルからパスを取得してセット
+- `ReviewScreen` / `ReturnedDetailScreen` で `useEffect` により署名付きURL（有効期限1時間）を生成して `PdfPane` に渡す
+
+**Practice.tsx — `PdfViewer`**
+- `pages` prop を廃止し、`url?: string` prop を追加
+- URL がある場合: `<iframe>` ＋「別タブで開く」リンク
+- URL がない場合: グレープレースホルダー
+
+- `FeedbackDetail` に `useEffect` を追加し、`corrections.student_pdf_path`（= `item.filename`）から署名付きURLを生成して `PdfViewer` に渡す
+- 過去問問題用紙は `tests` テーブルにPDFカラムが未存在のため、プレースホルダーを維持
+
+```
+
