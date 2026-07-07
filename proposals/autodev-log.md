@@ -796,3 +796,12 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 23:59 — gh_portal #42 Dashboard死コードTODAY_PILLSの削除
+
+- 結果: ✅ 成功
+
+```
+完了。`Dashboard.tsx` の L29–37 にあった未使用定数 `TODAY_PILLS`（9行）を削除し、型チェックを通過後にコミット・push しました。
+
+```
+
