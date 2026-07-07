@@ -904,3 +904,20 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:17 — gh_portal #49 Chat QUIZ_BANKのDB化
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容まとめ:**
+
+- `QUIZ_BANK` 定数（52行）を削除し、代わりに `ROOM_SUBJECT_MAP`（roomId → 日本語科目名）と `fetchQuizForRoom` 非同期関数を追加
+- `fetchQuizForRoom` は `exercise_questions` テーブルから対象科目の公開問題を最大20件取得し、ランダムに1問選んで `ChatMessage` 形式に変換（`answer` フィールドの 'A'〜'D' を 0-based インデックスに変換）
+- `handleThreadSend` を `async` 化し、DBフェッチと700ms待機を `Promise.all` で並行実行することで応答速度を維持
+- DBに問題がない場合は従来どおりテキスト応答にフォールバック
+- ビルド成功・push 済み
+
+```
+
