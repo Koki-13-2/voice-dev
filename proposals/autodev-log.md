@@ -113,3 +113,24 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 10:30 — gh_portal #5 Contents画面の書き込み機能追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容：**
+
+- **`contents` クエリに `url` を追加**し、`content_progress` からも `last_position_sec` / `total_watch_sec` / `started_at` / `is_completed` を取得するように拡張
+- **`VideoDetail` コンポーネント**を新規追加：
+  - lecture カードタップで `.modal-overlay` オーバーレイを表示
+  - `last_position_sec` から自動で再生再開（`onLoadedMetadata` で seek）
+  - **1秒ごとの tick** で実際の再生時間（`total_watch_sec`）を正確に積算
+  - **30秒ごとの定期保存** + 動画終了時 + オーバーレイ閉じ時に `content_progress` へ UPSERT（`onConflict: 'user_id,content_id'`）
+  - `watch_pct >= 90` で `is_completed = true` を自動セット
+  - シーク後退してもパーセントが下がらないよう `maxPctRef` で管理
+- **`handleProgressSaved`** で保存後にカードの進捗バッジをリアルタイム更新
+
+```
+
