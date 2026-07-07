@@ -207,3 +207,24 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 13:01 — gh_portal #12 tutorialDone状態のDB永続化
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容：
+
+**問題**: `completeTutorial()` が localStorage のみに書き込んでいたため、ブラウザデータ消去でチュートリアル完了状態がリセットされる。
+
+**修正内容**:
+1. **マイグレーション** (`20260707000003_...sql`): `profiles` テーブルに `tutorial_done boolean NOT NULL DEFAULT false` を追加
+2. **`AuthContext.tsx`**:
+   - `fetchProfile()` で `tutorial_done` をDBから取得
+   - `completeTutorial()` で Supabase への書き込みを追加（楽観的更新）
+   - ログイン時にDB値を正として同期。DB未書き込み（失敗キャッシュ）を検知したら自動リトライ
+3. **`database.types.ts`**: `profiles` の Row/Insert/Update に `tutorial_done` の型定義を追加
+
+要件書の「完了フラグの送信失敗時はローカルにキャッシュし、次回起動時にリトライする」も対応済みです。なお、Supabase 側でのマイグレーション適用（`supabase db push` 等）は別途必要です。
+
+```
+
