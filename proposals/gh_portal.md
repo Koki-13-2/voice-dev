@@ -39,7 +39,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 done:2026-07-07T19:47 -->
 - [x] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 done:2026-07-07T19:53 -->
 - [ ] 【機能/中】Chat AIルームのsetTimeout擬似応答をOpenAI API呼び出しに置換 — AI_SENDER・QUIZ_BANKをローカル定数で持つのをやめ、@AIメッセージ送信時にEdge Function経由でOpenAI APIを呼び出し実際のAI応答を返す <!-- id:34 -->
-- [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 -->
+- [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 done:2026-07-07T20:01 -->
 - [x] 【機能/小】Practice・TeacherPracticeのハードコード日付をnew Date()に修正 — Practice.tsx L981の`new Date('2026-04-16')`とTeacherPractice.tsx L147の`new Date('2026-04-14')`を現在日付に置換する <!-- id:36 -->
 - [x] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 -->
 - [x] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 -->

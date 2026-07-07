@@ -650,3 +650,29 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 20:01 — gh_portal #35 Practice演習問題QUESTIONSのDB化
+
+- 結果: ✅ 成功
+
+```
+完了です。実施した内容をまとめます：
+
+**変更内容：**
+
+1. **`supabase/migrations/20260707000006_exercise_questions.sql`（新規）**
+   - `exercise_questions` テーブルを新設（id, sort_order, subject, category, body, option_a〜d, answer, explanation, is_published, created_at）
+   - RLS を有効化し、認証済みユーザーの `SELECT` と講師/admin の全操作を許可
+   - 旧ハードコード2問（仮定法英文法）を初期データとして INSERT
+
+2. **`src/pages/Practice.tsx`**
+   - ハードコードの `QUESTIONS` 定数（29行）を削除
+   - `activeQuestions` の初期値を `QUESTIONS` → `[]` に変更
+   - `startQuiz` で `testId` がない場合に `exercise_questions` テーブルから `sort_order` 昇順で取得するよう変更
+
+3. **`src/lib/database.types.ts`**
+   - `exercise_questions` テーブルの型定義（Row/Insert/Update）を追加し TypeScript エラーを解消
+
+> **注意：** マイグレーションは Supabase ダッシュボードまたは `supabase db push` で適用が必要です。適用後はサンプル2問が DB に入り、startQuiz(testId 未指定) 時に DB から取得されます。
+
+```
+
