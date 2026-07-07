@@ -395,3 +395,23 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 18:46 — gh_portal #21 AssignNotification承諾・相談フローのエラーハンドリング追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容をまとめます。
+
+**実装した変更（`src/components/AssignNotification.tsx`）**
+
+- `AssignNotificationManager` に `error` state を追加
+- `handleAccept`：各DB操作（update→insert chat_room→insert room_members）の戻り値のエラーをチェックし、失敗時はエラーメッセージをセットしてearly returnする。UIは進まない
+- `handleConsult`：各DB操作（update→profiles select→insert chat_room→insert room_members→insert message→update consult_room_id）を同様にチェック
+- `AssignNotificationPopup` にエラーバナー（`an-error`）を追加。×ボタンで閉じられる
+
+**`src/styles/globals.css`** にエラーバナーのスタイルを追加（赤系ボーダー・背景）
+
+コミット `cbdc441` に全変更が含まれており、リモートにも反映済みです。
+
+```
+
