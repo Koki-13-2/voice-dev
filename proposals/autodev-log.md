@@ -96,3 +96,20 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 09:58 — gh_portal #3 MeetingFeedbackContextのlocalStorage→DB移行
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+
+1. **`MeetingFeedbackContext.tsx`**: localStorage を完全に削除し、`MeetingRecordContext` と同パターンで `useEffect` + Supabase の `meeting_feedbacks` テーブルからDBフェッチに変更。`addFeedback` は DB insert 済みの楽観的ステート更新のみ。
+
+2. **`Dashboard.tsx`** (関連バグ修正):
+   - フィードバック送信後に `meeting_records.feedback_pending = false` を更新 → 次回ロード時に通知が再表示されるバグを修正
+   - 完了画面クローズ時に `dbPendingRecord` をクリア → 同セッション内の再表示も防止
+
+```
+

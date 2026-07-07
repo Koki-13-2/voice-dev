@@ -7,7 +7,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 
 - [x] 【運用/中】database.types.tsの再生成 — `supabase gen types`を実行し、コードで使用中だが型定義未反映の11テーブル（student_subjects, departments, meeting_records等）をdatabase.types.tsに追加して`(supabase as any)`キャストを全廃する <!-- id:1 done:2026-07-07T09:02 -->
 - [x] 【セキュリティ/小】MeetingRecordContextのlocalStorage→DB移行 — 面談記録（MeetingRecordContext）がlocalStorageのみに保存されており、Dashboard.tsxではmeeting_recordsテーブルへの読み書きが既に実装済みなのでContextをDB参照に統一する <!-- id:2 done:2026-07-07T09:28 -->
-- [x] 【セキュリティ/小】MeetingFeedbackContextのlocalStorage→DB移行 — 面談フィードバック（MeetingFeedbackContext）もlocalStorageのみだが、Dashboard.tsxではmeeting_feedbacksテーブルへのINSERTが実装済みなのでContextをDB参照に統一する <!-- id:3 -->
+- [x] 【セキュリティ/小】MeetingFeedbackContextのlocalStorage→DB移行 — 面談フィードバック（MeetingFeedbackContext）もlocalStorageのみだが、Dashboard.tsxではmeeting_feedbacksテーブルへのINSERTが実装済みなのでContextをDB参照に統一する <!-- id:3 done:2026-07-07T09:58 -->
 - [x] 【機能/小】未使用テーブルjob_tasks/job_task_comments/job_task_readsの画面実装 — database.types.tsにタスク管理スキーマが定義済みだがどの画面からもアクセスされていないため、AdminJobまたはJob画面にタスク管理UIを追加する <!-- id:4 done:2026-07-07T08:38 -->
 - [x] 【機能/小】Contents画面の書き込み機能追加 — Contents.tsxはcontent_progressのSELECTのみで視聴進捗の更新（UPDATE/UPSERT）を行っていないため、動画視聴時にwatch_pctとlast_position_secを記録する処理を追加する <!-- id:5 -->
 - [x] 【性能/小】Dashboard.tsxのクエリ分割とキャッシュ — 4316行の巨大コンポーネントで講師ダッシュボードのfetchStudents()が5テーブルを同時にPromise.allで取得しており、担当生徒数増加時に重くなるためページネーションまたはSWR的キャッシュを導入する <!-- id:6 -->
