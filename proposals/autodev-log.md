@@ -869,3 +869,14 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 00:57 — gh_portal #46 Dashboard weakPoints保存ボタンのSupabase永続化
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+`Dashboard.tsx:4140-4149` の保存ボタン `onClick` を `async` 関数に変更し、`onChange` 呼び出しの前に `supabase.from('student_profiles').upsert({ id: student.id, memo: weakPoints }, { onConflict: 'id' })` を追加しました。これにより、講師が弱点メモを保存するたびに `student_profiles.memo` カラムに書き込まれ、再読み込み後も内容が保持されます。
+
+```
+
