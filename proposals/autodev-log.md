@@ -78,3 +78,21 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 09:28 — gh_portal #2 MeetingRecordContextのlocalStorage→DB移行
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容まとめ：**
+
+- **`src/lib/MeetingRecordContext.tsx`** — localStorage を完全削除。`useEffect` で Supabase の `meeting_records` テーブルから取得するよう変更。
+  - 講師ロール：`teacher_id` で絞り込み、生徒名を `profiles!meeting_records_student_id_fkey` でJOIN
+  - 生徒ロール：`student_id` で絞り込み、講師名を `profiles!meeting_records_teacher_id_fkey` でJOIN
+  - `addRecord()` はDBへの挿入は行わず、既にSupabaseに挿入済みのレコードをオプティミスティックに先頭追加するのみ（実挿入は `MtgWorkflowScreen.handleSave` 側）
+
+- **`src/pages/Dashboard.tsx`** — StudentDashboard から localStorage フォールバック（`localPending`）を削除。`pendingRecord` は直接 `dbPendingRecord` を参照するように簡略化。
+
+```
+
