@@ -58,8 +58,8 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Chat モックメッセージフォールバックを空状態UIに置換 — Supabase返却0件時にTEACHER_MESSAGES・CHANNEL_MESSAGESをフォールバック表示する処理を「まだメッセージはありません」等の空状態UIに置き換える <!-- id:51 done:2026-07-08T01:28 -->
 - [x] 【機能/中】Onboarding志望校入力をuniversitiesテーブルのサジェスト選択に変更 — 志望校が自由テキスト入力だがDBにuniversitiesテーブル（name, sort_order）が存在するため、入力をオートコンプリート付きセレクトに切り替え表記揺れを防止する <!-- id:52 done:2026-07-08T01:35 -->
 - [x] 【機能/小】AdminJob CATEGORY_OPTIONSの動的取得 — ジョブカテゴリが5項目ハードコードされているため、jobsテーブルのcategory列のDISTINCT値を取得し動的リスト化する <!-- id:53 done:2026-07-08T01:39 -->
-- [ ] 【セキュリティ/小】AdminRoute・OwnerRouteのlocalStorage信頼脆弱性修正 — App.tsxのAdminRoute/OwnerRouteがprofileReady前にlocalStorageのisAdmin/isOwnerを信頼しており、DevToolsで改竄するとDB確認前に管理画面へアクセスできるため、profileReady完了までのガード条件を追加する <!-- id:54 -->
-- [ ] 【セキュリティ/小】Register.tsx pending_roleのsessionStorage注入防止 — sessionStorageのpending_roleを検証せずprofilesテーブルに書き込んでおり、ユーザーが'admin'等を設定できるため、'student'|'teacher'のホワイトリスト検証を追加する <!-- id:55 -->
+- [x] 【セキュリティ/小】AdminRoute・OwnerRouteのlocalStorage信頼脆弱性修正 — App.tsxのAdminRoute/OwnerRouteがprofileReady前にlocalStorageのisAdmin/isOwnerを信頼しており、DevToolsで改竄するとDB確認前に管理画面へアクセスできるため、profileReady完了までのガード条件を追加する <!-- id:54 done:2026-07-08T08:28 -->
+- [x] 【セキュリティ/小】Register.tsx pending_roleのsessionStorage注入防止 — sessionStorageのpending_roleを検証せずprofilesテーブルに書き込んでおり、ユーザーが'admin'等を設定できるため、'student'|'teacher'のホワイトリスト検証を追加する <!-- id:55 -->
 - [ ] 【セキュリティ/小】storage.tsファイルアップロードのサイズ・ファイル名バリデーション追加 — storage.tsのupload関数がファイルサイズ・空ファイル名を検証せずSupabase Storageへ送信しているため、クライアント側でサイズ上限と空名チェックを追加する <!-- id:56 -->
 - [ ] 【性能/小】Practice.tsx useEffect依存配列の[user]→[user?.id]修正 — fetchTests useEffect（558行目）の依存配列が[user]オブジェクト参照のため、無関係なuserプロパティ変更でも全データ再取得が走るので[user?.id]に修正する <!-- id:57 -->
 - [ ] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 -->

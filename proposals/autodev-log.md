@@ -995,3 +995,22 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:28 — gh_portal #54 AdminRoute・OwnerRouteのlocalStorage信頼脆弱性修正
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**修正内容**: `App.tsx` の `AdminRoute`・`OwnerRoute` を修正し、`loading || !profileReady` の間は常にローディング画面を表示するようにしました。
+
+**修正前の問題点**:
+- `loading=false` かつ `profileReady=false`（DBフェッチ中）の状態で `user.isAdmin=true`（localStorageキャッシュ）なら即座に管理画面へ入れていた
+- DevToolsで `gh_portal_is_admin_<uid>` を `"true"` に書き換えると誰でも管理画面にアクセスできた
+
+**修正後の動作**:
+- `profileReady=true`（`fetchProfile`のDB確認完了）まで必ずローディング表示
+- DB確定値のみで `isAdmin`/`isOwner` を判断するため、localStorageを改竄しても無効
+
+```
+
