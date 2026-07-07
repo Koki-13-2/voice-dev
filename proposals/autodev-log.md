@@ -245,3 +245,18 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 14:02 — gh_portal #14 Chat.txチャンネル一覧のDB化
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容のまとめ:
+
+- **削除**: `CHANNELS` ハードコード定数（3件のモックデータ）
+- **追加**: `channels` / `channelsLoading` state
+- **追加**: `chat_rooms` テーブルから `type='group'` のルームを取得する `useEffect`（Supabase RLS により自分がメンバーのルームのみ返る）
+- **簡略化**: `initChannelRoom` 内の「名前でDBを検索」ロジックを削除。`activeChannel` がそのまま `chat_rooms.id`（UUID）になったため不要
+- **追加**: チャンネル一覧にローディング中・空状態のUI
+
+```
+
