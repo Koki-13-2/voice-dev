@@ -550,3 +550,23 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:32 — gh_portal #29 Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容のまとめ：
+
+**`src/pages/Practice.tsx` への変更（3箇所）**
+
+1. **未読数 state の追加**（`StudentPractice`）  
+   `const [unreadCount, setUnreadCount] = useState(0)` を追加
+
+2. **未読数フェッチの `useEffect` 追加**（`StudentPractice`）  
+   `corrections` テーブルで `status = 'returned'` かつ `is_read_by_student = false` の件数を Supabase の `count` クエリで取得し、ホーム画面のバッジに反映
+
+3. **既読更新の `useEffect` 追加**（`FeedbackDetail`）  
+   `item.read === false` の場合のみ、`corrections.is_read_by_student = true` へ DB 更新し、`onRead` コールバック経由でカウントをデクリメント（要件「既読状態を自動で更新」に対応）
+
+```
+

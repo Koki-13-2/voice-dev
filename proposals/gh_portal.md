@@ -33,7 +33,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 done:2026-07-07T19:15 -->
 - [x] 【機能/小】room_members.last_read_atを用いたチャット未読バッジの実装 — DBにlast_read_atカラムが存在するが未使用で未読表示がモックデータに依存している <!-- id:27 done:2026-07-07T19:23 -->
 - [x] 【機能/小】Practice連続学習日数をtest_submissions提出日から動的算出 — PracticeHomeバナーの「連続学習 5日」が固定リテラルで実際の学習記録と未接続 <!-- id:28 done:2026-07-07T19:25 -->
-- [x] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 -->
+- [x] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 done:2026-07-07T19:32 -->
 - [x] 【機能/中】Timelineコメントいいねのテーブル新設とDB永続化 — toggleReplyLikeがローカルstate更新のみで対応DBテーブルが未定義のためリロードでいいね状態が消える <!-- id:30 -->
 - [x] 【機能/小】Timeline投稿の画像添付UI実装 — posts.image_urlsカラムがDBに存在するが投稿作成UIに画像アップロード機能がなく常時null <!-- id:31 -->
 - [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 -->
