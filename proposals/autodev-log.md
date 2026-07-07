@@ -276,3 +276,18 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 15:03 — gh_portal #17 Dashboard生徒画面のスケジュール読み込み中表示追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:**
+
+- `Dashboard.tsx`: `pillsLoading` state を追加し、`fetchDashboard()` 実行開始時に `true`、完了時（または失敗時）に `false` をセット
+- `DailyPanel` に `pillsLoading` プロップを追加し、`pills.length === 0` かつローディング中は回転スピナー + 「読み込み中...」を表示、ローディング完了後にスケジュールがない場合のみ「この日の予定はまだ設定されていません」メッセージを表示
+- `globals.css`: `@keyframes spin` アニメーションを追加
+
+```
+
