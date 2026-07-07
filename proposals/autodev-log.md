@@ -979,3 +979,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:39 — gh_portal #53 AdminJob CATEGORY_OPTIONSの動的取得
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容まとめ：**
+
+- `CATEGORY_OPTIONS` ハードコード定数を `FALLBACK_CATEGORY_OPTIONS` にリネーム（DB未取得時の安全網として保持）
+- `AdminJob` に `categoryOptions` stateを追加（初期値はフォールバック）
+- ジョブ一覧取得後、全行の `category_tags[]` を `flatMap` → `Set` で重複排除 → ソートして `setCategoryOptions` に設定。取得値が空の場合はフォールバックを使用
+- `AdminJobForm` の props に `categoryOptions: string[]` を追加し、フォーム内のタグ選択ボタン描画に使用
+
+```
+
