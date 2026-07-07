@@ -536,3 +536,17 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:25 — gh_portal #28 Practice連続学習日数をtest_submissions提出日から動的算出
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容：
+
+- `test_submissions` クエリに `submitted_at` を追加
+- フェッチ完了後に提出日をSet化し、今日（または昨日）から遡って連続日数を算出する `streakCount` ロジックを追加
+- `streak` stateを `PracticeHome` に prop 経由で渡し、バナーの固定値 `5` を `{streak}` に置換
+- 未提出の場合は `0` 日が表示される
+
+```
+
