@@ -228,3 +228,20 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 13:32 — gh_portal #13 Chat.tsx講師ビューの生徒リストDB化
+
+- 結果: ✅ 成功
+
+```
+完了しました。変更内容のサマリー：
+
+**変更箇所：** `src/pages/Chat.tsx`
+
+- `students: Student[]` / `studentsLoading: boolean` の state を追加
+- `useEffect` を新設し、講師ログイン時に `teacher_student_assignments` テーブルから `teacher_id = 現在ユーザー` のレコードを取得 → `profiles` テーブルで名前を結合して生徒リストを構築
+- `STUDENTS.find(...)` × 2 を `students.find(...)` に置換
+- 講師チャットタブ・AIチャットタブの生徒一覧を `students.map/filter` に置換
+- ローディング中・担当生徒なし・検索ヒットなしの各空状態メッセージを追加
+
+```
+
