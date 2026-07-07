@@ -415,3 +415,20 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 18:50 — gh_portal #22 AdminStudents講師割り当て変更のエラーハンドリング追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容（`AdminStudents.tsx:940-968`）:**
+
+- `upsert`（講師追加）と `delete`（講師削除）の両方で `{ error }` を受け取るよう変更
+- エラーが発生した場合、`setStudents` で楽観的更新をロールバック（`assignedTeachers` を変更前の `current` に戻す）
+- `alert()` でエラーメッセージをユーザーに通知してから `return`（既存の `alert` スタイルに合わせた）
+
+これにより、DB反映に失敗してもUIが成功状態のままになる問題が解消されます。
+
+```
+

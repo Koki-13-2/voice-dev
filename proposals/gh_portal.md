@@ -26,7 +26,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/小】Timeline.tsxいいねトグルの失敗時ロールバック追加 — toggleLikeで楽観的更新後にDB同期が失敗してもUIが戻らない問題を修正し、エラー時に元の状態に復元する <!-- id:19 done:2026-07-07T16:03 -->
 - [x] 【機能/中】Practice.tsxレーダーチャート・成績推移のDB化 — RADAR_SCORESとSCORE_HISTORYが完全にハードコードされており、auto_score_resultsテーブルの実データから集計表示するよう置き換える <!-- id:20 done:2026-07-07T16:39 -->
 - [x] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 done:2026-07-07T18:46 -->
-- [x] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 -->
+- [x] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 done:2026-07-07T18:50 -->
 - [x] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 -->
 - [x] 【機能/小】Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得 — ASSIGNED_TEACHERSがハードコードされ実際のDB担当講師情報と未接続 <!-- id:24 -->
 - [x] 【機能/中】Chat AIルームのメッセージDB永続化 — AI_ROOMSとAIチャット応答が全てローカルstateで、リロード・端末変更時に全履歴が消失する <!-- id:25 -->
