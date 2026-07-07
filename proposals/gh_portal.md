@@ -47,4 +47,4 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得 — L3031で空文字固定のlastLoginフィールドをSupabase Authのメタデータから取得して表示する <!-- id:40 done:2026-07-07T23:52 -->
 - [x] 【機能/中】AdminMessages個別生徒選択のSupabase接続実装 — L152のスタブ表示を実際のprofilesテーブルから生徒一覧を取得するピッカーUIに差し替え、選択した生徒にメッセージを送信可能にする <!-- id:41 done:2026-07-07T23:56 -->
 - [x] 【機能/小】Dashboard死コードTODAY_PILLSの削除 — L29-37の未使用定数TODAY_PILLSを削除してコードの見通しを改善する <!-- id:42 done:2026-07-07T23:59 -->
-- [x] 【運用/小】Job.tsx MOCK_JOBSフォールバックの削除とログイン必須化 — セッション未認証時にモックデータを表示する分岐を削除し、未ログイン時はログイン画面へリダイレクトする <!-- id:43 -->
+- [x] 【運用/小】Job.tsx MOCK_JOBSフォールバックの削除とログイン必須化 — セッション未認証時にモックデータを表示する分岐を削除し、未ログイン時はログイン画面へリダイレクトする <!-- id:43 done:2026-07-08T00:07 -->

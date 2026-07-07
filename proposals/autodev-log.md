@@ -805,3 +805,20 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 00:07 — gh_portal #43 Job.tsx MOCK_JOBSフォールバックの削除とログイン必須化
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+- `MOCK_JOBS` 定数（7件のモックデータ、141行）を削除
+- `Job()` メインコンポーネントの `if (!useRealData) { setJobs(MOCK_JOBS); ... }` フォールバック分岐を削除
+- `react-router-dom` の `Navigate` を import し、`session` が null の場合に `/login` へリダイレクト
+- `useRealData` は常に `true` の定数に変更（サブコンポーネントへの prop は維持）
+
+`ProtectedRoute` がルートレベルで既にログインガードをしていますが、`Job` コンポーネント内にも明示的な `<Navigate to="/login" replace />` を追加し、二重に保護しています。
+
+```
+
