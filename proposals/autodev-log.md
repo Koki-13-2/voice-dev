@@ -498,3 +498,18 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:15 — gh_portal #26 Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得
+
+- 結果: ✅ 成功
+
+```
+実装完了。
+
+変更内容：
+- **削除**: `STUDENT_PILLS` ハードコード定数（6件の固定スロット）
+- **`MeetingInviteModal` 改修**: `studentPills` プロップを `studentId: string` に置き換え
+- **動的フェッチ**: モーダル内で `date` が変わるたびに `daily_schedule_slots` を Supabase からフェッチ。`homework_tickets → material_tickets` もJOINしてチケットラベルを取得
+- **変換ロジック**: `ticket_id` があれば `type: 'task'`、なければ `type: 'life'`。ラベルはスロットの `label` → チケットの `material_tickets.label` → フォールバック `'学習予定'` の優先順で設定
+
+```
+

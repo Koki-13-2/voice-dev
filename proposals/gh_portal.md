@@ -30,7 +30,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 done:2026-07-07T18:58 -->
 - [x] 【機能/小】Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得 — ASSIGNED_TEACHERSがハードコードされ実際のDB担当講師情報と未接続 <!-- id:24 done:2026-07-07T19:02 -->
 - [x] 【機能/中】Chat AIルームのメッセージDB永続化 — AI_ROOMSとAIチャット応答が全てローカルstateで、リロード・端末変更時に全履歴が消失する <!-- id:25 done:2026-07-07T19:12 -->
-- [x] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 -->
+- [x] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 done:2026-07-07T19:15 -->
 - [x] 【機能/小】room_members.last_read_atを用いたチャット未読バッジの実装 — DBにlast_read_atカラムが存在するが未使用で未読表示がモックデータに依存している <!-- id:27 -->
 - [x] 【機能/小】Practice連続学習日数をtest_submissions提出日から動的算出 — PracticeHomeバナーの「連続学習 5日」が固定リテラルで実際の学習記録と未接続 <!-- id:28 -->
 - [x] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 -->
