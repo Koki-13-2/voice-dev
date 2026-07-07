@@ -618,3 +618,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:47 — gh_portal #32 announcements.body詳細表示の追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容:**
+- `BannerSlide` 型に `body` フィールドを追加
+- Supabase クエリで `body` カラムを取得するよう更新（`select('id, title, body, banner_color')`）
+- 非管理者ユーザーがバナースライドをタップすると `setAnnouncementDetail` で詳細ステートを更新
+- `announcements.body` 本文を表示するボトムシートモーダルを既存パターンに合わせて追加（`announcement-detail__body` CSS）
+- 管理者のバナー画像アップロード動作は変更なし
+
+```
+

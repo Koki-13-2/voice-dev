@@ -36,7 +36,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 done:2026-07-07T19:32 -->
 - [x] 【機能/中】Timelineコメントいいねのテーブル新設とDB永続化 — toggleReplyLikeがローカルstate更新のみで対応DBテーブルが未定義のためリロードでいいね状態が消える <!-- id:30 done:2026-07-07T19:37 -->
 - [x] 【機能/小】Timeline投稿の画像添付UI実装 — posts.image_urlsカラムがDBに存在するが投稿作成UIに画像アップロード機能がなく常時null <!-- id:31 done:2026-07-07T19:44 -->
-- [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 -->
+- [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 done:2026-07-07T19:47 -->
 - [x] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 -->
 - [ ] 【機能/中】Chat AIルームのsetTimeout擬似応答をOpenAI API呼び出しに置換 — AI_SENDER・QUIZ_BANKをローカル定数で持つのをやめ、@AIメッセージ送信時にEdge Function経由でOpenAI APIを呼び出し実際のAI応答を返す <!-- id:34 -->
 - [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 -->
