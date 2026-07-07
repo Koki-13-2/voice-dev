@@ -453,3 +453,21 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:02 — gh_portal #24 Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:**
+
+- `ASSIGNED_TEACHERS` ハードコード定数（`山田 太郎`・`佐藤 涼子`）を削除
+- `assignedTeachers` state を追加し、生徒ログイン時に `teacher_student_assignments` → `profiles` の順でDBからフェッチする `useEffect` を実装
+- 3箇所のUI参照を置き換え：
+  - 講師チャットのヘッダータイトル（担当なし時は「担当講師」と表示）
+  - AIタブの「担当講師が全ルームに参加中」バナー（担当なし時は非表示）
+  - AIルーム内のヘッダーピル（担当なし時は非表示）
+
+```
+
