@@ -134,3 +134,27 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 10:58 — gh_portal #6 Dashboard.tsxのクエリ分割とキャッシュ
+
+- 結果: ✅ 成功
+
+```
+完了しました。実施内容のまとめ：
+
+**実装内容**
+
+`src/pages/Dashboard.tsx` の `TeacherDashboard` 直前に、60秒TTLのモジュールレベルキャッシュを追加しました。
+
+| 変更箇所 | 内容 |
+|---|---|
+| キャッシュ変数定義 | `StudentsCache` 型 + `studentsCache` + `STUDENTS_CACHE_TTL = 60_000` |
+| `fetchStudents` 冒頭 | 同一 `teacherId` のキャッシュが有効なら5テーブルのフェッチを全スキップ |
+| `fetchStudents` 末尾 | フェッチ結果をキャッシュに書き込み |
+| `handleStudentChange` | 講師が生徒データ編集した際にキャッシュも更新（staleデータ防止） |
+| meetings リアルタイム購読 | 生徒の承諾/拒否がWebSocketで届いた際にキャッシュも更新 |
+
+**効果**  
+一覧↔詳細画面を行き来するたびに `homework_tickets` 等5テーブルを再フェッチしていた重複クエリが、60秒以内であればゼロになります。60秒経過後は自動的に再フェッチして鮮度を保ちます。
+
+```
+
