@@ -570,3 +570,21 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:37 — gh_portal #30 Timelineコメントいいねのテーブル新設とDB永続化
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容の概要：
+
+**追加したもの**
+- `supabase/migrations/20260707000005_comment_likes.sql` — `comment_likes` テーブル（`comment_id` + `user_id` の複合PK）とRLSポリシー3つ。リモートDBに適用済み。
+- `database.types.ts` — `comment_likes` の型定義を追加
+
+**修正したもの（`Timeline.tsx`）**
+- `POST_SELECT` に `comment_likes ( user_id )` を追加し、コメント取得時にいいね情報を同時取得
+- `rowToFeedPost` の `replyList` マッピングで `liked` / `likes` を `comment_likes` から算出（従来は `false` / `0` のハードコード）
+- `toggleReplyLike` を `async` 関数に変更し、`post_likes` の `toggleLike` と同様にオプティミスティックUI + DBシンク + 失敗時ロールバックを実装
+
+```
+
