@@ -720,3 +720,23 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 20:18 — gh_portal #38 Dashboard GoalPanelのガントチャート日付範囲を動的算出
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容：**
+
+- モジュールレベルの固定定数 `CHART_START`・`CHART_END`・`CHART_MONTHS`（2026年4〜7月ハードコード）を削除
+- `buildChartRange(items, examDate?)` ヘルパーを追加：
+  - 全教材の `startDate`/`endDate` と `exam_date` の最小・最大から月境界を算出
+  - 最低 2 ヶ月分を保証するフォールバック付き
+  - 月ラベル配列（`["4月", "5月", ...]`）を動的生成
+- `dateToPct()` のシグネチャを `(dateStr, chartStart, chartEnd)` に変更してモジュール定数依存を排除
+- **生徒用 GoalPanel**：Supabase からデータ取得後に `buildChartRange(built, sp.exam_date)` で算出し state に保持
+- **講師用 TeacherGoalPanel**：レンダリング時に `buildChartRange(student.ganttItems, student.examDate)` で算出（IIFE 形式）
+
+```
+

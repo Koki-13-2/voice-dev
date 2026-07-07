@@ -42,7 +42,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 done:2026-07-07T20:01 -->
 - [x] 【機能/小】Practice・TeacherPracticeのハードコード日付をnew Date()に修正 — Practice.tsx L981の`new Date('2026-04-16')`とTeacherPractice.tsx L147の`new Date('2026-04-14')`を現在日付に置換する <!-- id:36 done:2026-07-07T20:02 -->
 - [x] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 done:2026-07-07T20:14 -->
-- [x] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 -->
+- [x] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 done:2026-07-07T20:18 -->
 - [ ] 【機能/小】Dashboard講師ビューの生徒カードrecentRate・weeklyStudyHours・studyStreakをDB集計 — fetchStudentsでゼロ固定の3フィールドをtest_submissionsとdaily_schedule_slotsから実値を算出して表示する <!-- id:39 -->
 - [ ] 【機能/小】Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得 — L3031で空文字固定のlastLoginフィールドをSupabase Authのメタデータから取得して表示する <!-- id:40 -->
 - [ ] 【機能/中】AdminMessages個別生徒選択のSupabase接続実装 — L152のスタブ表示を実際のprofilesテーブルから生徒一覧を取得するピッカーUIに差し替え、選択した生徒にメッセージを送信可能にする <!-- id:41 -->
