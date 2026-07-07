@@ -44,7 +44,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 done:2026-07-07T20:14 -->
 - [x] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 done:2026-07-07T20:18 -->
 - [x] 【機能/小】Dashboard講師ビューの生徒カードrecentRate・weeklyStudyHours・studyStreakをDB集計 — fetchStudentsでゼロ固定の3フィールドをtest_submissionsとdaily_schedule_slotsから実値を算出して表示する <!-- id:39 done:2026-07-07T23:47 -->
-- [x] 【機能/小】Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得 — L3031で空文字固定のlastLoginフィールドをSupabase Authのメタデータから取得して表示する <!-- id:40 -->
+- [x] 【機能/小】Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得 — L3031で空文字固定のlastLoginフィールドをSupabase Authのメタデータから取得して表示する <!-- id:40 done:2026-07-07T23:52 -->
 - [x] 【機能/中】AdminMessages個別生徒選択のSupabase接続実装 — L152のスタブ表示を実際のprofilesテーブルから生徒一覧を取得するピッカーUIに差し替え、選択した生徒にメッセージを送信可能にする <!-- id:41 -->
 - [x] 【機能/小】Dashboard死コードTODAY_PILLSの削除 — L29-37の未使用定数TODAY_PILLSを削除してコードの見通しを改善する <!-- id:42 -->
 - [x] 【運用/小】Job.tsx MOCK_JOBSフォールバックの削除とログイン必須化 — セッション未認証時にモックデータを表示する分岐を削除し、未ログイン時はログイン画面へリダイレクトする <!-- id:43 -->

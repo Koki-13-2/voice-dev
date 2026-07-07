@@ -758,3 +758,25 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 23:52 — gh_portal #40 Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得
+
+- 結果: ✅ 成功
+
+```
+完了しました。実装内容をまとめます：
+
+**変更内容：**
+
+1. **マイグレーション追加** (`supabase/migrations/20260707000008_get_students_last_login.sql`)  
+   `auth.users` にアクセスできる `SECURITY DEFINER` 関数 `get_students_last_login(uuid[])` を新設。複数の生徒IDの `last_sign_in_at` を一括返却。
+
+2. **Dashboard.tsx** (`src/pages/Dashboard.tsx`)  
+   - `Promise.all` に `supabase.rpc('get_students_last_login', ...)` を追加
+   - 結果を `lastLoginMap` に変換（`M/D HH:MM` 形式にフォーマット）
+   - `lastLogin: ''` → `lastLoginMap[sid] ?? '未ログイン'` に置換
+
+3. **型定義更新** (`src/lib/database.types.ts`)  
+   新RPC関数の引数・戻り値型を追加してビルドエラーを解消。
+
+```
+
