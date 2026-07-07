@@ -471,3 +471,30 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:12 — gh_portal #25 Chat AIルームのメッセージDB永続化
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容のまとめ：
+
+**実装内容**（`src/pages/Chat.tsx`）
+
+- **`dbToAiChat()` 関数を追加**：`is_ai` フラグを見てAI送信者・ユーザー・講師を識別してChatMessage型に変換
+
+- **状態追加**：
+  - `aiRoomDbIdsRef`（useRef）：科目キー→DB UUIDのキャッシュ（再レンダリング不要）
+  - `aiRoomsLoading`（useState）：ルーム入室時の読み込み表示用
+
+- **AI初期化 useEffect 追加**：生徒がAIルームに入室したとき
+  1. `room_members`を確認し、`type='ai'` `name='math'`等のルームを検索
+  2. 存在しなければ`chat_rooms`に新規作成＋`room_members`に自分を追加
+  3. `messages`テーブルからメッセージをロード（空なら初期デモデータ表示）
+
+- **`handleAiSend()` をasync化**：
+  - ユーザー送信メッセージ：`sender_id=user.id, is_ai=false` でDB挿入
+  - AI応答メッセージ：`sender_id=user.id, is_ai=true` でDB挿入（既存RLSポリシーに適合、migration不要）
+  - 楽観的UI更新後にDB挿入し、IDをDB由来のUUIDに置き換え
+
+```
+
