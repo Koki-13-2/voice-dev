@@ -177,3 +177,19 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 12:00 — gh_portal #8 AdminMessages画面のメッセージ送信DB保存
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容まとめ：
+
+**作成・変更ファイル:**
+- `supabase/migrations/20260707000002_message_logs.sql` — `message_logs` テーブル新規作成（`sent_by`, `target_type`, `target_ids[]`, `message`, `sent_at`）と RLS（`is_admin`/`is_owner` のみ読み書き可）
+- `src/pages/admin/AdminMessages.tsx` — 送信ボタンに `handleSendStudents` / `handleSendJobRemind` を追加し `message_logs` に INSERT。履歴タブで直近50件を取得・表示。jobリマインドの textarea を controlled に変更
+- `src/lib/database.types.ts` — `message_logs` の型定義を追加（TypeScript 型エラー解消）
+
+**動作:**「LINE送信」ボタンを押すと `message_logs` にログが保存され、「送信履歴」タブで確認できます。LINE連携が未確定のためノート付きで表示し、実際の外部送信は連携確定後の拡張に委ねています。
+
+```
+
