@@ -432,3 +432,24 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 18:58 — gh_portal #23 Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容をまとめます。
+
+---
+
+**変更内容**: `Dashboard.tsx` の `fetchDashboard` 内、stats計算ブロックを拡張
+
+1. **`homework_tickets` selectを拡張**: `actual_minutes, completed_at` を追加取得
+
+2. **`weeklyStudyHours`（今週の学習時間）**: 当週月曜0:00以降に`completed_at`があるdoneチケットの`actual_minutes`（未記録なら`estimated_minutes`）を合計し、分→時間へ変換（小数1桁）
+
+3. **`studyStreak`（連続学習日数）**: `completed_at`の日付セットを作り、今日から過去に向かって連続した日数をカウント（今日未完了の場合は昨日から起算）
+
+4. **`overallProgress`（全体進捗）**: 全`homework_tickets`のうち`done`の割合をパーセント表示
+
+```
+

@@ -27,7 +27,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Practice.tsxレーダーチャート・成績推移のDB化 — RADAR_SCORESとSCORE_HISTORYが完全にハードコードされており、auto_score_resultsテーブルの実データから集計表示するよう置き換える <!-- id:20 done:2026-07-07T16:39 -->
 - [x] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 done:2026-07-07T18:46 -->
 - [x] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 done:2026-07-07T18:50 -->
-- [x] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 -->
+- [x] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 done:2026-07-07T18:58 -->
 - [x] 【機能/小】Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得 — ASSIGNED_TEACHERSがハードコードされ実際のDB担当講師情報と未接続 <!-- id:24 -->
 - [x] 【機能/中】Chat AIルームのメッセージDB永続化 — AI_ROOMSとAIチャット応答が全てローカルstateで、リロード・端末変更時に全履歴が消失する <!-- id:25 -->
 - [x] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 -->
@@ -39,10 +39,10 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 -->
 - [x] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 -->
 - [ ] 【機能/中】Chat AIルームのsetTimeout擬似応答をOpenAI API呼び出しに置換 — AI_SENDER・QUIZ_BANKをローカル定数で持つのをやめ、@AIメッセージ送信時にEdge Function経由でOpenAI APIを呼び出し実際のAI応答を返す <!-- id:34 -->
-- [ ] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 -->
-- [ ] 【機能/小】Practice・TeacherPracticeのハードコード日付をnew Date()に修正 — Practice.tsx L981の`new Date('2026-04-16')`とTeacherPractice.tsx L147の`new Date('2026-04-14')`を現在日付に置換する <!-- id:36 -->
-- [ ] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 -->
-- [ ] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 -->
+- [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 -->
+- [x] 【機能/小】Practice・TeacherPracticeのハードコード日付をnew Date()に修正 — Practice.tsx L981の`new Date('2026-04-16')`とTeacherPractice.tsx L147の`new Date('2026-04-14')`を現在日付に置換する <!-- id:36 -->
+- [x] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 -->
+- [x] 【機能/小】Dashboard GoalPanelのガントチャート日付範囲を動的算出 — CHART_START/CHART_END/CHART_MONTHSの固定値をstudent_profilesのexam_dateと教材の開始日・終了日から自動算出する <!-- id:38 -->
 - [ ] 【機能/小】Dashboard講師ビューの生徒カードrecentRate・weeklyStudyHours・studyStreakをDB集計 — fetchStudentsでゼロ固定の3フィールドをtest_submissionsとdaily_schedule_slotsから実値を算出して表示する <!-- id:39 -->
 - [ ] 【機能/小】Dashboard講師ビューのlastLoginをauth.usersのlast_sign_in_atから取得 — L3031で空文字固定のlastLoginフィールドをSupabase Authのメタデータから取得して表示する <!-- id:40 -->
 - [ ] 【機能/中】AdminMessages個別生徒選択のSupabase接続実装 — L152のスタブ表示を実際のprofilesテーブルから生徒一覧を取得するピッカーUIに差し替え、選択した生徒にメッセージを送信可能にする <!-- id:41 -->
