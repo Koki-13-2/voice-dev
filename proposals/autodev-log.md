@@ -1069,3 +1069,12 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:50 — gh_portal #57 Practice.tsx useEffect依存配列の[user]→[user?.id]修正
+
+- 結果: ✅ 成功
+
+```
+`Practice.tsx:558` の `[user]` を `[user?.id]` に変更しました。これにより、ユーザーIDが変わらない限り（例: プロフィール更新など無関係なプロパティ変更）fetchTests が再実行されなくなります。コミットとpushも完了しています。
+
+```
+
