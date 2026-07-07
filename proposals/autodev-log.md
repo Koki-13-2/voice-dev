@@ -588,3 +588,33 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:44 — gh_portal #31 Timeline投稿の画像添付UI実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+## 変更内容
+
+**`src/pages/Timeline.tsx`**
+- `ImageAttachment` インターフェース（`file` + `previewUrl`）を追加
+- `FeedPost` に `imageUrls?: string[]` を追加
+- `POST_SELECT` に `image_urls` を追加し、DB取得時にフィードへ反映
+- `postImages` / `questionImages` state を追加
+- `closeComposer` でオブジェクトURLを revoke してリセット
+- `handleAttachChange` で選択ファイルをプレビューURLとセットで保持
+- `removeImage` で個別削除
+- `uploadImages` で Supabase Storage (`post-images` バケット) にアップロードし公開URLを返す
+- `submitPost` / `submitQuestion` で画像URLを `image_urls` カラムに保存
+- コンポーザーUIに画像プレビューグリッド（サムネイル + ×ボタン）を表示
+- フィードの投稿カードに添付画像を表示（1枚: 16:9横幅いっぱい、複数: 2カラム4:3グリッド）
+
+**`src/styles/globals.css`**
+- `.composer-images` / `.composer-image-item` / `.composer-image-thumb` / `.composer-image-remove` を追加
+- `.post-images` / `.post-images--single` / `.post-images__img` を追加
+
+> **注意**: Supabase ダッシュボードで `post-images` という名前のパブリックバケットを作成する必要があります。バケットが存在しない場合、テキスト投稿は正常に動作しますが、画像はアップロードされません（サイレントスキップ）。
+
+```
+
