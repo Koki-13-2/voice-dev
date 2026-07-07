@@ -839,3 +839,33 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 00:53 — gh_portal #45 AdminStudents メッセージテンプレートのDB永続化
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。変更内容をまとめます。
+
+---
+
+### 実装内容
+
+**マイグレーション** (`supabase/migrations/20260708000001_message_templates.sql`)
+- `message_templates` テーブルを新設（`id`, `name`, `sort_order`, `created_at`）
+- RLS: `is_admin` または `is_owner` のユーザーのみ操作可能
+- 従来の `DEFAULT_TEMPLATES` 5件を初期 seed として挿入
+
+**型定義** (`src/lib/database.types.ts`, `src/lib/supabase.ts`)
+- `message_templates` テーブルの Row/Insert/Update 型を追加
+- `MessageTemplate` エクスポートを追加
+
+**UI** (`src/pages/admin/AdminStudents.tsx`)
+- `MessageComposer` を全面改修
+  - マウント時に `message_templates` からロード（sort_order 順）
+  - 追加: `INSERT` → レスポンスのレコードをローカル state に追加
+  - 削除: 即時 UI 反映（楽観的更新） → `DELETE` をバックグラウンド実行
+
+> **注意**: マイグレーション SQL はファイルとして追加済みですが、Supabase ダッシュボードの SQL エディタから `supabase/migrations/20260708000001_message_templates.sql` を手動実行する必要があります。
+
+```
+
