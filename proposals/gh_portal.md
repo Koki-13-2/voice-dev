@@ -16,3 +16,14 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【テスト/中】画面別Supabaseクエリの統合テスト作成 — 44テーブルへの接続点がRLS等で保護されているか検証するため、各画面のCRUD操作に対してロール別（student/teacher/admin）の権限テストを作成する <!-- id:9 -->
 - [x] 【UI/UX/小】get_university_rankingのRPCエラーハンドリング追加 — Dashboard.tsxのUniversityRankingPanelでsupabase.rpc呼び出しの失敗時にユーザーへのフィードバックがないため、エラー表示とリトライUIを追加する <!-- id:10 done:2026-07-07T12:28 -->
 - [x] 【運用/中】Realtime購読の一元管理 — Dashboard/Chat/Job/AdminJobで個別にsupabase.channel()を管理しており購読漏れ（メモリリーク）のリスクがあるため、useRealtimeカスタムフックで購読ライフサイクルを統一する <!-- id:11 -->
+- [ ] 【セキュリティ/小】tutorialDone状態のDB永続化 — completeTutorial()がlocalStorageのみに書き込んでおりDB保存されないため、ブラウザデータ消去で状態がリセットされる問題をprofilesテーブルへの書き込みに修正する <!-- id:12 -->
+- [ ] 【機能/中】Chat.tsx講師ビューの生徒リストDB化 — 講師側チャットの生徒リスト（STUDENTS定数）が完全にハードコードされており、teacher_student_assignmentsテーブルから実データを取得するよう置き換える <!-- id:13 -->
+- [ ] 【機能/中】Chat.txチャンネル一覧のDB化 — CHANNELS定数がハードコードされており、chat_roomsテーブルのtype='channel'から動的に取得するよう変更する <!-- id:14 -->
+- [ ] 【UI/UX/小】GoalPanelの受験日表示をDBから取得 — Dashboard.tsx:1560で「2027-01-23（土）共通テスト」がハードコードされており、student_profiles.exam_dateから動的に表示すべき <!-- id:15 -->
+- [ ] 【性能/小】LifePatternContextの楽観的更新ロールバック実装 — addPatternで仮IDによる楽観的更新を行うがDB insert失敗時にロールバックされず、UIに存在しないパターンが残り続ける問題を修正する <!-- id:16 -->
+- [ ] 【UI/UX/小】Dashboard生徒画面のスケジュール読み込み中表示追加 — pills配列が空の初期状態と実際にスケジュールがない状態が区別できず、ローディングインジケーターが表示されない問題を修正する <!-- id:17 -->
+- [ ] 【セキュリティ/小】saveLifeSlotsToDbのdelete→insert原子性確保 — Dashboard.tsx:137-162でdelete成功後にinsertが失敗するとスロットデータが消失するため、エラーチェックと失敗時の通知を追加する <!-- id:18 -->
+- [ ] 【UI/UX/小】Timeline.tsxいいねトグルの失敗時ロールバック追加 — toggleLikeで楽観的更新後にDB同期が失敗してもUIが戻らない問題を修正し、エラー時に元の状態に復元する <!-- id:19 -->
+- [ ] 【機能/中】Practice.tsxレーダーチャート・成績推移のDB化 — RADAR_SCORESとSCORE_HISTORYが完全にハードコードされており、auto_score_resultsテーブルの実データから集計表示するよう置き換える <!-- id:20 -->
+- [ ] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 -->
+- [ ] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 -->
