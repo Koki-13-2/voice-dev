@@ -51,7 +51,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】AdminStudents lastLoginDaysAgoのDB接続 — lastLoginDaysAgoが常に0にハードコードされており7日以上未ログイン警告・フィルター機能が無効化されているため、get_students_last_login RPCを呼び出して実値を反映する <!-- id:44 done:2026-07-08T00:46 -->
 - [x] 【機能/小】AdminStudents メッセージテンプレートのDB永続化 — DEFAULT_TEMPLATESがインメモリのみで追加・削除がリロードで消失するため、message_templatesテーブルを新設しCRUD接続する <!-- id:45 done:2026-07-08T00:53 -->
 - [x] 【機能/小】Dashboard weakPoints保存ボタンのSupabase永続化 — TeacherGoalPanelの弱点メモ保存がローカルstate更新のみでDBに書き込まないため、student_profiles.memoへのupsertを追加する <!-- id:46 done:2026-07-08T00:57 -->
-- [x] 【運用/小】Dashboard simulateStudentResponseデモコードの除去 — 講師ビューStudentDetailDashboard内の面談応答シミュレーター（デモ用UIとロジック）を本番コードから除去する <!-- id:47 -->
+- [x] 【運用/小】Dashboard simulateStudentResponseデモコードの除去 — 講師ビューStudentDetailDashboard内の面談応答シミュレーター（デモ用UIとロジック）を本番コードから除去する <!-- id:47 done:2026-07-08T01:03 -->
 - [x] 【運用/小】Dashboard dailyComment死フィールドの除去 — TeacherStudentDataのdailyCommentが常に空文字で設定されUIでも未使用のため、型定義と代入を削除する <!-- id:48 -->
 - [x] 【機能/小】Chat QUIZ_BANKのDB化 — スレッドクイズ生成で使用する科目別問題テンプレートがChat.tsx内にハードコードされているため、exercise_questionsテーブルから動的取得する <!-- id:49 -->
 - [x] 【機能/小】Chat threadMessagesデモデータの除去と空状態UI追加 — AIルームa6に毎回ハードコードされたデモスレッドが表示されるため、初期状態を空にしDB保存済みスレッドのみ表示する <!-- id:50 -->

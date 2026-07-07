@@ -880,3 +880,18 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:03 — gh_portal #47 Dashboard simulateStudentResponseデモコードの除去
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+- `simulateStudentResponse` 関数（5行）を削除
+- デモ用UIブロック（`{/* デモ：生徒応答シミュレーター（invited時のみ） */}` の `div` 全体、19行）を削除
+
+ビルド成功・push 済みです。面談インビテーションの講師側送信・バッジ表示などの本番機能はそのまま維持されています。
+
+```
+
