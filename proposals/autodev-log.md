@@ -193,3 +193,17 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 12:28 — gh_portal #10 get_university_rankingのRPCエラーハンドリング追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容：
+
+- **`fetchError` ステート追加** — RPC が `error` を返したときに `true` にセット
+- **`retryCount` ステート追加** — `useEffect` の依存配列に含め、インクリメントで再フェッチをトリガー
+- **エラー表示UI** — 「ランキングの取得に失敗しました」メッセージと「再試行」ボタンを既存のローディング/空状態と同じスタイルで表示
+- エラー後に再試行ボタンを押すと `retryCount` が増加し、`useEffect` が再実行されてRPCを再呼び出しする
+
+```
+

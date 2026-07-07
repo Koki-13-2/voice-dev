@@ -14,5 +14,5 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/小】life_pattern_slotsテーブルの使途確認と整理 — database.types.tsにlife_pattern_slotsが定義されているがlife_patterns.blocksにJSONで同等データを格納しており二重管理状態なので不要なら型定義とテーブルを削除する <!-- id:7 done:2026-07-07T11:28 -->
 - [x] 【セキュリティ/小】AdminMessages画面のメッセージ送信DB保存 — AdminMessages.tsxはjobs/profilesのSELECTのみでメッセージ本文のINSERTがなく、送信ロジックが未実装のため送信結果のDB永続化を追加する <!-- id:8 done:2026-07-07T12:00 -->
 - [ ] 【テスト/中】画面別Supabaseクエリの統合テスト作成 — 44テーブルへの接続点がRLS等で保護されているか検証するため、各画面のCRUD操作に対してロール別（student/teacher/admin）の権限テストを作成する <!-- id:9 -->
-- [x] 【UI/UX/小】get_university_rankingのRPCエラーハンドリング追加 — Dashboard.tsxのUniversityRankingPanelでsupabase.rpc呼び出しの失敗時にユーザーへのフィードバックがないため、エラー表示とリトライUIを追加する <!-- id:10 -->
+- [x] 【UI/UX/小】get_university_rankingのRPCエラーハンドリング追加 — Dashboard.tsxのUniversityRankingPanelでsupabase.rpc呼び出しの失敗時にユーザーへのフィードバックがないため、エラー表示とリトライUIを追加する <!-- id:10 done:2026-07-07T12:28 -->
 - [x] 【運用/中】Realtime購読の一元管理 — Dashboard/Chat/Job/AdminJobで個別にsupabase.channel()を管理しており購読漏れ（メモリリーク）のリスクがあるため、useRealtimeカスタムフックで購読ライフサイクルを統一する <!-- id:11 -->
