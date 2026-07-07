@@ -676,3 +676,17 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 20:02 — gh_portal #36 Practice・TeacherPracticeのハードコード日付をnew Date()に修正
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+- `Practice.tsx` L1011: `new Date('2026-04-16')` → `new Date()`
+- `TeacherPractice.tsx` L147: `new Date('2026-04-14')` → `new Date()`
+
+ビルド成功・push 済みです。これにより期限までの残日数（Practice の締切バッジ）と提出からの経過日数（TeacherPractice の「〇日前」表示）が常に実行時の現在日付を基準に計算されます。
+
+```
+
