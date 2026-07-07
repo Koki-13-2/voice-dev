@@ -822,3 +822,20 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 00:46 — gh_portal #44 AdminStudents lastLoginDaysAgoのDB接続
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容** (`src/pages/admin/AdminStudents.tsx`)
+
+`load()` 内で `subjectsMap` 取得後に `get_students_last_login` RPC を呼び出し、`last_sign_in_at` から現在日時までの日数差分を算出して `lastLoginDaysMap` に格納。生徒リスト構築時に `lastLoginDaysAgo: lastLoginDaysMap[p.id] ?? 0` で実値を反映しました。
+
+- `last_sign_in_at` が null（未ログイン記録なし）の場合は 0 にフォールバック（誤警告を防ぐため）
+- Dashboard.tsx の同 RPC 呼び出しパターンに準拠
+- 警告バッジ「7日以上未ログイン」と詳細フィルターの `loginDaysMin/Max` が正常動作するようになります
+
+```
+
