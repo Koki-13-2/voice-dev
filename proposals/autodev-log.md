@@ -158,3 +158,22 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 11:28 — gh_portal #7 life_pattern_slotsテーブルの使途確認と整理
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+
+| 変更 | 詳細 |
+|------|------|
+| `src/lib/database.types.ts` | `life_pattern_slots` テーブル定義（Row/Insert/Update/Relationships）を削除 |
+| `src/lib/supabase.ts` | `LifePatternSlot` 型エクスポートを削除 |
+| `supabase/migrations/20260707000001_drop_life_pattern_slots.sql` | `DROP TABLE IF EXISTS public.life_pattern_slots` マイグレーション追加 |
+
+**根拠:** コード全体を検索した結果、`life_pattern_slots` テーブルはどのコンポーネントからも参照されていませんでした。`LifePatternContext.tsx` は `life_patterns.blocks` JSON列のみを使ってスロットデータを管理しており、別テーブルは完全に未使用の二重管理状態でした。`tsc --noEmit` でも型エラーなし。
+
+```
+
