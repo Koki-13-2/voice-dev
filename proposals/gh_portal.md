@@ -20,21 +20,21 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Chat.tsx講師ビューの生徒リストDB化 — 講師側チャットの生徒リスト（STUDENTS定数）が完全にハードコードされており、teacher_student_assignmentsテーブルから実データを取得するよう置き換える <!-- id:13 done:2026-07-07T13:32 -->
 - [x] 【機能/中】Chat.txチャンネル一覧のDB化 — CHANNELS定数がハードコードされており、chat_roomsテーブルのtype='channel'から動的に取得するよう変更する <!-- id:14 done:2026-07-07T14:02 -->
 - [x] 【UI/UX/小】GoalPanelの受験日表示をDBから取得 — Dashboard.tsx:1560で「2027-01-23（土）共通テスト」がハードコードされており、student_profiles.exam_dateから動的に表示すべき <!-- id:15 done:2026-07-07T14:32 -->
-- [ ] 【性能/小】LifePatternContextの楽観的更新ロールバック実装 — addPatternで仮IDによる楽観的更新を行うがDB insert失敗時にロールバックされず、UIに存在しないパターンが残り続ける問題を修正する <!-- id:16 -->
+- [x] 【性能/小】LifePatternContextの楽観的更新ロールバック実装 — addPatternで仮IDによる楽観的更新を行うがDB insert失敗時にロールバックされず、UIに存在しないパターンが残り続ける問題を修正する <!-- id:16 done:2026-07-07T18:39 -->
 - [x] 【UI/UX/小】Dashboard生徒画面のスケジュール読み込み中表示追加 — pills配列が空の初期状態と実際にスケジュールがない状態が区別できず、ローディングインジケーターが表示されない問題を修正する <!-- id:17 done:2026-07-07T15:03 -->
 - [x] 【セキュリティ/小】saveLifeSlotsToDbのdelete→insert原子性確保 — Dashboard.tsx:137-162でdelete成功後にinsertが失敗するとスロットデータが消失するため、エラーチェックと失敗時の通知を追加する <!-- id:18 done:2026-07-07T15:33 -->
 - [x] 【UI/UX/小】Timeline.tsxいいねトグルの失敗時ロールバック追加 — toggleLikeで楽観的更新後にDB同期が失敗してもUIが戻らない問題を修正し、エラー時に元の状態に復元する <!-- id:19 done:2026-07-07T16:03 -->
 - [x] 【機能/中】Practice.tsxレーダーチャート・成績推移のDB化 — RADAR_SCORESとSCORE_HISTORYが完全にハードコードされており、auto_score_resultsテーブルの実データから集計表示するよう置き換える <!-- id:20 done:2026-07-07T16:39 -->
-- [ ] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 -->
-- [ ] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 -->
-- [ ] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 -->
-- [ ] 【機能/小】Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得 — ASSIGNED_TEACHERSがハードコードされ実際のDB担当講師情報と未接続 <!-- id:24 -->
-- [ ] 【機能/中】Chat AIルームのメッセージDB永続化 — AI_ROOMSとAIチャット応答が全てローカルstateで、リロード・端末変更時に全履歴が消失する <!-- id:25 -->
-- [ ] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 -->
-- [ ] 【機能/小】room_members.last_read_atを用いたチャット未読バッジの実装 — DBにlast_read_atカラムが存在するが未使用で未読表示がモックデータに依存している <!-- id:27 -->
-- [ ] 【機能/小】Practice連続学習日数をtest_submissions提出日から動的算出 — PracticeHomeバナーの「連続学習 5日」が固定リテラルで実際の学習記録と未接続 <!-- id:28 -->
-- [ ] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 -->
-- [ ] 【機能/中】Timelineコメントいいねのテーブル新設とDB永続化 — toggleReplyLikeがローカルstate更新のみで対応DBテーブルが未定義のためリロードでいいね状態が消える <!-- id:30 -->
-- [ ] 【機能/小】Timeline投稿の画像添付UI実装 — posts.image_urlsカラムがDBに存在するが投稿作成UIに画像アップロード機能がなく常時null <!-- id:31 -->
-- [ ] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 -->
-- [ ] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 -->
+- [x] 【UI/UX/小】AssignNotification承諾・相談フローのエラーハンドリング追加 — handleAccept/handleConsultで複数のDB操作（update→insert→insert）を順次実行するが、途中失敗時にユーザーへのフィードバックがなくUIだけ進む問題を修正する <!-- id:21 -->
+- [x] 【機能/小】AdminStudents講師割り当て変更のエラーハンドリング追加 — upsert/deleteによる担当講師変更（AdminStudents.tsx:942-948）でエラーを無視しておりUI上は成功に見えるが実際にはDB反映されていない可能性がある問題を修正する <!-- id:22 -->
+- [x] 【機能/中】Dashboard学習統計（studyStreak・weeklyStudyHours等）のDB集計 — MOCK_STUDENT_STATSの4指標が常時0のままで、daily_schedule_slotsやauto_score_resultsの実績データから算出すべき <!-- id:23 -->
+- [x] 【機能/小】Chat生徒ビューの担当講師一覧をteacher_student_assignmentsから取得 — ASSIGNED_TEACHERSがハードコードされ実際のDB担当講師情報と未接続 <!-- id:24 -->
+- [x] 【機能/中】Chat AIルームのメッセージDB永続化 — AI_ROOMSとAIチャット応答が全てローカルstateで、リロード・端末変更時に全履歴が消失する <!-- id:25 -->
+- [x] 【機能/小】Chat面談招待モーダルの生徒スケジュールをdaily_schedule_slotsから取得 — STUDENT_PILLSがハードコードで生徒の実際のスケジュールと無関係な空き時間が表示される <!-- id:26 -->
+- [x] 【機能/小】room_members.last_read_atを用いたチャット未読バッジの実装 — DBにlast_read_atカラムが存在するが未使用で未読表示がモックデータに依存している <!-- id:27 -->
+- [x] 【機能/小】Practice連続学習日数をtest_submissions提出日から動的算出 — PracticeHomeバナーの「連続学習 5日」が固定リテラルで実際の学習記録と未接続 <!-- id:28 -->
+- [x] 【機能/小】Practice添削フィードバック未読数をcorrections.is_read_by_studentから集計 — unreadCountが0固定でDBのis_read_by_studentカラムが画面側で一切参照・更新されていない <!-- id:29 -->
+- [x] 【機能/中】Timelineコメントいいねのテーブル新設とDB永続化 — toggleReplyLikeがローカルstate更新のみで対応DBテーブルが未定義のためリロードでいいね状態が消える <!-- id:30 -->
+- [x] 【機能/小】Timeline投稿の画像添付UI実装 — posts.image_urlsカラムがDBに存在するが投稿作成UIに画像アップロード機能がなく常時null <!-- id:31 -->
+- [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 -->
+- [x] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 -->
