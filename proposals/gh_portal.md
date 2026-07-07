@@ -15,7 +15,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】AdminMessages画面のメッセージ送信DB保存 — AdminMessages.tsxはjobs/profilesのSELECTのみでメッセージ本文のINSERTがなく、送信ロジックが未実装のため送信結果のDB永続化を追加する <!-- id:8 done:2026-07-07T12:00 -->
 - [ ] 【テスト/中】画面別Supabaseクエリの統合テスト作成 — 44テーブルへの接続点がRLS等で保護されているか検証するため、各画面のCRUD操作に対してロール別（student/teacher/admin）の権限テストを作成する <!-- id:9 -->
 - [x] 【UI/UX/小】get_university_rankingのRPCエラーハンドリング追加 — Dashboard.tsxのUniversityRankingPanelでsupabase.rpc呼び出しの失敗時にユーザーへのフィードバックがないため、エラー表示とリトライUIを追加する <!-- id:10 done:2026-07-07T12:28 -->
-- [ ] 【運用/中】Realtime購読の一元管理 — Dashboard/Chat/Job/AdminJobで個別にsupabase.channel()を管理しており購読漏れ（メモリリーク）のリスクがあるため、useRealtimeカスタムフックで購読ライフサイクルを統一する <!-- id:11 -->
+- [ ] 【運用/中】Realtime購読の一元管理 — Dashboard/Chat/Job/AdminJobで個別にsupabase.channel()を管理しており購読漏れ（メモリリーク）のリスクがあるため、useRealtimeカスタムフックで購読ライフサイクルを統一する <!-- id:11 done:2026-07-07T18:46 -->
 - [x] 【セキュリティ/小】tutorialDone状態のDB永続化 — completeTutorial()がlocalStorageのみに書き込んでおりDB保存されないため、ブラウザデータ消去で状態がリセットされる問題をprofilesテーブルへの書き込みに修正する <!-- id:12 done:2026-07-07T13:01 -->
 - [x] 【機能/中】Chat.tsx講師ビューの生徒リストDB化 — 講師側チャットの生徒リスト（STUDENTS定数）が完全にハードコードされており、teacher_student_assignmentsテーブルから実データを取得するよう置き換える <!-- id:13 done:2026-07-07T13:32 -->
 - [x] 【機能/中】Chat.txチャンネル一覧のDB化 — CHANNELS定数がハードコードされており、chat_roomsテーブルのtype='channel'から動的に取得するよう変更する <!-- id:14 done:2026-07-07T14:02 -->
