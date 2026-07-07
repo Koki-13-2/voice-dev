@@ -1028,3 +1028,27 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:43 — gh_portal #62 Admin5画面の共通データ取得フック（useAsyncLoad）抽出
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容：**
+
+1. **`src/lib/useAsyncLoad.ts`** — 新規作成
+   - `useEffect + cancelled + setLoading` パターンを汎用フックに抽出
+   - `fn(isCancelled: () => boolean) => Promise<void>` を受け取り、`loading: boolean` を返す
+   - deps 変更時に自動で `loading=true` にリセット
+   - `try/finally` でエラー時もローディングが解除されるよう安全に実装
+
+2. **`src/pages/admin/adminUtils.ts`** — 新規作成
+   - `toInitial` を3ファイルから1か所に集約
+
+3. **AdminUsers / AdminStudents / AdminPayroll / AdminDeliverables** — `useAsyncLoad` 置き換え＋`toInitial` import 変更
+
+4. **AdminMessages** — 最初の `useEffect`（jobs + count 取得）を `useAsyncLoad` に置き換え（students の条件付き遅延ロードや logs 取得は構造が異なるため変更対象外）
+
+```
+
