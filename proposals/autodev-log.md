@@ -740,3 +740,21 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 23:47 — gh_portal #39 Dashboard講師ビューの生徒カードrecentRate・weeklyStudyHours・studyStreakをDB集計
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容：
+
+**`fetchStudents` に2クエリ追加：**
+- `test_submissions`（直近7日、`created_at >= 7日前`）→ `recentRate` 算出
+- `daily_schedule_slots`（直近30日、`date >= 30日前`）→ `weeklyStudyHours` と `studyStreak` 算出
+
+**各フィールドの算出ロジック：**
+- `recentRate`: 直近7日に作成されたテスト提出のうち `status='completed'` の割合（%）
+- `weeklyStudyHours`: 今週（月曜日以降）の `ticket_id IS NOT NULL`（宿題スロット）の `duration_minutes` 合計 ÷ 60
+- `studyStreak`: 今日から遡って `daily_schedule_slots` に記録がある連続日数（最大30日）
+
+```
+
