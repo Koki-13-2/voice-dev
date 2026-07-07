@@ -1078,3 +1078,22 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:57 — gh_portal #59 Chatタブ切替時の下書きテキスト分離管理
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容：**
+
+`Chat.tsx:749` の `const [draft, setDraft] = useState('')` を以下に置き換えました：
+
+- `drafts: Record<string, string>` — タブ+ルームキーで引く辞書
+- `draftKey` — `tab`・`selectedStudentId`・`activeChannel`・`selectedAiStudentId`・`activeAiRoomId` の組み合わせで自動計算
+- `draft` と `setDraft` — 既存のすべての呼び出し箇所はそのまま動作する互換ラッパー
+
+これにより、講師タブ→チャンネルタブ→AIタブと切り替えても、それぞれの入力中テキストが保持されます。ビルド成功・プッシュ済み。
+
+```
+

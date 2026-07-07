@@ -63,7 +63,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】storage.tsファイルアップロードのサイズ・ファイル名バリデーション追加 — storage.tsのupload関数がファイルサイズ・空ファイル名を検証せずSupabase Storageへ送信しているため、クライアント側でサイズ上限と空名チェックを追加する <!-- id:56 done:2026-07-08T08:45 -->
 - [x] 【性能/小】Practice.tsx useEffect依存配列の[user]→[user?.id]修正 — fetchTests useEffect（558行目）の依存配列が[user]オブジェクト参照のため、無関係なuserプロパティ変更でも全データ再取得が走るので[user?.id]に修正する <!-- id:57 done:2026-07-08T08:50 -->
 - [ ] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 -->
-- [x] 【UI/UX/小】Chatタブ切替時の下書きテキスト分離管理 — Chatコンポーネントのdraft状態（749行目）が全タブで共有されており、タブ切替時に前のタブの入力途中テキストが残るため、タブ/ルームごとに独立したdraft管理にする <!-- id:59 -->
+- [x] 【UI/UX/小】Chatタブ切替時の下書きテキスト分離管理 — Chatコンポーネントのdraft状態（749行目）が全タブで共有されており、タブ切替時に前のタブの入力途中テキストが残るため、タブ/ルームごとに独立したdraft管理にする <!-- id:59 done:2026-07-08T08:57 -->
 - [x] 【UI/UX/小】Practice演習開始時のローディングインジケーター追加 — startQuiz（576-632行目）がDB問い合わせ中にスピナー等を表示せずUIがフリーズして見えるため、ローディング状態を追加する <!-- id:60 -->
 - [x] 【運用/小】React ErrorBoundaryの追加 — コードベース全体にErrorBoundaryが存在せず、レンダリング時例外で白画面クラッシュになるため、AppRoutesまたはLayout.tsxのOutlet周辺にフォールバックUI付きErrorBoundaryを追加する <!-- id:61 -->
 - [x] 【運用/中】Admin5画面の共通データ取得フック（useAsyncLoad）抽出 — AdminUsers・AdminStudents・AdminPayroll・AdminDeliverables・AdminMessagesで同一のuseEffect+cancelled+setLoadingパターンとtoInitial関数が重複しているため、共通カスタムフックに抽出する <!-- id:62 done:2026-07-08T08:43 -->
