@@ -59,7 +59,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Onboarding志望校入力をuniversitiesテーブルのサジェスト選択に変更 — 志望校が自由テキスト入力だがDBにuniversitiesテーブル（name, sort_order）が存在するため、入力をオートコンプリート付きセレクトに切り替え表記揺れを防止する <!-- id:52 done:2026-07-08T01:35 -->
 - [x] 【機能/小】AdminJob CATEGORY_OPTIONSの動的取得 — ジョブカテゴリが5項目ハードコードされているため、jobsテーブルのcategory列のDISTINCT値を取得し動的リスト化する <!-- id:53 done:2026-07-08T01:39 -->
 - [x] 【セキュリティ/小】AdminRoute・OwnerRouteのlocalStorage信頼脆弱性修正 — App.tsxのAdminRoute/OwnerRouteがprofileReady前にlocalStorageのisAdmin/isOwnerを信頼しており、DevToolsで改竄するとDB確認前に管理画面へアクセスできるため、profileReady完了までのガード条件を追加する <!-- id:54 done:2026-07-08T08:28 -->
-- [x] 【セキュリティ/小】Register.tsx pending_roleのsessionStorage注入防止 — sessionStorageのpending_roleを検証せずprofilesテーブルに書き込んでおり、ユーザーが'admin'等を設定できるため、'student'|'teacher'のホワイトリスト検証を追加する <!-- id:55 -->
+- [x] 【セキュリティ/小】Register.tsx pending_roleのsessionStorage注入防止 — sessionStorageのpending_roleを検証せずprofilesテーブルに書き込んでおり、ユーザーが'admin'等を設定できるため、'student'|'teacher'のホワイトリスト検証を追加する <!-- id:55 done:2026-07-08T08:34 -->
 - [ ] 【セキュリティ/小】storage.tsファイルアップロードのサイズ・ファイル名バリデーション追加 — storage.tsのupload関数がファイルサイズ・空ファイル名を検証せずSupabase Storageへ送信しているため、クライアント側でサイズ上限と空名チェックを追加する <!-- id:56 -->
 - [ ] 【性能/小】Practice.tsx useEffect依存配列の[user]→[user?.id]修正 — fetchTests useEffect（558行目）の依存配列が[user]オブジェクト参照のため、無関係なuserプロパティ変更でも全データ再取得が走るので[user?.id]に修正する <!-- id:57 -->
 - [ ] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 -->
@@ -71,10 +71,10 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【性能/中】React.lazyによるページ単位コード分割の導入 — 全ページを同期importしておりバンドルが1.5MBの単一ファイルになっているため、React.lazy + Suspenseでルート単位の遅延読み込みを実装する <!-- id:64 -->
 - [ ] 【運用/小】toInitial・fmtDate等の重複ユーティリティ関数をlib/utils.tsに集約 — toInitialが4箇所、fmtDateが4箇所、formatDateが2箇所に同一実装が散在しているため共通モジュールに抽出する <!-- id:65 -->
 - [ ] 【UI/UX/小】PillItem型定義のChat.tsxとDashboard.tsx間での重複解消 — 同名・類似構造のPillItemインターフェースが2ファイルに定義されており、共通型をlib/types.tsに切り出す <!-- id:66 -->
-- [ ] 【セキュリティ/小】Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加 — supabase.tsでimport.meta.envを直接参照しており、未設定時にランタイムエラーとなるため起動時バリデーションを追加する <!-- id:67 -->
-- [ ] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 -->
-- [ ] 【性能/小】Contents.tsxの動画プレイヤーをlazy importに分離 — VideoDetail内でvideoRefやprogressロジックを含む重いコンポーネントが常にバンドルされているため、モーダル展開時のみ読み込むようにする <!-- id:69 -->
-- [ ] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 -->
-- [ ] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 -->
-- [ ] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 -->
-- [ ] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 -->
+- [x] 【セキュリティ/小】Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加 — supabase.tsでimport.meta.envを直接参照しており、未設定時にランタイムエラーとなるため起動時バリデーションを追加する <!-- id:67 -->
+- [x] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 -->
+- [x] 【性能/小】Contents.tsxの動画プレイヤーをlazy importに分離 — VideoDetail内でvideoRefやprogressロジックを含む重いコンポーネントが常にバンドルされているため、モーダル展開時のみ読み込むようにする <!-- id:69 -->
+- [x] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 -->
+- [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 -->
+- [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 -->
+- [x] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 -->

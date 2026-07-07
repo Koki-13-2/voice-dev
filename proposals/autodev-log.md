@@ -1014,3 +1014,17 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:34 — gh_portal #55 Register.tsx pending_roleのsessionStorage注入防止
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**修正内容**: `AuthContext.tsx:109-122` の `SIGNED_IN` ハンドラで、`sessionStorage` から読み取った `pending_role` を `supabase.from('profiles').update(...)` に渡す前に `['student', 'teacher']` のホワイトリスト検証を追加しました。
+
+- **修正前**: 任意の文字列（`'admin'` 等）をそのままDBに書き込んでいた
+- **修正後**: `'student'` または `'teacher'` のみ許可。それ以外の値は `sessionStorage` から削除した上でスルーし、通常の認証フローへ続く（`updateUser` を呼ばないため SIGNED_IN の再発火もなく、リターンせず正常に state が更新される）
+
+```
+
