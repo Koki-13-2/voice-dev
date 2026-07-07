@@ -513,3 +513,26 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 19:23 — gh_portal #27 room_members.last_read_atを用いたチャット未読バッジの実装
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容の概要：
+
+**追加したヘルパー関数（モジュールレベル）：**
+- `getRoomUnreadCounts(roomIds, lastReadAtMap, currentUserId)` — 各ルームで `last_read_at` 以降の他者メッセージ数を一括集計
+- `markRoomAsRead(roomId, userId)` — `room_members.last_read_at` を現在時刻に更新
+
+**fetchStudents の変更（講師向け生徒一覧）：**
+プロフィール取得後、講師の DM ルームメンバーシップを取得 → 各生徒との DM ルームを特定 → `last_read_at` を参照して未読カウントを計算し `Student.unread` に反映。
+
+**fetchChannels の変更：**
+チャンネル取得後、自分の `room_members` レコード（`last_read_at` 含む）を取得 → チャンネルごとの未読カウントを計算し `Channel.unread` に反映。
+
+**ルーム入室時の処理：**
+- DM ルーム（講師→生徒）: `markRoomAsRead` で DB 更新 + 生徒リストの `unread` をクリア
+- チャンネル: `markRoomAsRead` で DB 更新 + チャンネルリストの `unread` をクリア
+
+```
+
