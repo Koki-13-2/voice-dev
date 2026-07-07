@@ -19,7 +19,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】tutorialDone状態のDB永続化 — completeTutorial()がlocalStorageのみに書き込んでおりDB保存されないため、ブラウザデータ消去で状態がリセットされる問題をprofilesテーブルへの書き込みに修正する <!-- id:12 done:2026-07-07T13:01 -->
 - [x] 【機能/中】Chat.tsx講師ビューの生徒リストDB化 — 講師側チャットの生徒リスト（STUDENTS定数）が完全にハードコードされており、teacher_student_assignmentsテーブルから実データを取得するよう置き換える <!-- id:13 done:2026-07-07T13:32 -->
 - [x] 【機能/中】Chat.txチャンネル一覧のDB化 — CHANNELS定数がハードコードされており、chat_roomsテーブルのtype='channel'から動的に取得するよう変更する <!-- id:14 done:2026-07-07T14:02 -->
-- [x] 【UI/UX/小】GoalPanelの受験日表示をDBから取得 — Dashboard.tsx:1560で「2027-01-23（土）共通テスト」がハードコードされており、student_profiles.exam_dateから動的に表示すべき <!-- id:15 -->
+- [x] 【UI/UX/小】GoalPanelの受験日表示をDBから取得 — Dashboard.tsx:1560で「2027-01-23（土）共通テスト」がハードコードされており、student_profiles.exam_dateから動的に表示すべき <!-- id:15 done:2026-07-07T14:32 -->
 - [ ] 【性能/小】LifePatternContextの楽観的更新ロールバック実装 — addPatternで仮IDによる楽観的更新を行うがDB insert失敗時にロールバックされず、UIに存在しないパターンが残り続ける問題を修正する <!-- id:16 -->
 - [x] 【UI/UX/小】Dashboard生徒画面のスケジュール読み込み中表示追加 — pills配列が空の初期状態と実際にスケジュールがない状態が区別できず、ローディングインジケーターが表示されない問題を修正する <!-- id:17 -->
 - [x] 【セキュリティ/小】saveLifeSlotsToDbのdelete→insert原子性確保 — Dashboard.tsx:137-162でdelete成功後にinsertが失敗するとスロットデータが消失するため、エラーチェックと失敗時の通知を追加する <!-- id:18 -->

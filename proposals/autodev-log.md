@@ -260,3 +260,19 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 14:32 — gh_portal #15 GoalPanelの受験日表示をDBから取得
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。
+
+**変更内容：**
+- `GoalPanel` に `examDateLabel` state を追加
+- `student_profiles` の select に `exam_type` を追加取得
+- `exam_date` が取得できたとき、`YYYY-MM-DD（曜日）{exam_type}` 形式でラベルを構成しstateに保存（`exam_type` がなければ日付＋曜日のみ）
+- `exam_date` が未設定の場合は「受験日未設定」を表示
+- `daysLeft` の計算には引き続き同じ `exam_date` を使用
+
+```
+
