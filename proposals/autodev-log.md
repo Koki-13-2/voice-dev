@@ -895,3 +895,12 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:09 — gh_portal #48 Dashboard dailyComment死フィールドの除去
+
+- 結果: ✅ 成功
+
+```
+完了。`TeacherStudentData` 型から `dailyComment: string` の定義（1999行目）と、オブジェクト生成時の `dailyComment: ''` 代入（3136行目）を削除しました。型チェック通過・push済みです。
+
+```
+
