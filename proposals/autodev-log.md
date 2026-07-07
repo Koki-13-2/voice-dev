@@ -959,3 +959,23 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 01:35 — gh_portal #52 Onboarding志望校入力をuniversitiesテーブルのサジェスト選択に変更
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容：
+
+**変更ファイル**
+- `src/pages/Onboarding.tsx` — `UniversityCombobox`コンポーネントを追加し、STEP 3の第一・第二・第三志望大学のinputを置き換え。`universities`テーブルから一括取得した候補を入力文字で絞り込み表示。第一志望選択時は`target_university_id`（FK）もDBに保存。
+- `src/styles/globals.css` — `.onboarding-combobox` / `__list` / `__item` のスタイルを追加（絶対位置ドロップダウン、最大10件・200px、ホバーでオレンジ系ハイライト）。
+
+**動作概要**
+1. コンポーネントマウント時に`universities`テーブルを`sort_order`順で全件取得
+2. ユーザーが文字を入力すると大学名を部分一致で絞り込み（最大10件表示）
+3. 候補をクリックすると名前をセット（第一志望はIDもセット）
+4. コンポーネント外クリックでドロップダウンを閉じる
+5. リストにない大学名は自由テキストでも入力可能（後方互換性を維持）
+
+```
+
