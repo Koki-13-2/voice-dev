@@ -318,3 +318,32 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 16:39 — gh_portal #20 Practice.tsxレーダーチャート・成績推移のDB化
+
+- 結果: ✅ 成功
+
+```
+完了です。実装内容をまとめます。
+
+## 実施内容
+
+**削除したもの:**
+- `RADAR_SUBJECT_LIST`（固定科目リスト）
+- `RadarSubject` 型
+- `RADAR_SCORES`（ハードコードのスコア）
+- `SCORE_HISTORY`（ハードコードの推移データ）
+
+**追加・変更したもの:**
+
+`FeedbackDashboard` コンポーネント内に DB 取得ロジックを追加:
+
+1. **マイスコア集計**: `test_submissions → auto_score_results → tests` を結合し、`type='mock'` または `'past_exam'` の完了済み受験結果を科目別に集計
+2. **生徒平均集計**: 同じテスト ID を受験した全ユーザーの `auto_score_results` から平均を算出
+3. **科目リスト動的生成**: DB から取得した受験データに存在する科目のみを表示
+4. **得点推移**: `submitted_at` でソートして時系列順に並べ、模試は `title`、過去問は `university·year` をラベルとして使用
+5. **空状態対応**: データなし・ローディング中それぞれに適切なメッセージを表示
+
+TypeScript 型チェック・ビルドともにエラーなし、`git push` 済みです。
+
+```
+
