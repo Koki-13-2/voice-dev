@@ -1052,3 +1052,20 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 08:45 — gh_portal #56 storage.tsファイルアップロードのサイズ・ファイル名バリデーション追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容（`src/lib/storage.ts`）:**
+
+- `MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024`（Supabase Storage の 50 MB 上限）を定数で定義
+- `file.name.trim()` が空の場合は早期 `null` リターン
+- `file.size > MAX_FILE_SIZE_BYTES` の場合は MB 値を含むエラーログとともに早期 `null` リターン
+
+呼び出し元（`Job.tsx`, `Practice.tsx`）はすでに `null` チェックで対応済みのため、既存の挙動を壊さずにバリデーションが機能します。
+
+```
+
