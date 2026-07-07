@@ -307,3 +307,14 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-07 16:03 — gh_portal #19 Timeline.tsxいいねトグルの失敗時ロールバック追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:** `Timeline.tsx:478` の `toggleLike` 関数で、DB同期（Supabaseの `insert`/`delete`）の戻り値 `error` を取得し、エラー時に楽観的更新前の `liked`/`likes` 状態へ復元するロールバック処理を追加しました。
+
+```
+
