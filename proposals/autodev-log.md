@@ -780,3 +780,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-07 23:56 — gh_portal #41 AdminMessages個別生徒選択のSupabase接続実装
+
+- 結果: ✅ 成功
+
+```
+実装完了しプッシュしました。
+
+変更内容：
+- `StudentOption` 型を追加し、`students`・`selectedStudentIds`・`studentSearch`・`studentsLoading` の state を追加
+- `studentTarget === 'select'` に切り替えた際、`profiles` テーブルから生徒一覧をレイジーロードするeffectを追加
+- スタブの `<p>` を名前検索フィールド＋全選択チェックボックス＋スクロール可能なリストのピッカーUIに置き換え
+- `handleSendStudents` で `select` モードのとき `target_ids` に選択済み生徒IDを渡すよう更新
+- 送信ボタンは `select` モードで未選択の場合は無効化
+
+```
+
