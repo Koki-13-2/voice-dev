@@ -1497,3 +1497,17 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:19 — gh_portal #82 ProfileSheet保存後のwindow.location.reload()をAuthContext状態更新に置換
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容:**
+
+- `AuthContext.tsx`: `refreshProfile()` 関数を追加。呼ばれると現在ユーザーの `fetchProfile()` を再実行し、`user` ステートと `localStorage` キャッシュ（isAdmin/isOwner）を更新する。インターフェースとデフォルト値にも追加。
+- `ProfileSheet.tsx` (`ProfileEditView`): `handleSave()` の `window.location.reload()` を `await refreshProfile()` + `onBack()` に置換。保存後はページ全体を破棄せずに React ステートだけ更新し、メニュー画面に戻るようになった。
+
+```
+
