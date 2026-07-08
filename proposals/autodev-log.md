@@ -1148,3 +1148,22 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:20 — gh_portal #64 React.lazyによるページ単位コード分割の導入
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容のまとめ：
+
+**実装内容 (`src/App.tsx`)**
+- 全19ページコンポーネントの `import { X } from '...'` を `React.lazy()` に変換
+- named export 対応のため `.then(m => ({ default: m.X }))` パターンを使用
+- `<AppRoutes />` を `<Suspense fallback={<LoadingScreen />}>` でラップ（既存の読み込み画面を再利用）
+
+**効果（ビルド結果）**
+- 各ページが独立チャンクに分割され、訪問したページのみが読み込まれるように
+  - Practice: 223KB、MathMarkdown: 428KB、Dashboard: 101KB、Chat: 44KB など
+- 初期バンドル（index.js）が 413KB に抑制（コード分割前は全ページ分が一括含まれていた）
+
+```
+
