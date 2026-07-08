@@ -1452,3 +1452,17 @@ TypeScriptエラーなし、ビルド成功、push完了。
 
 ```
 
+## 2026-07-08 11:11 — gh_portal #76 Job.tsxフォームのcheckboxフィールドにcheckedバインディングを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**修正内容** (`src/pages/Job.tsx:881-897`):
+- `FieldRenderer` の `checkbox` レンダリング部分で、`<input type="checkbox" />` に `checked` と `onChange` バインディングを追加
+- 複数選択に対応するため、選択値はカンマ区切り文字列 (`"optionA,optionB"`) として `formValues` state に保持
+- チェック/アンチェック時に配列を更新して `onChange(next.join(','))` を呼ぶことで、送信時の `formValues` に正しく反映される
+
+```
+
