@@ -1486,3 +1486,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 11:22 — gh_portal #81 ページ遷移時のdocument.title動的更新
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。
+
+`src/App.tsx` に `PageTitleUpdater` コンポーネントを追加し、`useLocation` でルート変化を検知して `document.title` を更新するようにしました。タイトル形式は `ページ名 | 🔥 hennyujuku` で、全16ルート（ログイン・タイムライン・ダッシュボード・管理画面各種など）に対応しています。既知のパスにマッチしない場合はベースタイトル `🔥 hennyujuku` にフォールバックします。
+
+```
+
