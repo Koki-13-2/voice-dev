@@ -76,7 +76,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【性能/小】Contents.tsxの動画プレイヤーをlazy importに分離 — VideoDetail内でvideoRefやprogressロジックを含む重いコンポーネントが常にバンドルされているため、モーダル展開時のみ読み込むようにする <!-- id:69 done:2026-07-08T09:53 -->
 - [x] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 done:2026-07-08T09:56 -->
 - [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 done:2026-07-08T10:03 -->
-- [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 -->
+- [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 done:2026-07-08T10:10 -->
 - [x] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 -->
 - [ ] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 -->
 - [ ] 【UI/UX/小】不明ルートに対する404ページの追加 — App.tsxのcatch-allルートが無言で/timelineにリダイレクトするため、ユーザーがURLの誤りに気づけない <!-- id:75 -->
