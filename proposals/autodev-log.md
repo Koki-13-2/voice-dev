@@ -1418,3 +1418,37 @@ const next: PayStatus = target.status === 'paid' ? 'unpaid' : 'paid'
 
 ```
 
+## 2026-07-08 11:09 — gh_portal #74 モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。
+
+---
+
+**実施内容まとめ:**
+
+**`src/components/FocusTrapDialog.tsx` を新規作成し、以下の機能を実装：**
+- **フォーカストラップ**: Tab/Shift+Tab でダイアログ内の要素を循環
+- **Escapeキー**: 押下で `onClose` を呼び出して閉じる
+- **ARIA属性**: `role="dialog"`, `aria-modal="true"`, `aria-label` を自動付与
+- **createPortal**: 常に `document.body` にマウント（z-index問題を解消）
+- **ネスト対応**: `activeDialogs` スタックで最前面のダイアログのみが Escape/Tab を処理
+- **フォーカス復元**: アンマウント時に呼び出し元要素へフォーカスを戻す
+- **`layout="sheet"` prop**: ボトムシート（overlay と dialog が兄弟要素）に対応
+
+**適用箇所 (17モーダル):**
+- Dashboard: 削除確認・志望校編集・教材追加/編集・PillDetailModal(2状態)
+- Practice: タブ離脱確認・中断確認
+- AdminUsers: 管理者権限確認・招待モーダル
+- AdminMessages: 送信内容確認
+- AdminStudents: 講師詳細・講師選択・アサイン確定確認（ネスト対応含む）
+- Timeline: 投稿シート・お知らせ詳細・プロフィールミニシート（layout="sheet"）
+- VideoDetail: 動画プレイヤー
+- AdminJob: フィールド承認/差し戻し確認
+
+TypeScriptエラーなし、ビルド成功、push完了。
+
+```
+

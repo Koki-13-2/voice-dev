@@ -78,7 +78,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 done:2026-07-08T10:03 -->
 - [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 done:2026-07-08T10:10 -->
 - [x] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 done:2026-07-08T10:15 -->
-- [x] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 -->
+- [x] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 done:2026-07-08T11:09 -->
 - [x] 【UI/UX/小】不明ルートに対する404ページの追加 — App.tsxのcatch-allルートが無言で/timelineにリダイレクトするため、ユーザーがURLの誤りに気づけない <!-- id:75 done:2026-07-08T10:27 -->
 - [x] 【機能/小】Job.tsxフォームのcheckboxフィールドにcheckedバインディングを追加 — checkboxタイプのフォームフィールドがuncontrolledで、ユーザーの選択がformValues stateに反映されず送信時に消失するバグを修正する <!-- id:76 -->
 - [x] 【機能/小】AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正 — toggleStatusが'unpaid'⇔'paid'のみ切替え、'pending'ステータスのレコードが永久に状態遷移できなくなるバグを修正する <!-- id:77 done:2026-07-08T10:32 -->
