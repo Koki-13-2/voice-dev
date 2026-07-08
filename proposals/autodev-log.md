@@ -1205,3 +1205,14 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:36 — gh_portal #67 Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:** `src/lib/supabase.ts` に `requireEnv()` ヘルパーを追加し、`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` が未設定の場合に起動時（モジュールロード時）に明示的なエラーを投げるよう修正しました。これにより `as string` キャストで `undefined` が無言で `createClient` に渡っていた問題が解消されます。
+
+```
+
