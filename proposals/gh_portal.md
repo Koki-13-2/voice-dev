@@ -99,7 +99,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 -->
 - [x] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 done:2026-07-08T16:52 -->
 - [ ] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 -->
-- [x] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 -->
+- [x] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 done:2026-07-08T16:57 -->
 - [ ] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 -->
 - [ ] 【セキュリティ/小】ログアウト時のlocalStorageキャッシュクリア — logout関数がisAdmin/isOwner/tutorial等のlocalStorageキーを削除せずセッション間でstaleな権限データが残るため、signOut時に関連キーを全消去する <!-- id:97 -->
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 -->

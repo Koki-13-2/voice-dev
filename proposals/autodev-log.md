@@ -1585,3 +1585,18 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:57 — gh_portal #95 utils.ts日付フォーマット関数のJST対応
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容** (`src/lib/utils.ts`):
+- `fmtDateFull`: `dateStr.slice(0, 10)` → `new Date()` + `Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' })` でJST変換
+- `fmtDateTime`: 同様にISO文字列スライスを廃止し、`year/month/day/hour/minute` オプション付きの `Intl.DateTimeFormat` に統一
+
+ビルド成功・push 完了。UTC→JST の最大9時間ずれが解消されます。
+
+```
+
