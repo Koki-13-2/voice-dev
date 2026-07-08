@@ -95,7 +95,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/中】Timeline画像アップロードにファイルサイズ・件数上限バリデーションを追加 — accept属性のみでサイズ制限がなく、大容量ファイルのアップロードが無制限に可能 <!-- id:88 done:2026-07-08T16:36 -->
 - [x] 【性能/小】Onboarding localStorageドラフト保存にdebounceを追加 — 25以上のstateを依存配列に持つuseEffectがキー入力のたびにJSON.stringify+setItemを実行しておりパフォーマンスが悪い <!-- id:89 done:2026-07-08T16:41 -->
 - [ ] 【UI/UX/小】globals.cssにprefers-reduced-motionメディアクエリを追加 — page-enterアニメーションやカルーセルの自動スライドがモーション低減設定を無視しており、前庭障害のあるユーザーに不快を与える可能性がある <!-- id:90 -->
-- [x] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 -->
+- [x] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 done:2026-07-08T16:46 -->
 - [ ] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 -->
 - [x] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 -->
 - [ ] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 -->

@@ -1565,3 +1565,12 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:46 — gh_portal #91 AdminPayroll saveRulesのupsertエラーチェック追加
+
+- 結果: ✅ 成功
+
+```
+修正完了。`saveRules` の処理順序を変更し、`supabase.upsert` の結果を先に受け取ってエラーチェックを行うようにしました。書き込み失敗時はアラートを表示してダイアログを閉じずに留まり、UIとDBの状態が乖離しなくなっています。
+
+```
+
