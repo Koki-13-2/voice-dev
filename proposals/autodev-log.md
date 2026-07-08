@@ -1574,3 +1574,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:52 — gh_portal #93 AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化
+
+- 結果: ✅ 成功
+
+```
+完了です。
+
+`AdminStudents.tsx` の `useAsyncLoad` 内で、最初の `Promise.all`（5クエリ）が完了した後に逐次実行されていた `fetchStudentSubjectsMap` と `get_students_last_login` を、第2の `Promise.all` でまとめて並列化しました。これにより生徒一覧画面の読み込み時間が短縮されます（2クエリ分のレイテンシが直列→並列になり、遅い方の時間のみ待つ形になります）。
+
+```
+
