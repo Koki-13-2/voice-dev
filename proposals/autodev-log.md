@@ -1350,3 +1350,26 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 10:32 — gh_portal #77 AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**修正内容：** `AdminPayroll.tsx:111` の1行を変更。
+
+```typescript
+// Before（バグあり）
+const next: PayStatus = target.status === 'unpaid' ? 'paid' : 'unpaid'
+// ↑ pending は 'unpaid' でないので 'unpaid' に遷移してしまい、paid に到達できない
+
+// After（修正）
+const next: PayStatus = target.status === 'paid' ? 'unpaid' : 'paid'
+// ↑ paid 以外（unpaid・pending 両方）は paid に進む
+```
+
+これにより `pending` → `paid` の遷移が可能になり、ステータスが永久に固定されるバグが解消されます。`unpaid ⇔ paid` の既存動作も変わりません。
+
+```
+

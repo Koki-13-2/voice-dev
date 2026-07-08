@@ -81,7 +81,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 -->
 - [x] 【UI/UX/小】不明ルートに対する404ページの追加 — App.tsxのcatch-allルートが無言で/timelineにリダイレクトするため、ユーザーがURLの誤りに気づけない <!-- id:75 done:2026-07-08T10:27 -->
 - [ ] 【機能/小】Job.tsxフォームのcheckboxフィールドにcheckedバインディングを追加 — checkboxタイプのフォームフィールドがuncontrolledで、ユーザーの選択がformValues stateに反映されず送信時に消失するバグを修正する <!-- id:76 -->
-- [x] 【機能/小】AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正 — toggleStatusが'unpaid'⇔'paid'のみ切替え、'pending'ステータスのレコードが永久に状態遷移できなくなるバグを修正する <!-- id:77 -->
+- [x] 【機能/小】AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正 — toggleStatusが'unpaid'⇔'paid'のみ切替え、'pending'ステータスのレコードが永久に状態遷移できなくなるバグを修正する <!-- id:77 done:2026-07-08T10:32 -->
 - [x] 【セキュリティ/小】AdminStudents TeacherListModalの選択キーをname→idに変更 — 講師の選択判定にname（表示名）を使用しているため、同名の講師が存在すると一方を選択すると両方が選択される <!-- id:78 -->
 - [x] 【セキュリティ/小】AdminUsers toggleAdminの権限昇格操作に確認ダイアログを追加 — 管理者権限の付与・剥奪がワンクリックで即実行されるうえ、連打によるレースコンディションも発生しうる <!-- id:79 -->
 - [x] 【性能/小】AuthContext onAuthStateChangeのTOKEN_REFRESHEDイベントでプロフィール再取得をスキップ — 約1時間ごとのトークンリフレッシュのたびにprofiles・teacher_profilesテーブルへの不要なクエリとlocalStorage書き込みが発生している <!-- id:80 -->
