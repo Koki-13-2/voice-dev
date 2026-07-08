@@ -1239,3 +1239,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:53 — gh_portal #69 Contents.tsxの動画プレイヤーをlazy importに分離
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+- `src/pages/VideoDetail.tsx` を新規作成し、`videoRef` / インターバル / 進捗保存ロジックを含む `VideoDetail` コンポーネントを分離
+- `Contents.tsx` で `React.lazy` + `Suspense` による動的インポートに切り替え（モーダルが `selected !== null` のときだけチャンクを読み込む）
+- `ContentItem` 型を `export interface` に変更し `VideoDetail.tsx` から参照できるようにした
+
+ビルド結果で `VideoDetail-D8iFxHki.js`（3.13 kB）が独立チャンクとして分割されたことを確認済みです。
+
+```
+
