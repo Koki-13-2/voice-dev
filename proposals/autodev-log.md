@@ -1625,3 +1625,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 07:43 — gh_portal #94 Layout.tsx key={location.pathname}の除去
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+`<main key={location.pathname}>` を削除したことで、ルート遷移のたびに `<main>` とその子コンポーネント全体がアンマウント→再マウントされる動作が解消されます。`useLocation` と `location` 変数は `noPadTop`（`/timeline` と `/practice` でのパディング制御）のために引き続き保持しています。
+
+```
+

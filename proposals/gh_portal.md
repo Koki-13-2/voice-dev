@@ -98,23 +98,23 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 done:2026-07-08T16:46 -->
 - [ ] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 -->
 - [x] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 done:2026-07-08T16:52 -->
-- [x] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 -->
+- [x] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 done:2026-07-09T07:43 -->
 - [x] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 done:2026-07-08T16:57 -->
 - [ ] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 -->
 - [x] 【セキュリティ/小】ログアウト時のlocalStorageキャッシュクリア — logout関数がisAdmin/isOwner/tutorial等のlocalStorageキーを削除せずセッション間でstaleな権限データが残るため、signOut時に関連キーを全消去する <!-- id:97 -->
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 -->
 - [ ] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 -->
-- [x] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
+- [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
-- [x] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->
+- [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->
 - [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 -->
 - [ ] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
 - [ ] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 -->
-- [ ] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 -->
-- [ ] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 -->
-- [ ] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 -->
+- [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 -->
+- [x] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 -->
+- [x] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 -->
 - [ ] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
 - [ ] 【アクセシビリティ/小】Timeline投稿画像にユーザー入力alt属性を追加 — 全投稿画像がalt=""で出力されスクリーンリーダーに無視される（画像投稿UIにalt入力欄を追加） <!-- id:111 -->
-- [ ] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 -->
+- [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 -->
 - [ ] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 -->
