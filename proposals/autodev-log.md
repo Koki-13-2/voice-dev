@@ -1132,3 +1132,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:15 — gh_portal #63 Onboardingフォーム途中保存の実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容:
+
+**`Onboarding.tsx` / `TeacherOnboarding.tsx` 共通の仕様:**
+
+- **自動保存**: フォームの任意のフィールドが変わるたびに `localStorage` へ保存（キー: `onboarding_draft_student_<userId>` / `onboarding_draft_teacher_<userId>`）
+- **復元**: コンポーネントマウント時にドラフトを読み込み、保存されていたステップと全フィールドを復元して「途中から再開」できる
+- **クリーンアップ**: 送信成功後に `localStorage.removeItem` でドラフトを削除
+- **耐障害性**: JSON パース失敗・ストレージ容量不足は try/catch で黙殺
+
+```
+
