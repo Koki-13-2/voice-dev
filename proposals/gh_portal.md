@@ -90,7 +90,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】AdminMessages「プレビュー/確認」ボタンのonClickハンドラ実装 — disabled制御はあるがonClickが未定義のため、ボタンを押しても何も起こらない未実装状態を解消する <!-- id:83 done:2026-07-08T10:22 -->
 - [x] 【UI/UX/小】Chat入力のIMEコンポジション対応 — onKeyDownのEnter送信がIME確定操作（日本語入力中のEnter）で誤送信されるため、e.nativeEvent.isComposingチェックを追加する <!-- id:84 done:2026-07-08T16:25 -->
 - [ ] 【UI/UX/小】TabBarにaria-current="page"とラベルテキスト表示を追加 — 現在アクティブなタブがCSS class（is-active）のみで示されておりスクリーンリーダーに伝わらないため、aria-current属性と視覚的なラベル文字を追加する <!-- id:85 -->
-- [x] 【性能/小】PillDetailModalのsetIntervalタイマーをDate.now()差分方式に変更 — 1秒ごとのカウンター加算はブラウザタブがバックグラウンドになるとスロットリングされてズレるため、開始時刻との差分で経過秒を算出する <!-- id:86 -->
+- [x] 【性能/小】PillDetailModalのsetIntervalタイマーをDate.now()差分方式に変更 — 1秒ごとのカウンター加算はブラウザタブがバックグラウンドになるとスロットリングされてズレるため、開始時刻との差分で経過秒を算出する <!-- id:86 done:2026-07-08T16:30 -->
 - [ ] 【UI/UX/小】Chatメッセージ受信時のauto-scrollを実装 — Realtimeで新着メッセージを受信しても自動スクロールが発生せず、ユーザーが手動でスクロールしないと新しいメッセージが見えない <!-- id:87 -->
 - [x] 【UI/UX/中】Timeline画像アップロードにファイルサイズ・件数上限バリデーションを追加 — accept属性のみでサイズ制限がなく、大容量ファイルのアップロードが無制限に可能 <!-- id:88 -->
 - [x] 【性能/小】Onboarding localStorageドラフト保存にdebounceを追加 — 25以上のstateを依存配列に持つuseEffectがキー入力のたびにJSON.stringify+setItemを実行しておりパフォーマンスが悪い <!-- id:89 -->

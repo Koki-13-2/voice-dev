@@ -1520,3 +1520,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:30 — gh_portal #86 PillDetailModalのsetIntervalタイマーをDate.now()差分方式に変更
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:** `PillDetailModal` の `useEffect` 内で `status === 'in_progress'` になった瞬間の `Date.now()` を基準時刻として保持し、`setInterval` のコールバックで `Math.floor((Date.now() - startedAt) / 1000)` を算出するよう変更しました（`Dashboard.tsx:4377-4385`）。バックグラウンドタブでタイマーがスロットリングされても、壁時計との差分から正確な経過秒を取得できます。
+
+```
+
