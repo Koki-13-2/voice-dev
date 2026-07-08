@@ -1466,3 +1466,23 @@ TypeScriptエラーなし、ビルド成功、push完了。
 
 ```
 
+## 2026-07-08 11:16 — gh_portal #80 AuthContext onAuthStateChangeのTOKEN_REFRESHEDイベントでプロフィール再取得をスキップ
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:** `AuthContext.tsx:106` の `onAuthStateChange` ハンドラに `TOKEN_REFRESHED` イベントの早期 return を追加しました。
+
+```typescript
+if (event === 'TOKEN_REFRESHED') {
+  setSession(s)
+  return
+}
+```
+
+これにより、約1時間ごとのトークンリフレッシュ時に `fetchProfile()` によるDBクエリと `localStorage` 書き込みが発生しなくなります。セッション状態の更新（`setSession`）は引き続き行うため、JWT トークンは正常に更新されます。
+
+```
+

@@ -84,7 +84,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正 — toggleStatusが'unpaid'⇔'paid'のみ切替え、'pending'ステータスのレコードが永久に状態遷移できなくなるバグを修正する <!-- id:77 done:2026-07-08T10:32 -->
 - [x] 【セキュリティ/小】AdminStudents TeacherListModalの選択キーをname→idに変更 — 講師の選択判定にname（表示名）を使用しているため、同名の講師が存在すると一方を選択すると両方が選択される <!-- id:78 done:2026-07-08T10:42 -->
 - [x] 【セキュリティ/小】AdminUsers toggleAdminの権限昇格操作に確認ダイアログを追加 — 管理者権限の付与・剥奪がワンクリックで即実行されるうえ、連打によるレースコンディションも発生しうる <!-- id:79 done:2026-07-08T10:44 -->
-- [x] 【性能/小】AuthContext onAuthStateChangeのTOKEN_REFRESHEDイベントでプロフィール再取得をスキップ — 約1時間ごとのトークンリフレッシュのたびにprofiles・teacher_profilesテーブルへの不要なクエリとlocalStorage書き込みが発生している <!-- id:80 -->
+- [x] 【性能/小】AuthContext onAuthStateChangeのTOKEN_REFRESHEDイベントでプロフィール再取得をスキップ — 約1時間ごとのトークンリフレッシュのたびにprofiles・teacher_profilesテーブルへの不要なクエリとlocalStorage書き込みが発生している <!-- id:80 done:2026-07-08T11:16 -->
 - [x] 【UI/UX/小】ページ遷移時のdocument.title動的更新 — 全ルートでブラウザタブのタイトルが同一のままであり、複数タブ利用時にどのページを開いているか区別できない <!-- id:81 -->
 - [ ] 【運用/小】ProfileSheet保存後のwindow.location.reload()をAuthContext状態更新に置換 — プロフィール保存のたびにページ全体をリロードして全Reactステートが破棄されるため、AuthContextにrefreshProfile関数を追加して状態のみ更新する <!-- id:82 -->
 - [x] 【機能/小】AdminMessages「プレビュー/確認」ボタンのonClickハンドラ実装 — disabled制御はあるがonClickが未定義のため、ボタンを押しても何も起こらない未実装状態を解消する <!-- id:83 done:2026-07-08T10:22 -->
