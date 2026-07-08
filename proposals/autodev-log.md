@@ -1317,3 +1317,21 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 10:22 — gh_portal #83 AdminMessages「プレビュー/確認」ボタンのonClickハンドラ実装
+
+- 結果: ✅ 成功
+
+```
+実装完了・push済みです。
+
+**変更内容:**
+
+- `AdminMessages.tsx` の `プレビュー・確認` ボタン（291行目）に `onClick={() => setShowPreview(true)}` を追加
+- `showPreview` ステートを追加し、クリック時に確認モーダルを表示
+- モーダルには「送信対象（全生徒/未提出者/個別選択した名前一覧）」と「メッセージ本文・文字数」を表示
+- モーダル内の「確認して送信」ボタンが `handleSendStudents()` を呼び、成功時にモーダルを閉じる
+- オーバーレイクリックでもキャンセル可能
+- `handleSendStudents` を `Promise<boolean>` に変更し、成功/失敗を返すよう修正（既存の「LINE送信」ボタンの動作は変わらず）
+
+```
+
