@@ -1654,3 +1654,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 07:54 — gh_portal #107 Timeline投稿・質問送信失敗時にcloseComposerを呼ばない
+
+- 結果: ✅ 成功
+
+```
+修正完了。
+
+`submitPost` と `submitQuestion` の両関数で、`closeComposer()` の呼び出しを `if (!error && data)` ブロック内に移動しました。これにより、DBへの書き込みに失敗した場合はコンポーザーが閉じられず、ユーザーの入力テキストと画像が保持されます。
+
+```
+

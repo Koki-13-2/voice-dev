@@ -111,7 +111,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 -->
 - [ ] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
 - [ ] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 -->
-- [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 -->
+- [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 done:2026-07-09T07:54 -->
 - [x] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 -->
 - [x] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 -->
 - [ ] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
