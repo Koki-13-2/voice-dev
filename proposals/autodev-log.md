@@ -1636,3 +1636,21 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 07:49 — gh_portal #97 ログアウト時のlocalStorageキャッシュクリア
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容** (`src/lib/AuthContext.tsx:213`):
+- `logout` 関数内で `supabase.auth.signOut()` を呼ぶ前に、現在ユーザーの4つのlocalStorageキーを削除するよう修正しました：
+  - `gh_portal_is_admin_${uid}`
+  - `gh_portal_is_owner_${uid}`
+  - `gh_portal_tutorial_${uid}`
+  - `gh_portal_onboarding_${uid}`
+
+これにより、ログアウト後に別ユーザーが同じブラウザでログインした際、前ユーザーの権限フラグ（isAdmin/isOwner）やonboarding状態がlocalStorageに残留するリスクがなくなります。コミット・プッシュ済みです。
+
+```
+
