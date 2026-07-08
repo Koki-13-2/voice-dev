@@ -1097,3 +1097,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:03 — gh_portal #60 Practice演習開始時のローディングインジケーター追加
+
+- 結果: ✅ 成功
+
+```
+完了です。
+
+実装内容:
+- `Practice.tsx:209` に `const [loadingQuiz, setLoadingQuiz] = useState(false)` を追加
+- `startQuiz` を `try/finally` で囲み、開始時に `setLoadingQuiz(true)`、終了時（成功・失敗問わず）に `setLoadingQuiz(false)` をセット
+- `if (screen === 'quiz')` の直前に `if (loadingQuiz)` の早期リターンを追加し、CSS アニメーション付きのスピナーと「問題を読み込み中…」テキストをフルスクリーンオーバーレイで表示
+
+これにより、テスト開始ボタンを押した瞬間からDB取得完了までの間、UIがフリーズして見える問題が解消されます。
+
+```
+
