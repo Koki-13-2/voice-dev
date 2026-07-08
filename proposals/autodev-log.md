@@ -1820,3 +1820,22 @@ push完了です。タスクが完了しました。
 
 ```
 
+## 2026-07-09 08:50 — gh_portal #123 面談実施後のmeetings.statusを'completed'に遷移する処理の追加
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容まとめ:
+
+**マイグレーション** (`supabase/migrations/20260709000001_meetings_add_completed_status.sql`):
+- `meetings.status` の CHECK 制約に `'completed'` を追加
+
+**`Dashboard.tsx` の `handleSave()`**:
+- `meeting_records` 挿入時に `meeting_id: inv.id` を設定（スキーマにあったが未設定だった）
+- insert 成功後に `meetings.status = 'completed'` へ UPDATE するコードを追加
+- `MeetingStatus` 型に `'completed'` を追加
+
+Supabase の本番 DB にマイグレーションを適用するには `supabase db push` が必要です。
+
+```
+
