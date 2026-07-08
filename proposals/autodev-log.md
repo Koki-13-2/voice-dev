@@ -1665,3 +1665,19 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 08:02 — gh_portal #108 Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+
+`src/pages/Dashboard.tsx` の面談インビテーションカードにある3つのボタン（承諾する・別の日程を希望・取り消す）のonClickハンドラーを修正しました：
+
+- **修正前**: `await supabase...update(...)` の結果を検証せず、常に `setInvitation(...)` でUIを更新（失敗時にUI/DB不整合が永続化）
+- **修正後**: `const { error } = await ...` でエラーを取り出し、エラー時は `reportError` でロギング＋エラーバナー表示（4秒）の上 `return` してUIを更新しない。成功時のみUI状態を更新。
+
+```
+
