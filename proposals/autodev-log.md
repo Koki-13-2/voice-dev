@@ -1264,3 +1264,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 10:03 — gh_portal #71 Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加
+
+- 結果: ✅ 成功
+
+```
+実装完了。
+
+**変更内容:**
+- `src/components/Toast.tsx` — 新規作成。固定位置（画面上部中央）に表示、4秒後自動消去、✕ボタンで手動閉じも可能
+- `src/styles/globals.css` — `.toast` / `.toast--error` / `.toast__message` / `.toast__close` と `toast-in` アニメーションを追加
+- `Onboarding.tsx` / `TeacherOnboarding.tsx` — エラー発生箇所（DB失敗・タイムアウト・予期せぬエラー）で `setToastMsg(msg)` を追加し `<Toast>` をレンダリング
+
+既存の `setError()` によるフォーム内表示は維持しつつ、スクロール位置に依存しない画面固定のトーストも同時に表示されます。
+
+```
+
