@@ -1681,3 +1681,24 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 08:13 — gh_portal #109 AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+
+`src/pages/AdminJob.tsx`（3028行）の全28箇所のSupabase呼び出しに3パターンのエラーハンドリングを追加しました：
+
+| パターン | 対象 | 箇所数 | 動作 |
+|----------|------|--------|------|
+| A: 読み取り fetch関数 | fetchSubmissionComments, fetchFieldComments など7関数 | 7 | try/catch + reportError（silently） |
+| B: チャット送信（楽観的更新あり） | handleSend各コンポーネント | 6 | エラー時に楽観的メッセージを削除・input復元・alert |
+| C: 重要なミューテーション | 承認/却下/差戻し/タスク保存・削除など | 10 | `{ error }` チェック + reportError + alert（日本語メッセージ） |
+
+これで承認・差戻し等の管理操作が失敗した際、ユーザーに明確にエラーが通知されます。
+
+```
+
