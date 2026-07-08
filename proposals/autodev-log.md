@@ -1549,3 +1549,19 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:41 — gh_portal #89 Onboarding localStorageドラフト保存にdebounceを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:**
+- `Onboarding.tsx` と `TeacherOnboarding.tsx` の localStorage保存 `useEffect` に500msのdebounceを追加
+- `useRef<ReturnType<typeof setTimeout>>` でタイマーIDを保持し、新しい変更が来るたびに前のタイマーをキャンセル
+- クリーンアップ関数で unmount 時にもタイマーをキャンセル（`TeacherOnboarding.tsx` には `useRef` のインポートも追加）
+
+これにより、キー入力のたびに実行されていた `JSON.stringify` + `localStorage.setItem` が、入力が止まってから500ms後の1回だけに削減されます。
+
+```
+
