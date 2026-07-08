@@ -1611,3 +1611,17 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 07:39 — gh_portal #87 Chatメッセージ受信時のauto-scrollを実装
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。
+
+**変更内容：**
+- `Chat.tsx` に `teacherScrollRef` / `channelScrollRef` / `aiScrollRef` の3つの `useRef<HTMLDivElement>` を追加
+- 各メッセージ配列 (`teacherChatMessages`, `channelMessages`, `aiMessages`) の変化を監視する `useEffect` を追加し、変化のたびに `scrollTop = scrollHeight` で最下部に自動スクロール
+- JSX 内の `.chat-messages` div（全5箇所：講師チャット生徒視点・講師視点、チャンネル、AIチャット生徒視点・講師視点）に対応する ref を付与
+
+```
+
