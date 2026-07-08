@@ -124,7 +124,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
 - [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
 - [ ] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->
-- [ ] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 -->
+- [x] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 done:2026-07-09T08:22 -->
 - [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 -->
 - [ ] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 -->
 - [x] 【機能/小】面談実施後のmeetings.statusを'completed'に遷移する処理の追加 — MtgWorkflowScreenでmeeting_recordsは保存されるがmeetingsテーブルのstatusが'accepted'のまま更新されず、面談の完了状態が管理できない <!-- id:123 -->

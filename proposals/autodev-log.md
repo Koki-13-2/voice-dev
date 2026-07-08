@@ -1726,3 +1726,23 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-09 08:22 — gh_portal #120 Register.tsx招待トークンの検証と消費の実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容:**
+
+**`Register.tsx`（全面改修）:**
+- マウント時に `?invite=` パラメータを取得し、Supabase の `invitations` テーブルに照合
+- トークンなし・存在しない・期限切れ・使用済み のいずれかでブロック（エラーメッセージを場合分け表示）
+- 有効なトークンの場合はそのロール（teacher/student）を自動適用し、Google サインアップ画面へ進む
+- ロール選択UIを廃止（要件定義の「招待制」に準拠）
+
+**`AuthContext.tsx`（追記）:**
+- SIGNED_IN 後にロールを設定するブロックで、`sessionStorage` の `pending_invite_token` を読み取り、`invitations.used_by` にユーザーIDを書き込んでトークンを消費。再利用不可になります。
+
+```
+
