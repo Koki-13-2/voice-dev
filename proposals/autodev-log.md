@@ -1335,3 +1335,18 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 10:27 — gh_portal #75 不明ルートに対する404ページの追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容：**
+- `src/pages/NotFound.tsx` を新規作成：🔍アイコン + 「404」（プライマリカラー）+ 日本語メッセージ + 誘導ボタン（認証済みなら「タイムラインに戻る」、未認証なら「ログイン画面へ」）
+- `src/App.tsx` の `path="*"` を `<RootRedirect />` から `<NotFound />` に変更
+
+デザインはトーン・マナー準拠（`--color-primary`、`border-radius`、`btn-primary` クラス）、ビルド・push 完了しました。
+
+```
+
