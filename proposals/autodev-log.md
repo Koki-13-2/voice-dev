@@ -1391,3 +1391,19 @@ const next: PayStatus = target.status === 'paid' ? 'unpaid' : 'paid'
 
 ```
 
+## 2026-07-08 10:44 — gh_portal #79 AdminUsers toggleAdminの権限昇格操作に確認ダイアログを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+
+- `confirmTarget` state を追加。トグルボタンクリック時はDBを直接叩かず、まずダイアログを表示する
+- `toggling` state を追加。DB更新中はすべてのトグルボタンを `disabled` にしてレースコンディションを防止
+- ダイアログは既存の `admin-modal` スタイルを再利用し、付与時はオレンジ（primary）・剥奪時は赤（danger）ボタンで操作の重大性を区別
+- `admin-btn--danger` スタイルを `globals.css` に追加
+
+```
+
