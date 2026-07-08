@@ -1765,3 +1765,14 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-09 08:31 — gh_portal #92 /adminインデックスルートにデフォルトリダイレクトを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+`App.tsx:146` に `<Route index element={<Navigate to="/admin/students" replace />} />` を追加しました。これで `/admin` にアクセスすると自動的に `/admin/students` にリダイレクトされます。ビルド成功・コミット・push まで完了しています。
+
+```
+

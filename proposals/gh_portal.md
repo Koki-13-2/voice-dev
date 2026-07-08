@@ -96,14 +96,14 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【性能/小】Onboarding localStorageドラフト保存にdebounceを追加 — 25以上のstateを依存配列に持つuseEffectがキー入力のたびにJSON.stringify+setItemを実行しておりパフォーマンスが悪い <!-- id:89 done:2026-07-08T16:41 -->
 - [ ] 【UI/UX/小】globals.cssにprefers-reduced-motionメディアクエリを追加 — page-enterアニメーションやカルーセルの自動スライドがモーション低減設定を無視しており、前庭障害のあるユーザーに不快を与える可能性がある <!-- id:90 -->
 - [x] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 done:2026-07-08T16:46 -->
-- [ ] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 -->
+- [x] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 done:2026-07-09T08:31 -->
 - [x] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 done:2026-07-08T16:52 -->
 - [x] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 done:2026-07-09T07:43 -->
 - [x] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 done:2026-07-08T16:57 -->
-- [ ] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 -->
+- [x] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 -->
 - [x] 【セキュリティ/小】ログアウト時のlocalStorageキャッシュクリア — logout関数がisAdmin/isOwner/tutorial等のlocalStorageキーを削除せずセッション間でstaleな権限データが残るため、signOut時に関連キーを全消去する <!-- id:97 done:2026-07-09T07:49 -->
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 -->
-- [ ] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
+- [x] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 -->
 - [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
