@@ -1373,3 +1373,21 @@ const next: PayStatus = target.status === 'paid' ? 'unpaid' : 'paid'
 
 ```
 
+## 2026-07-08 10:42 — gh_portal #78 AdminStudents TeacherListModalの選択キーをname→idに変更
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容の要約：**
+
+- `assignedTeachers: string[]` — 格納値を講師名 → **講師ID**に変更
+- `TeacherListModal` の `selected` Set — `t.name` → `t.id` をキーに変更。チェック判定・バッジ表示・`onConfirm`コールバックすべてIDベースに統一
+- 表示箇所（フッターサマリー・確認ダイアログ・生徒カード・生徒詳細画面）では `idToName()` ヘルパーでIDを名前に解決して表示
+- `applyAdvanced` — `teachers[]` を受け取り、`f.teacherName`（名前文字列）からIDを逆引きして比較するよう修正
+- `handleConfirmAssign` — 名前→IDの変換ステップが不要になり簡略化
+- データ読み込み時の `teacherNameById` Map を削除（`myAssigns.map(a => a.teacher_id)` に簡略化）
+
+```
+
