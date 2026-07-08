@@ -74,7 +74,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加 — supabase.tsでimport.meta.envを直接参照しており、未設定時にランタイムエラーとなるため起動時バリデーションを追加する <!-- id:67 done:2026-07-08T09:36 -->
 - [x] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 done:2026-07-08T09:49 -->
 - [x] 【性能/小】Contents.tsxの動画プレイヤーをlazy importに分離 — VideoDetail内でvideoRefやprogressロジックを含む重いコンポーネントが常にバンドルされているため、モーダル展開時のみ読み込むようにする <!-- id:69 done:2026-07-08T09:53 -->
-- [x] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 -->
+- [x] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 done:2026-07-08T09:56 -->
 - [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 -->
 - [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 -->
 - [x] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 -->

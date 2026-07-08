@@ -1255,3 +1255,12 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:56 — gh_portal #70 Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更
+
+- 結果: ✅ 成功
+
+```
+完了しました。`Dashboard.tsx:137` の `handleReorder` 内で `for...of + await` による直列DB更新を `Promise.all` + `.map()` による並列実行に変更し、コミット・プッシュ済みです。複数スロットが同時に移動された場合も、全更新リクエストが並列で発火するためUIブロックが解消されます。
+
+```
+
