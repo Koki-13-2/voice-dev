@@ -1746,3 +1746,22 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-09 08:28 — gh_portal #121 AdminStudents生徒メモ（student_profiles.memo）の編集UI追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。以下の変更を行いました。
+
+**実装内容（`AdminStudents.tsx`）:**
+- `StudentDetail` に `onMemoUpdate` プロップを追加
+- `memoEditing` / `memoValue` / `memoSaving` の状態を追加
+- `handleMemoSave` 関数：`student_profiles.memo` を `supabase.upsert` で更新
+- 志望・受験情報セクション内の静的メモ表示を削除し、**「申し送り・面談メモ」専用セクション**として独立させた
+- 表示モード（鉛筆ボタン）↔ 編集モード（textarea + 保存/キャンセル）のインライン切り替え
+- 保存後は親の `students` 配列と `selected` 状態をローカル即時反映
+
+**`globals.css`:** `.admin-memo-edit-area` / `.admin-memo-edit-btn` スタイルを追加
+
+```
+
