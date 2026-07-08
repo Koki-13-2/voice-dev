@@ -128,3 +128,13 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 -->
 - [ ] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 -->
 - [x] 【機能/小】面談実施後のmeetings.statusを'completed'に遷移する処理の追加 — MtgWorkflowScreenでmeeting_recordsは保存されるがmeetingsテーブルのstatusが'accepted'のまま更新されず、面談の完了状態が管理できない <!-- id:123 -->
+- [ ] 【機能/小】SchoolEditModal志望校・受験日変更のstudent_profiles永続化 — 講師ダッシュボードの志望校・受験日編集モーダル（Dashboard.tsx:4244）でonSaveがローカルstate更新のみでSupabaseに書き込まれないため、画面を閉じると変更が消失する <!-- id:124 -->
+- [ ] 【機能/小】Chat面談招待ステータス変更のmeetingsテーブル同期 — Chat.tsx:1329のupdateMeetingStatusが生徒の承諾・拒否をローカルstateのみで処理しDBに反映しないため、Dashboard側との状態不整合が発生する <!-- id:125 -->
+- [ ] 【機能/中】Contents画面のarticle・column・youtube型コンテンツのクリック遷移実装 — Contents.tsx:204でlecture以外のtype（article/column/youtube）にonSelectが付与されずタップ不能のため、動画以外の学習コンテンツにアクセスできない <!-- id:126 -->
+- [ ] 【機能/小】Contents画面のvisibilityハードコード解消 — Contents.tsx:100でvisibilityが常に'private'にハードコードされておりDBのstatusカラムと乖離するため、公開コンテンツにもロックアイコンが表示される <!-- id:127 -->
+- [ ] 【機能/小】meeting_recordsのmeeting_id紐付け追加 — Dashboard.tsx:2806のmeeting_records INSERT時にmeeting_idカラムを設定しないため、面談予約（meetingsテーブル）と実施記録（meeting_records）がDB上で紐付かず面談実施率の集計ができない <!-- id:128 -->
+- [ ] 【機能/中】Practice予想問題（PredictedList）のDB接続と問題取得ロジック実装 — Practice.tsx:1442のPredictedListが常に「予想問題はありません」を表示するプレースホルダーのため、志望校別の類題演習機能が利用不能である <!-- id:129 -->
+- [ ] 【機能/小】AdminJob提出物コメント送信者名の'不明'表示解消 — AdminJob.tsx:270-274でjob_submission_comments初回ロード時にsenderNameが一律'不明'にハードコードされるため、管理者がコメント投稿者を識別できない <!-- id:130 -->
+- [ ] 【運用/小】Job.tsx作業タイマーのSupabase同期 — Job.tsx:911-917でタイマーデータがlocalStorageのみに保存されるため端末変更時に全作業時間データが消失し、講師の作業実績が正確に記録されない <!-- id:131 -->
+- [ ] 【機能/小】AdminPayrollコマ数自動集計のmeeting_records連携 — AdminPayroll.tsx:305でコマ数が手動入力前提（lesson_count）のため、meeting_recordsの面談実施件数から自動集計する仕組みがなく運用負荷が高い <!-- id:132 -->
+- [ ] 【機能/小】PillDetailModal「教材詳細」ボタンのonClickハンドラ実装 — Dashboard.tsx:4475の「教材詳細」ボタンにonClickが未設定でクリックしても何も起こらないため、生徒が宿題実施中に教材情報を参照できない <!-- id:133 -->
