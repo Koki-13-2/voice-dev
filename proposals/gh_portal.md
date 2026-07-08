@@ -62,7 +62,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】Register.tsx pending_roleのsessionStorage注入防止 — sessionStorageのpending_roleを検証せずprofilesテーブルに書き込んでおり、ユーザーが'admin'等を設定できるため、'student'|'teacher'のホワイトリスト検証を追加する <!-- id:55 done:2026-07-08T08:34 -->
 - [x] 【セキュリティ/小】storage.tsファイルアップロードのサイズ・ファイル名バリデーション追加 — storage.tsのupload関数がファイルサイズ・空ファイル名を検証せずSupabase Storageへ送信しているため、クライアント側でサイズ上限と空名チェックを追加する <!-- id:56 done:2026-07-08T08:45 -->
 - [x] 【性能/小】Practice.tsx useEffect依存配列の[user]→[user?.id]修正 — fetchTests useEffect（558行目）の依存配列が[user]オブジェクト参照のため、無関係なuserプロパティ変更でも全データ再取得が走るので[user?.id]に修正する <!-- id:57 done:2026-07-08T08:50 -->
-- [ ] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 -->
+- [x] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 done:2026-07-08T10:49 -->
 - [x] 【UI/UX/小】Chatタブ切替時の下書きテキスト分離管理 — Chatコンポーネントのdraft状態（749行目）が全タブで共有されており、タブ切替時に前のタブの入力途中テキストが残るため、タブ/ルームごとに独立したdraft管理にする <!-- id:59 done:2026-07-08T08:57 -->
 - [x] 【UI/UX/小】Practice演習開始時のローディングインジケーター追加 — startQuiz（576-632行目）がDB問い合わせ中にスピナー等を表示せずUIがフリーズして見えるため、ローディング状態を追加する <!-- id:60 done:2026-07-08T09:03 -->
 - [x] 【運用/小】React ErrorBoundaryの追加 — コードベース全体にErrorBoundaryが存在せず、レンダリング時例外で白画面クラッシュになるため、AppRoutesまたはLayout.tsxのOutlet周辺にフォールバックUI付きErrorBoundaryを追加する <!-- id:61 done:2026-07-08T09:08 -->
@@ -78,9 +78,9 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 done:2026-07-08T10:03 -->
 - [x] 【セキュリティ/小】AdminUsers招待トークンの有効期限・使用済みチェックをクライアント側で表示 — invitationsテーブルにexpires_at・used_atがあるが、招待リンク発行後に期限切れ・使用済み状態がUI上で確認できない <!-- id:72 done:2026-07-08T10:10 -->
 - [x] 【運用/小】本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加 — 16箇所のconsole.errorが散在しており、本番でのエラー追跡が困難なためreportError関数に集約する <!-- id:73 done:2026-07-08T10:15 -->
-- [ ] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 -->
+- [x] 【UI/UX/中】モーダル共通コンポーネント（フォーカストラップ・Escキー・aria-modal）の実装 — Dashboard・Chat・Practice・AdminJob・Timeline・Contents等15箇所以上のモーダルで背景要素へキーボード操作が漏れるため、共通のFocusTrapDialogコンポーネントを作成して一括適用する <!-- id:74 -->
 - [x] 【UI/UX/小】不明ルートに対する404ページの追加 — App.tsxのcatch-allルートが無言で/timelineにリダイレクトするため、ユーザーがURLの誤りに気づけない <!-- id:75 done:2026-07-08T10:27 -->
-- [ ] 【機能/小】Job.tsxフォームのcheckboxフィールドにcheckedバインディングを追加 — checkboxタイプのフォームフィールドがuncontrolledで、ユーザーの選択がformValues stateに反映されず送信時に消失するバグを修正する <!-- id:76 -->
+- [x] 【機能/小】Job.tsxフォームのcheckboxフィールドにcheckedバインディングを追加 — checkboxタイプのフォームフィールドがuncontrolledで、ユーザーの選択がformValues stateに反映されず送信時に消失するバグを修正する <!-- id:76 -->
 - [x] 【機能/小】AdminPayroll toggleStatusの'pending'ステータス遷移漏れ修正 — toggleStatusが'unpaid'⇔'paid'のみ切替え、'pending'ステータスのレコードが永久に状態遷移できなくなるバグを修正する <!-- id:77 done:2026-07-08T10:32 -->
 - [x] 【セキュリティ/小】AdminStudents TeacherListModalの選択キーをname→idに変更 — 講師の選択判定にname（表示名）を使用しているため、同名の講師が存在すると一方を選択すると両方が選択される <!-- id:78 done:2026-07-08T10:42 -->
 - [x] 【セキュリティ/小】AdminUsers toggleAdminの権限昇格操作に確認ダイアログを追加 — 管理者権限の付与・剥奪がワンクリックで即実行されるうえ、連打によるレースコンディションも発生しうる <!-- id:79 done:2026-07-08T10:44 -->

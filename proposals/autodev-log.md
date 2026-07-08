@@ -1407,3 +1407,14 @@ const next: PayStatus = target.status === 'paid' ? 'unpaid' : 'paid'
 
 ```
 
+## 2026-07-08 10:49 — gh_portal #58 Dashboard rescheduleMaterialのN+1クエリ解消
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+`rescheduleMaterial` の for ループ内逐次 `await` を `Promise.all` + `.map()` に置き換え、N回の逐次Supabaseコールを並列実行に変更しました（`Dashboard.tsx:927-930`）。ビルド・プッシュともに成功しています。
+
+```
+
