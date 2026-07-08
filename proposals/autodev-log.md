@@ -1511,3 +1511,12 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 16:25 — gh_portal #84 Chat入力のIMEコンポジション対応
+
+- 結果: ✅ 成功
+
+```
+完了。Chat.tsx内のonKeyDownハンドラ全6箇所（`handleSend`×1、`handleTeacherSend`×2、`handleChannelSend`×1、`handleAiSend`×2）に `!e.nativeEvent.isComposing` チェックを追加し、日本語IME変換中のEnterキー押下で誤送信されなくなりました。ビルド・コミット・pushまで完了しています。
+
+```
+

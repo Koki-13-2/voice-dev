@@ -88,23 +88,23 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【UI/UX/小】ページ遷移時のdocument.title動的更新 — 全ルートでブラウザタブのタイトルが同一のままであり、複数タブ利用時にどのページを開いているか区別できない <!-- id:81 done:2026-07-08T11:22 -->
 - [x] 【運用/小】ProfileSheet保存後のwindow.location.reload()をAuthContext状態更新に置換 — プロフィール保存のたびにページ全体をリロードして全Reactステートが破棄されるため、AuthContextにrefreshProfile関数を追加して状態のみ更新する <!-- id:82 done:2026-07-08T16:19 -->
 - [x] 【機能/小】AdminMessages「プレビュー/確認」ボタンのonClickハンドラ実装 — disabled制御はあるがonClickが未定義のため、ボタンを押しても何も起こらない未実装状態を解消する <!-- id:83 done:2026-07-08T10:22 -->
-- [x] 【UI/UX/小】Chat入力のIMEコンポジション対応 — onKeyDownのEnter送信がIME確定操作（日本語入力中のEnter）で誤送信されるため、e.nativeEvent.isComposingチェックを追加する <!-- id:84 -->
+- [x] 【UI/UX/小】Chat入力のIMEコンポジション対応 — onKeyDownのEnter送信がIME確定操作（日本語入力中のEnter）で誤送信されるため、e.nativeEvent.isComposingチェックを追加する <!-- id:84 done:2026-07-08T16:25 -->
 - [ ] 【UI/UX/小】TabBarにaria-current="page"とラベルテキスト表示を追加 — 現在アクティブなタブがCSS class（is-active）のみで示されておりスクリーンリーダーに伝わらないため、aria-current属性と視覚的なラベル文字を追加する <!-- id:85 -->
 - [x] 【性能/小】PillDetailModalのsetIntervalタイマーをDate.now()差分方式に変更 — 1秒ごとのカウンター加算はブラウザタブがバックグラウンドになるとスロットリングされてズレるため、開始時刻との差分で経過秒を算出する <!-- id:86 -->
-- [x] 【UI/UX/小】Chatメッセージ受信時のauto-scrollを実装 — Realtimeで新着メッセージを受信しても自動スクロールが発生せず、ユーザーが手動でスクロールしないと新しいメッセージが見えない <!-- id:87 -->
-- [ ] 【UI/UX/中】Timeline画像アップロードにファイルサイズ・件数上限バリデーションを追加 — accept属性のみでサイズ制限がなく、大容量ファイルのアップロードが無制限に可能 <!-- id:88 -->
-- [ ] 【性能/小】Onboarding localStorageドラフト保存にdebounceを追加 — 25以上のstateを依存配列に持つuseEffectがキー入力のたびにJSON.stringify+setItemを実行しておりパフォーマンスが悪い <!-- id:89 -->
+- [ ] 【UI/UX/小】Chatメッセージ受信時のauto-scrollを実装 — Realtimeで新着メッセージを受信しても自動スクロールが発生せず、ユーザーが手動でスクロールしないと新しいメッセージが見えない <!-- id:87 -->
+- [x] 【UI/UX/中】Timeline画像アップロードにファイルサイズ・件数上限バリデーションを追加 — accept属性のみでサイズ制限がなく、大容量ファイルのアップロードが無制限に可能 <!-- id:88 -->
+- [x] 【性能/小】Onboarding localStorageドラフト保存にdebounceを追加 — 25以上のstateを依存配列に持つuseEffectがキー入力のたびにJSON.stringify+setItemを実行しておりパフォーマンスが悪い <!-- id:89 -->
 - [ ] 【UI/UX/小】globals.cssにprefers-reduced-motionメディアクエリを追加 — page-enterアニメーションやカルーセルの自動スライドがモーション低減設定を無視しており、前庭障害のあるユーザーに不快を与える可能性がある <!-- id:90 -->
-- [ ] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 -->
+- [x] 【セキュリティ/小】AdminPayroll saveRulesのupsertエラーチェック追加 — 楽観的にsetRulesを更新した後supabase.upsertのerrorを確認していないため、書き込み失敗時にUIとDBの状態が乖離する <!-- id:91 -->
 - [ ] 【運用/小】/adminインデックスルートにデフォルトリダイレクトを追加 — /adminパスにアクセスすると空のAdminLayoutが表示されるため、Navigate to="/admin/students"でデフォルト画面に誘導する <!-- id:92 -->
-- [ ] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 -->
+- [x] 【性能/中】AdminStudents fetchStudentSubjectsMapとget_students_last_loginの並列化 — 5件のSupabase並列クエリの後に2件が逐次実行されており、これらを最初のPromise.allに統合することで読み込み時間を短縮する <!-- id:93 -->
 - [ ] 【性能/小】Layout.tsx key={location.pathname}の除去 — ルート遷移ごとにページ全体がアンマウント・再マウントされ全Supabaseクエリが毎回再実行されるため、keyプロップを除去して不要な再フェッチを防止する <!-- id:94 -->
-- [ ] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 -->
+- [x] 【UI/UX/小】utils.ts日付フォーマット関数のJST対応 — fmtDateFull/fmtDateTimeがISO文字列をスライスするためUTC表示になり日本時間と最大9時間ずれる問題を、Dateオブジェクト経由のlocale変換に修正する <!-- id:95 -->
 - [ ] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 -->
 - [ ] 【セキュリティ/小】ログアウト時のlocalStorageキャッシュクリア — logout関数がisAdmin/isOwner/tutorial等のlocalStorageキーを削除せずセッション間でstaleな権限データが残るため、signOut時に関連キーを全消去する <!-- id:97 -->
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 -->
 - [ ] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 -->
 - [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
-- [ ] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 -->
+- [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 -->
 - [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->
