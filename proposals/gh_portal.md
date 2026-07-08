@@ -69,7 +69,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/中】Admin5画面の共通データ取得フック（useAsyncLoad）抽出 — AdminUsers・AdminStudents・AdminPayroll・AdminDeliverables・AdminMessagesで同一のuseEffect+cancelled+setLoadingパターンとtoInitial関数が重複しているため、共通カスタムフックに抽出する <!-- id:62 done:2026-07-08T08:43 -->
 - [x] 【機能/小】Onboardingフォーム途中保存の実装 — Onboarding.tsxでブラウザを閉じると全入力データが消失するため、ステップ完了ごとにlocalStorageまたはSupabaseのドラフト行に途中状態を保存する <!-- id:63 done:2026-07-08T09:15 -->
 - [x] 【性能/中】React.lazyによるページ単位コード分割の導入 — 全ページを同期importしておりバンドルが1.5MBの単一ファイルになっているため、React.lazy + Suspenseでルート単位の遅延読み込みを実装する <!-- id:64 done:2026-07-08T09:20 -->
-- [x] 【運用/小】toInitial・fmtDate等の重複ユーティリティ関数をlib/utils.tsに集約 — toInitialが4箇所、fmtDateが4箇所、formatDateが2箇所に同一実装が散在しているため共通モジュールに抽出する <!-- id:65 -->
+- [x] 【運用/小】toInitial・fmtDate等の重複ユーティリティ関数をlib/utils.tsに集約 — toInitialが4箇所、fmtDateが4箇所、formatDateが2箇所に同一実装が散在しているため共通モジュールに抽出する <!-- id:65 done:2026-07-08T09:27 -->
 - [x] 【UI/UX/小】PillItem型定義のChat.tsxとDashboard.tsx間での重複解消 — 同名・類似構造のPillItemインターフェースが2ファイルに定義されており、共通型をlib/types.tsに切り出す <!-- id:66 -->
 - [x] 【セキュリティ/小】Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加 — supabase.tsでimport.meta.envを直接参照しており、未設定時にランタイムエラーとなるため起動時バリデーションを追加する <!-- id:67 -->
 - [x] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 -->

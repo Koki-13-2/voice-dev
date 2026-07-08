@@ -1167,3 +1167,26 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:27 — gh_portal #65 toInitial・fmtDate等の重複ユーティリティ関数をlib/utils.tsに集約
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容まとめ：**
+
+- `src/lib/utils.ts` を新規作成し、4つの関数をエクスポート：
+  - `toInitial` — adminUtils の堅牢版（`?.trim()` + `?? '?'`）を採用
+  - `fmtDate` — "YYYY-MM-DD" → "MM/DD"（Chat・Dashboard の面談日表示用）
+  - `fmtDateFull` — ISO文字列 → "YYYY/MM/DD"、null安全（ProfileSheet・AdminStudents・AdminDeliverables用）
+  - `fmtDateTime` — ISO文字列 → "YYYY/MM/DD HH:MM"（ProfileSheet・AdminDeliverables用）
+
+- `adminUtils.ts` は `utils.ts` から `toInitial` を再エクスポートする形に変更し、`AdminUsers.tsx` / `AdminPayroll.tsx` 側のインポートを変更不要に
+
+- ローカル定義を削除したファイル：`Timeline.tsx`、`Chat.tsx`、`Dashboard.tsx`、`ProfileSheet.tsx`、`AdminDeliverables.tsx`、`AdminStudents.tsx`
+
+ビルドエラーなし、push 完了。
+
+```
+
