@@ -72,7 +72,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/小】toInitial・fmtDate等の重複ユーティリティ関数をlib/utils.tsに集約 — toInitialが4箇所、fmtDateが4箇所、formatDateが2箇所に同一実装が散在しているため共通モジュールに抽出する <!-- id:65 done:2026-07-08T09:27 -->
 - [x] 【UI/UX/小】PillItem型定義のChat.tsxとDashboard.tsx間での重複解消 — 同名・類似構造のPillItemインターフェースが2ファイルに定義されており、共通型をlib/types.tsに切り出す <!-- id:66 done:2026-07-08T09:31 -->
 - [x] 【セキュリティ/小】Supabase匿名キーのハードコード確認とenv変数の型安全ラッパー追加 — supabase.tsでimport.meta.envを直接参照しており、未設定時にランタイムエラーとなるため起動時バリデーションを追加する <!-- id:67 done:2026-07-08T09:36 -->
-- [x] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 -->
+- [x] 【UI/UX/小】Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行 — 最も頻出するパターン（カード・バッジ・グリッド）をglobals.cssのユーティリティクラスに抽出し保守性を改善する <!-- id:68 done:2026-07-08T09:49 -->
 - [x] 【性能/小】Contents.tsxの動画プレイヤーをlazy importに分離 — VideoDetail内でvideoRefやprogressロジックを含む重いコンポーネントが常にバンドルされているため、モーダル展開時のみ読み込むようにする <!-- id:69 -->
 - [x] 【機能/小】Chat講師チャットのhandleReorder逐次awaitをPromise.allに変更 — ドラッグ並び替え後のDB更新がfor...of + awaitで直列実行されており、複数スロット移動時にUIがブロックされるため並列化する <!-- id:70 -->
 - [x] 【UI/UX/小】Onboarding・TeacherOnboardingの送信エラー時にトースト通知を追加 — 現在setError()でフォーム上部にエラー表示するが、長いフォームではスクロール位置により見えないためトーストで通知する <!-- id:71 -->

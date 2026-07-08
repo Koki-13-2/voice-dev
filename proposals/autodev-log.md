@@ -1216,3 +1216,26 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:49 — gh_portal #68 Dashboard.tsxのインラインstyle(358箇所)をCSS変数・クラスに段階的に移行
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+## 実施内容
+
+**globals.css に追加したユーティリティクラス（140行追加）：**
+
+| クラス群 | 用途 | 削減した重複 |
+|----------|------|--------------|
+| `.dashboard-stats-strip` / `.dashboard-stats-cell` / `.dashboard-stats-label` / `.dashboard-stats-value` | 4セルのサマリーストリップグリッド | 生徒・教師の両側に重複していた8セル分のインラインstyle |
+| `.notice-card` + `--info / --success / --warning / --compact / --row` | 面談招待・確定・アンケート通知カード | 3枚のカードの`margin / padding / borderRadius / background / border`の重複 |
+| `.notice-card__head` | カード内ヘッダー行 | 各カード内の`display:flex / gap / fontWeight / fontSize`の重複 |
+| `.status-badge` + `--warning / --error / --success / --muted / --bold` | `MeetingBadge`の全5状態 | 5パターンのバッジで各10個以上のプロパティが重複 |
+| `.spinner` / `.tl-empty-state` / `.tl-empty-state__msg` | ローディング・空状態 | 2箇所で重複していたローディングUI |
+
+**既存機能への影響なし**（ビルド成功・TypeScriptエラーなし）。
+
+```
+
