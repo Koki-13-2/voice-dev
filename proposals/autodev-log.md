@@ -1301,3 +1301,19 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 10:15 — gh_portal #73 本番console.errorをstructured loggingサービス(Sentry等)へ置換する準備としてエラーレポートユーティリティを追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+
+- `src/lib/reportError.ts` を新規作成。現在は `console.error` へのフォールスルーで動作し、将来 Sentry 等を導入する際はこの関数の中身を変更するだけで全エラー報告先を切り替えられます。
+- 19箇所の `console.error` を `reportError` に置換（9ファイル）:
+  - `ErrorBoundary.tsx`, `storage.ts`, `Login.tsx`, `Register.tsx`, `Onboarding.tsx`, `TeacherOnboarding.tsx`, `Practice.tsx`, `Dashboard.tsx`, `AdminJob.tsx`, `Job.tsx`
+- `tsc && vite build` でビルド成功を確認後、コミット＆プッシュ済み。
+
+```
+
