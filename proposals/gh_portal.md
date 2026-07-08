@@ -103,7 +103,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【セキュリティ/小】ProfileSheet編集フォームのバリデーション追加 — Onboardingにあるカタカナ・電話番号・郵便番号のバリデーションがProfileSheet編集にはなく厳格な入力検証をバイパスできるため同等のバリデーションを追加する <!-- id:96 done:2026-07-09T08:38 -->
 - [x] 【セキュリティ/小】ログアウト時のlocalStorageキャッシュクリア — logout関数がisAdmin/isOwner/tutorial等のlocalStorageキーを削除せずセッション間でstaleな権限データが残るため、signOut時に関連キーを全消去する <!-- id:97 done:2026-07-09T07:49 -->
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 -->
-- [x] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
+- [x] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 done:2026-07-09T08:46 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 -->
 - [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->

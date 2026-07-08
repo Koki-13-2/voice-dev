@@ -1797,3 +1797,26 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 ```
 
+## 2026-07-09 08:46 — gh_portal #99 Material Symbols Roundedフォントのサブセット化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+push完了です。タスクが完了しました。
+
+**実施内容まとめ:**
+
+- `index.html` の Material Symbols Rounded フォント URL を最適化
+- **`icon_names` パラメータ**: 全アイコンから実際に使用している103個のみにサブセット化
+- **可変軸の固定**: 全範囲ロードから実使用値のみに絞り込み
+  - `opsz`: `20..48` → `24`（CSSで固定値24のみ使用）
+  - `wght`: `100..700` → `400`（CSSで固定値400のみ使用）
+  - `FILL`: `0..1` のまま維持（0と1の両方を使用）
+  - `GRAD`: `-50..200` → `0`（CSSで固定値0のみ使用）
+- **`display=block`** を追加（アイコンフォントはswapより適切）
+
+推定500KB超のフォントペイロードが大幅に削減され、First Contentful Paint が改善されます。
+
+```
+
