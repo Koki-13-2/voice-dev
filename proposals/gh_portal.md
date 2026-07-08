@@ -116,7 +116,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 done:2026-07-09T08:13 -->
 - [ ] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
 - [ ] 【アクセシビリティ/小】Timeline投稿画像にユーザー入力alt属性を追加 — 全投稿画像がalt=""で出力されスクリーンリーダーに無視される（画像投稿UIにalt入力欄を追加） <!-- id:111 -->
-- [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 -->
+- [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 done:2026-07-09T08:16 -->
 - [ ] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 -->
 - [ ] 【機能/小】Chat面談招待モーダルのmeetingsテーブルINSERT実装 — Chat.tsxのhandleSendMeetingがローカルstate更新のみで面談招待がDBに永続化されず、Dashboard側と断絶している <!-- id:114 -->
 - [ ] 【機能/中】AdminStudents宿題（添削）進捗セクションの実データ表示実装 — 「今後のアップデートで実装予定」プレースホルダーをhomework_tickets/correctionsの集計データに置き換え、講師が生徒の学習進捗を把握できるようにする <!-- id:115 -->
@@ -125,6 +125,6 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
 - [ ] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->
 - [ ] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 -->
-- [ ] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 -->
+- [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 -->
 - [ ] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 -->
-- [ ] 【機能/小】面談実施後のmeetings.statusを'completed'に遷移する処理の追加 — MtgWorkflowScreenでmeeting_recordsは保存されるがmeetingsテーブルのstatusが'accepted'のまま更新されず、面談の完了状態が管理できない <!-- id:123 -->
+- [x] 【機能/小】面談実施後のmeetings.statusを'completed'に遷移する処理の追加 — MtgWorkflowScreenでmeeting_recordsは保存されるがmeetingsテーブルのstatusが'accepted'のまま更新されず、面談の完了状態が管理できない <!-- id:123 -->

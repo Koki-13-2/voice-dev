@@ -1702,3 +1702,27 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-09 08:16 — gh_portal #112 Timelineいいねトグルにデバウンスまたはロック機構を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了。
+
+## 変更内容
+
+`src/pages/Timeline.tsx` に2つのロック用Refを追加しました：
+
+- **`likeInFlight`** — 投稿いいね用（`Set<string>`、投稿IDを管理）
+- **`replyLikeInFlight`** — リプライいいね用（`Set<string>`、リプライIDを管理）
+
+**動作原理：**
+1. `toggleLike(id)` / `toggleReplyLike(postId, replyId)` 呼び出し時、対象IDがSetに存在する場合は即座に`return`（連打を無視）
+2. 処理開始時にIDをSetに追加
+3. DB操作完了後（成功・失敗どちらも）IDをSetから削除してロック解除
+
+これにより、前のINSERT/DELETE操作が完了するまで次のトグルを受け付けないため、「UI=解除済みだがDBにはlikeレコードが残る」競合状態が解消されます。オプティミスティックUIの即時反映は維持したままです。
+
+```
+
