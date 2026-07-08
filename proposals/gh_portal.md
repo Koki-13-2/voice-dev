@@ -106,5 +106,5 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 -->
 - [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
-- [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 -->
+- [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
 - [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->

@@ -1600,3 +1600,14 @@ if (event === 'TOKEN_REFRESHED') {
 
 ```
 
+## 2026-07-08 17:03 — gh_portal #102 AdminPayroll unitPrice/bonusFlatの数値バリデーション追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+`unitPrice` と `bonusFlat` 両方の `onChange` ハンドラに `Math.max(0, Number(e.target.value))` を追加し、ブラウザの `min={0}` ヒントをすり抜けた負の値（手動入力や devtools 経由）もクランプするようにしました。コミット・push 済みです。
+
+```
+
