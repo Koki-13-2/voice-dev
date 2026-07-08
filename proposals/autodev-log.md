@@ -1190,3 +1190,18 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:31 — gh_portal #66 PillItem型定義のChat.tsxとDashboard.tsx間での重複解消
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容:**
+- `src/lib/types.ts` を新規作成し、`TaskStatus` 型と `PillItem` インターフェース（Dashboard版の完全な定義）を定義
+- `Dashboard.tsx` から重複する `TaskStatus` と `PillItem` の定義を削除し、`lib/types` からimport
+- `Chat.tsx` から `PillItem` の定義を削除し、`lib/types` からimport
+- `tsc --noEmit` で型エラーなしを確認済み
+
+```
+
