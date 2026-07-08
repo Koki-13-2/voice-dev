@@ -1113,3 +1113,22 @@ Chat.tsxは `realtimeSubRef` / `channelRealtimeRef` と手動 `cleanup()` 関数
 
 ```
 
+## 2026-07-08 09:08 — gh_portal #61 React ErrorBoundaryの追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容:**
+
+- `src/components/ErrorBoundary.tsx` を新規作成（React クラスコンポーネント）
+  - 日本語フォールバック UI（アプリの CSS 変数・カードスタイルに準拠）
+  - 「再試行」ボタンで状態リセット可能
+  - `componentDidCatch` でコンソールにエラーログを出力
+- **`Layout.tsx`** の `Outlet` 周辺に追加 → ページ単位のエラーをキャッチ、Header/TabBar は維持
+- **`App.tsx`** のトップレベルにも追加 → Context 例外など全体をカバー
+- ビルド成功、`git push` 済み
+
+```
+

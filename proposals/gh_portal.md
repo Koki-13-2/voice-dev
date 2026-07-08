@@ -65,7 +65,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【性能/小】Dashboard rescheduleMaterialのN+1クエリ解消 — rescheduleMaterial（938-941行目）がforループ内で逐次awaitしてSupabaseをN回呼び出しているため、Promise.allまたは単一RPCにバッチ化する <!-- id:58 -->
 - [x] 【UI/UX/小】Chatタブ切替時の下書きテキスト分離管理 — Chatコンポーネントのdraft状態（749行目）が全タブで共有されており、タブ切替時に前のタブの入力途中テキストが残るため、タブ/ルームごとに独立したdraft管理にする <!-- id:59 done:2026-07-08T08:57 -->
 - [x] 【UI/UX/小】Practice演習開始時のローディングインジケーター追加 — startQuiz（576-632行目）がDB問い合わせ中にスピナー等を表示せずUIがフリーズして見えるため、ローディング状態を追加する <!-- id:60 done:2026-07-08T09:03 -->
-- [x] 【運用/小】React ErrorBoundaryの追加 — コードベース全体にErrorBoundaryが存在せず、レンダリング時例外で白画面クラッシュになるため、AppRoutesまたはLayout.tsxのOutlet周辺にフォールバックUI付きErrorBoundaryを追加する <!-- id:61 -->
+- [x] 【運用/小】React ErrorBoundaryの追加 — コードベース全体にErrorBoundaryが存在せず、レンダリング時例外で白画面クラッシュになるため、AppRoutesまたはLayout.tsxのOutlet周辺にフォールバックUI付きErrorBoundaryを追加する <!-- id:61 done:2026-07-08T09:08 -->
 - [x] 【運用/中】Admin5画面の共通データ取得フック（useAsyncLoad）抽出 — AdminUsers・AdminStudents・AdminPayroll・AdminDeliverables・AdminMessagesで同一のuseEffect+cancelled+setLoadingパターンとtoInitial関数が重複しているため、共通カスタムフックに抽出する <!-- id:62 done:2026-07-08T08:43 -->
 - [x] 【機能/小】Onboardingフォーム途中保存の実装 — Onboarding.tsxでブラウザを閉じると全入力データが消失するため、ステップ完了ごとにlocalStorageまたはSupabaseのドラフト行に途中状態を保存する <!-- id:63 -->
 - [x] 【性能/中】React.lazyによるページ単位コード分割の導入 — 全ページを同期importしておりバンドルが1.5MBの単一ファイルになっているため、React.lazy + Suspenseでルート単位の遅延読み込みを実装する <!-- id:64 -->
