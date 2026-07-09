@@ -1877,3 +1877,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 10:17 — gh_portal #130 AdminJob提出物コメント送信者名の'不明'表示解消
+
+- 結果: ✅ 成功
+
+```
+修正完了です。
+
+**変更内容:**
+
+1. **`src/pages/AdminJob.tsx:3106`** — 初回ロード時のSupabaseクエリで `job_submission_comments(*)` を `job_submission_comments(*, profiles!sender_id(name, is_admin, is_owner))` に変更し、送信者の `profiles` を JOIN するようにした。
+
+2. **`src/pages/AdminJob.tsx:270-271`** — `mapAdminJob` 関数内のコメントマッピングで `senderName: '不明'`（ハードコード）を `senderName: c.profiles?.name ?? '不明'`、`isAdmin: false` を `isAdmin: !!(c.profiles?.is_admin || c.profiles?.is_owner)` に修正。
+
+これにより、管理者が案件詳細を開いた初回ロード時から、コメント投稿者の名前と管理者フラグが正しく表示されます（リアルタイム更新時はすでに正しく取得されていたため、そちらは変更不要）。
+
+```
+
