@@ -126,10 +126,10 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->
 - [x] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 done:2026-07-09T08:22 -->
 - [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 done:2026-07-09T08:28 -->
-- [ ] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 -->
+- [x] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 done:2026-07-09T23:42 -->
 - [x] 【機能/小】面談実施後のmeetings.statusを'completed'に遷移する処理の追加 — MtgWorkflowScreenでmeeting_recordsは保存されるがmeetingsテーブルのstatusが'accepted'のまま更新されず、面談の完了状態が管理できない <!-- id:123 done:2026-07-09T08:50 -->
-- [ ] 【機能/小】SchoolEditModal志望校・受験日変更のstudent_profiles永続化 — 講師ダッシュボードの志望校・受験日編集モーダル（Dashboard.tsx:4244）でonSaveがローカルstate更新のみでSupabaseに書き込まれないため、画面を閉じると変更が消失する <!-- id:124 -->
-- [ ] 【機能/小】Chat面談招待ステータス変更のmeetingsテーブル同期 — Chat.tsx:1329のupdateMeetingStatusが生徒の承諾・拒否をローカルstateのみで処理しDBに反映しないため、Dashboard側との状態不整合が発生する <!-- id:125 -->
+- [x] 【機能/小】SchoolEditModal志望校・受験日変更のstudent_profiles永続化 — 講師ダッシュボードの志望校・受験日編集モーダル（Dashboard.tsx:4244）でonSaveがローカルstate更新のみでSupabaseに書き込まれないため、画面を閉じると変更が消失する <!-- id:124 -->
+- [x] 【機能/小】Chat面談招待ステータス変更のmeetingsテーブル同期 — Chat.tsx:1329のupdateMeetingStatusが生徒の承諾・拒否をローカルstateのみで処理しDBに反映しないため、Dashboard側との状態不整合が発生する <!-- id:125 -->
 - [x] 【機能/中】Contents画面のarticle・column・youtube型コンテンツのクリック遷移実装 — Contents.tsx:204でlecture以外のtype（article/column/youtube）にonSelectが付与されずタップ不能のため、動画以外の学習コンテンツにアクセスできない <!-- id:126 -->
 - [x] 【機能/小】Contents画面のvisibilityハードコード解消 — Contents.tsx:100でvisibilityが常に'private'にハードコードされておりDBのstatusカラムと乖離するため、公開コンテンツにもロックアイコンが表示される <!-- id:127 -->
 - [x] 【機能/小】meeting_recordsのmeeting_id紐付け追加 — Dashboard.tsx:2806のmeeting_records INSERT時にmeeting_idカラムを設定しないため、面談予約（meetingsテーブル）と実施記録（meeting_records）がDB上で紐付かず面談実施率の集計ができない <!-- id:128 -->

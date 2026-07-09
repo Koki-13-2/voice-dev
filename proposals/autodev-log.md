@@ -1972,3 +1972,27 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:42 — gh_portal #122 添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+## 実施内容
+
+**根本原因:** `corrections` テーブルの RLS ポリシーに `teacher_update_own`（教師のみ UPDATE 可）しか存在せず、生徒が `is_read_by_student` を更新しようとしても Supabase が RLS でサイレントに拒否していた。
+
+**対応内容:**
+
+1. **`supabase/migrations/20260709000004_corrections_student_update_read_status.sql`** を新規作成
+   - `student_update_read_status` ポリシーを追加：`test_submissions.student_id = auth.uid()` で検証し、生徒が自分の添削レコードのみ UPDATE できるように
+   - `supabase db push` でリモート DB に適用済み
+
+2. **`src/pages/Practice.tsx` の `FeedbackDetail`** を改善
+   - `.then(({ error }) => { ... })` に変更してエラーを検出
+   - DB 更新失敗時は `onRead?.()` を呼ばないよう修正（誤った既読状態を防ぐ）
+   - 失敗時は `reportError` でログ出力
+
+```
+
