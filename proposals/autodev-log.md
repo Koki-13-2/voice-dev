@@ -2055,3 +2055,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-10 00:01 — gh_portal #127 Contents画面のvisibilityハードコード解消
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容：**
+
+1. **`Contents.tsx:62`** — Supabaseクエリの`select`に`visibility`カラムを追加
+2. **`Contents.tsx:100`** — `'private' as const`のハードコードを`(c.visibility as ContentItem['visibility']) ?? 'private'`に変更（DBに値がない場合のフォールバックとして`'private'`を維持）
+3. **`database.types.ts`** — `contents`テーブルのRow/Insert/Update型定義に`visibility: string | null`を追加し、Supabaseの型推論エラーを解消
+
+これにより、DBの`visibility`カラムが`'public'`のコンテンツ（例：`article`タイプ）ではロックアイコン(🔒)ではなくグローブアイコン(🌐)が正しく表示されるようになります。
+
+```
+
