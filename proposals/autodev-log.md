@@ -1955,3 +1955,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:30 — gh_portal #134 TeacherPractice handleReturn添削返却のエラーハンドリング追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容（`src/pages/TeacherPractice.tsx`）:**
+
+- `returnError` state（`string | null`）を追加
+- `handleReturn` の2つのDB操作（`correction_comments` INSERT・`corrections` UPDATE）をtry-catchで包み、Supabaseが返すエラーオブジェクトを確認してスロー
+- エラー発生時は `returnError` をセットして `saving` をリセット（UIが「返却中...」のまま固まらない）
+- 確認ダイアログ内のボタン上部にエラーメッセージを赤字で表示
+- キャンセルボタンでダイアログを閉じる際に `returnError` もリセット
+
+```
+
