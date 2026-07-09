@@ -2097,3 +2097,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-10 00:14 — gh_portal #137 corrections提出時の担当講師へのアプリ内通知実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容まとめ：**
+
+- `TeacherStudentData` インターフェースに `pendingCorrectionCount: number` を追加
+- `fetchStudents()` の `Promise.all` に corrections クエリを追加：`corrections` テーブルを `test_submissions` とジョインして `status = 'pending'` の件数を生徒IDごとに集計
+- 生徒カード（`StudentListScreen`）に「未添削 N件」バッジ（黄色）を表示（件数が1以上の場合のみ）
+
+ダッシュボードの既存アラートバッジ（宿題遅延）と並んで表示されるため、講師はPDF提出があった生徒を一目で確認できます。
+
+```
+
