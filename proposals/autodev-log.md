@@ -1839,3 +1839,18 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 10:07 — gh_portal #133 PillDetailModal「教材詳細」ボタンのonClickハンドラ実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容:**
+
+1. **`BookDetailModal`** — 「学習進捗・完了目標」セクションを `item.deadline` が空の場合は非表示にするよう修正（ガントチャートからの既存利用には影響なし）
+
+2. **`PillDetailModal`** — `showBookDetail` ステートを追加し、「教材詳細」ボタンに `onClick={() => setShowBookDetail(true)}` を接続。ボタンクリックで既存の `BookDetailModal` が開き、教材名でGoogle Books APIを検索して表紙・著者・説明・外部リンクを表示。× ボタンで閉じると元の宿題ピルポップアップに戻ります。
+
+```
+
