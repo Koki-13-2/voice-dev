@@ -1934,3 +1934,24 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:28 — gh_portal #140 Job.tsx講師側DB操作（handleSubmit・SubmissionThread.handleSend）のエラーハンドリング追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。以下の変更を実施しました：
+
+**修正箇所（全4箇所）**
+
+1. **`JobDetail.handleSubmit`** — `supabase.from('job_submissions').insert(...)` をtry-catchで囲み、エラー時は早期リターンして `submitError` 状態をセット。提出フォームのボタン下にエラーメッセージを赤色で表示する。
+
+2. **`SubmissionThread.handleSend`** — insertの返り値の `error` を検査し、失敗時は楽観的に追加したコメントを削除・入力を復元し `sendError` を表示。
+
+3. **`TeacherFieldCommentThread.handleSend`** — 同上。
+
+4. **`TeacherJobTaskThread.handleSend`** — 同上。
+
+いずれも `reportError()` でコンソールにもログを出力し、ユーザーには赤いエラーバナーを表示します。ビルド成功・pushまで完了。
+
+```
+
