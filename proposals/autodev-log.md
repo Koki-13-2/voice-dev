@@ -1854,3 +1854,26 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 10:15 — gh_portal #129 Practice予想問題（PredictedList）のDB接続と問題取得ロジック実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更の概要：
+
+**マイグレーション** (`20260709000002_add_similar_type_to_tests.sql`)
+- `tests.type` の CHECK 制約に `'similar'` を追加
+- `tests.difficulty` カラムを追加（基礎/標準/応用/発展）
+
+**`PredictedList` コンポーネント**（`Practice.tsx:1442`）
+- `student_profiles` から志望校3件を取得してフィルタリング
+- `tests WHERE type = 'similar'` で類似問題を取得
+- 過去の `auto_score_results` を集計して苦手科目（正答率 70% 未満）を特定し、優先表示
+- 科目・難易度チップフィルター
+- 受験状況バッジ（未受験 / 受験済 XX%）
+- 問題タップで既存の `startQuiz` → `test_questions` 取得フローで受験開始
+
+志望校が未設定の場合は設定を促すメッセージ、類似問題がまだ登録されていない場合は「志望校の過去問が追加されると自動生成されます」と表示するため、データなし状態でも適切に案内できます。
+
+```
+
