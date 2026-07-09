@@ -1894,3 +1894,27 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 10:25 — gh_portal #131 Job.tsx作業タイマーのSupabase同期
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+## 変更内容
+
+**マイグレーション** (`supabase/migrations/20260709000003_job_timer_states.sql`)
+- `job_timer_states` テーブルを新規作成（`teacher_id + job_id` が主キー）
+- RLS ポリシー付き（自分のレコードのみ読み書き可能）
+
+**Job.tsx のタイマーロジック変更**
+- **初回マウント時**: `localStorage` にデータがない場合のみ Supabase から状態を復元 → `localStorage` へも書き戻す（端末変更後に継続可能）
+- **タイマー操作時**（開始・中断・再開）: `localStorage` と Supabase 両方に保存（`phase === 'idle'` の初期状態は同期しない）
+- **タイマー停止時**: `localStorage` と Supabase 両方から削除
+
+**database.types.ts**: `job_timer_states` の型定義を追加（TypeScript 型安全）
+
+> **注意**: マイグレーションは Supabase ダッシュボードの SQL Editor で `supabase/migrations/20260709000003_job_timer_states.sql` を実行してテーブルを作成してください。
+
+```
+
