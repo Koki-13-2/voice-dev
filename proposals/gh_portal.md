@@ -136,7 +136,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】Practice予想問題（PredictedList）のDB接続と問題取得ロジック実装 — Practice.tsx:1442のPredictedListが常に「予想問題はありません」を表示するプレースホルダーのため、志望校別の類題演習機能が利用不能である <!-- id:129 done:2026-07-09T10:15 -->
 - [x] 【機能/小】AdminJob提出物コメント送信者名の'不明'表示解消 — AdminJob.tsx:270-274でjob_submission_comments初回ロード時にsenderNameが一律'不明'にハードコードされるため、管理者がコメント投稿者を識別できない <!-- id:130 done:2026-07-09T10:17 -->
 - [x] 【運用/小】Job.tsx作業タイマーのSupabase同期 — Job.tsx:911-917でタイマーデータがlocalStorageのみに保存されるため端末変更時に全作業時間データが消失し、講師の作業実績が正確に記録されない <!-- id:131 done:2026-07-09T10:25 -->
-- [x] 【機能/小】AdminPayrollコマ数自動集計のmeeting_records連携 — AdminPayroll.tsx:305でコマ数が手動入力前提（lesson_count）のため、meeting_recordsの面談実施件数から自動集計する仕組みがなく運用負荷が高い <!-- id:132 -->
+- [x] 【機能/小】AdminPayrollコマ数自動集計のmeeting_records連携 — AdminPayroll.tsx:305でコマ数が手動入力前提（lesson_count）のため、meeting_recordsの面談実施件数から自動集計する仕組みがなく運用負荷が高い <!-- id:132 done:2026-07-09T10:29 -->
 - [x] 【機能/小】PillDetailModal「教材詳細」ボタンのonClickハンドラ実装 — Dashboard.tsx:4475の「教材詳細」ボタンにonClickが未設定でクリックしても何も起こらないため、生徒が宿題実施中に教材情報を参照できない <!-- id:133 done:2026-07-09T10:07 -->
 - [ ] 【運用/小】TeacherPractice handleReturn添削返却のエラーハンドリング追加 — correction_comments INSERTとcorrections UPDATE の2DB操作にtry-catchがなく、失敗時にUIフィードバックがないため添削が中途半端な状態で残りうる <!-- id:134 -->
 - [ ] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 -->

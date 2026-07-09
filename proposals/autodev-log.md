@@ -1918,3 +1918,19 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 10:29 — gh_portal #132 AdminPayrollコマ数自動集計のmeeting_records連携
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容：**
+
+- `meeting_records` テーブルから当月分（`meeting_date >= YYYY-MM-01 AND < YYYY-(M+1)-01`）のレコードを取得し、`teacher_id` ごとに件数を集計してコマ数として使用するよう変更
+- `payroll_records` からは `lesson_count` を取得しなくなり（ステータス管理のみ）、コマ数は完全に `meeting_records` の実績から自動算出
+- 月セレクトを変更するたびに再フェッチするため、当月・過去月ともに正確な面談件数が表示される
+- ビルド確認 → コミット → プッシュ完了
+
+```
+
