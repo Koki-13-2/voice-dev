@@ -142,7 +142,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 -->
 - [ ] 【機能/小】homework_tickets生徒側の完了報告UI実装 — 生徒が宿題完了を報告しhomework_ticketsのステータスを更新するボタンとDB処理を追加する <!-- id:136 -->
 - [x] 【機能/中】corrections提出時の担当講師へのアプリ内通知実装 — 生徒がPDF提出でcorrectionsレコードを作成した際に担当講師のDashboardに未添削通知を表示する仕組みを追加する <!-- id:137 done:2026-07-10T00:14 -->
-- [x] 【機能/中】content_progress視聴進捗の講師側確認UI追加 — 担当生徒のコンテンツ視聴進捗率（content_progress.watch_pct）を講師がDashboard上で一覧確認できるセクションを追加する <!-- id:138 -->
+- [x] 【機能/中】content_progress視聴進捗の講師側確認UI追加 — 担当生徒のコンテンツ視聴進捗率（content_progress.watch_pct）を講師がDashboard上で一覧確認できるセクションを追加する <!-- id:138 done:2026-07-10T00:17 -->
 - [x] 【運用/中】TeacherPractice添削ドラフトのlocalStorage自動保存 — 添削中のスコアシート・コメントをlocalStorageにdebounce付きで定期保存しブラウザクローズ時のデータ消失を防止する <!-- id:139 -->
 - [x] 【運用/小】Job.tsx講師側DB操作（handleSubmit・SubmissionThread.handleSend）のエラーハンドリング追加 — ファイル提出とコメント送信にtry-catchがなく失敗が検知されずUIが成功状態のまま残る問題を修正する <!-- id:140 done:2026-07-09T23:28 -->
 - [x] 【機能/中】auto_score_results自動採点結果の講師側閲覧UI追加 — TeacherPracticeに担当生徒の確認テスト自動採点結果を生徒別に一覧表示・フィルタリングできるセクションを追加する <!-- id:141 -->
