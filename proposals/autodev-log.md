@@ -2072,3 +2072,28 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-10 00:05 — gh_portal #128 meeting_recordsのmeeting_id紐付け追加
+
+- 結果: ✅ 成功
+
+```
+このタスクはすでに実装済みです。
+
+コミット `758b2eb`（`feat(MtgWorkflow): 面談完了時にmeetings.statusを'completed'に更新`）の中で同時に対応されており、コミットメッセージにも `meeting_recordsへのinsert時にmeeting_idも設定（スキーマに存在するが未設定だった）` と明記されています。
+
+現在の `Dashboard.tsx:2812` では：
+
+```typescript
+.insert({
+  teacher_id: teacherId,
+  student_id: student.id,
+  meeting_id: inv.id ?? null,   // ← 既に設定済み
+  meeting_date: inv.date,
+  ...
+})
+```
+
+`meeting_id` が正しく設定されており、`meetingsテーブル` との紐付けも機能しています。追加の実装作業は不要です。
+
+```
+
