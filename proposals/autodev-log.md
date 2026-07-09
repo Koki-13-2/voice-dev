@@ -2040,3 +2040,18 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:56 — gh_portal #126 Contents画面のarticle・column・youtube型コンテンツのクリック遷移実装
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容：
+
+**`Contents.tsx:204`** の `onSelect` 判定を修正しました。
+
+- `lecture` → 従来通り VideoDetail モーダルを開く
+- `article` / `youtube` / `column` → `item.url` が存在する場合、`window.open(..., '_blank', 'noopener,noreferrer')` で新タブ外部遷移（要件定義の画面遷移図に準拠）
+- `url` が null のカードは非活性のまま（クラッシュしない）
+
+```
+
