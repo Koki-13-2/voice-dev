@@ -1996,3 +1996,19 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:44 — gh_portal #124 SchoolEditModal志望校・受験日変更のstudent_profiles永続化
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容**: `Dashboard.tsx:4162` の `SchoolEditModal` の `onSave` ハンドラを `async` 化し、ローカルstate更新の前に `supabase.from('student_profiles').upsert(...)` を追加しました。
+
+- `targetSchool`（例: `東京大学・法学部`）を `・` で分割し、`target_university` / `target_major` として個別に保存
+- `exam_date` も `exam_date` カラムに保存（空文字は `null` として渡す）
+- `{ onConflict: 'id' }` で既存行のupsertに対応
+- ビルドOK・pushOK
+
+```
+
