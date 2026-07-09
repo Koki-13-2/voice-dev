@@ -2012,3 +2012,31 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-09 23:54 — gh_portal #125 Chat面談招待ステータス変更のmeetingsテーブル同期
+
+- 結果: ✅ 成功
+
+```
+実装完了しました。変更内容のまとめ：
+
+**修正内容（`src/pages/Chat.tsx`）**
+
+1. **`MeetingInvitation`インターフェース**: `meetingId?: string` を追加してDBレコードと紐づけ
+
+2. **`dbToChat`関数**: `__meeting__:<JSON>` プレフィックスを検出・解析して `meetingInvite` を復元。これにより、DBに保存した面談招待メッセージをRealtimeで受信した際も正しくカード表示できる
+
+3. **`handleSendMeeting`（async化）**: 
+   - `meetings` テーブルにINSERTして meeting UUID を取得
+   - `messages` テーブルに `__meeting__:...` 形式で保存（Realtime経由で生徒側にも配信）
+   - ローカルstate更新は削除（Realtimeが担う）
+
+4. **`updateMeetingStatus`（async化）**: 
+   - ローカルstate更新を維持しつつ、`meetings.status` をDB更新
+   - `invited → rejected` 遷移時のみ `reject_count` をインクリメント（2回辞退でシステム通知する要件に対応）
+
+5. **生徒ビュー**: `MeetingInviteCard` 描画を追加（`onAccept`/`onReject` 付き）。これで生徒が承諾・辞退ボタンを押すとDB更新が実行される
+
+6. **講師ビュー**: 既存の `MeetingInviteCard` に `onAccept`/`onReject` を追加
+
+```
+
