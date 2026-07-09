@@ -2134,3 +2134,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-10 00:21 — gh_portal #139 TeacherPractice添削ドラフトのlocalStorage自動保存
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容をまとめます。
+
+**実装内容（`TeacherPractice.tsx`）**
+
+- `draftKey` / `loadDraft` / `hasDraftInStorage` ヘルパーを追加（キー形式: `tp_draft_v1_{correctionId}`）
+- `ReviewScreen` の `problems` 初期値を lazy initializer でlocalStorage復元に変更（ドラフトがあれば復元、なければデフォルト5大問）
+- `problems` 変更時に1秒debounceでlocalStorageへ自動保存する `useEffect` を追加
+- 返却成功後に `localStorage.removeItem` でドラフトをクリア
+- 一覧の `hasDraft` 判定を `!!c.model_pdf_path`（誤り）から `hasDraftInStorage(c.id)` に修正
+
+```
+
