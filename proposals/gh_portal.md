@@ -145,6 +145,6 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】content_progress視聴進捗の講師側確認UI追加 — 担当生徒のコンテンツ視聴進捗率（content_progress.watch_pct）を講師がDashboard上で一覧確認できるセクションを追加する <!-- id:138 done:2026-07-10T00:17 -->
 - [x] 【運用/中】TeacherPractice添削ドラフトのlocalStorage自動保存 — 添削中のスコアシート・コメントをlocalStorageにdebounce付きで定期保存しブラウザクローズ時のデータ消失を防止する <!-- id:139 done:2026-07-10T00:21 -->
 - [x] 【運用/小】Job.tsx講師側DB操作（handleSubmit・SubmissionThread.handleSend）のエラーハンドリング追加 — ファイル提出とコメント送信にtry-catchがなく失敗が検知されずUIが成功状態のまま残る問題を修正する <!-- id:140 done:2026-07-09T23:28 -->
-- [x] 【機能/中】auto_score_results自動採点結果の講師側閲覧UI追加 — TeacherPracticeに担当生徒の確認テスト自動採点結果を生徒別に一覧表示・フィルタリングできるセクションを追加する <!-- id:141 -->
+- [x] 【機能/中】auto_score_results自動採点結果の講師側閲覧UI追加 — TeacherPracticeに担当生徒の確認テスト自動採点結果を生徒別に一覧表示・フィルタリングできるセクションを追加する <!-- id:141 done:2026-07-10T00:28 -->
 - [ ] 【機能/小】homework_tickets期限切れアラートの表示実装 — 宿題の期限超過・期限間近（例: 残り1日以内）を生徒Dashboard・講師Dashboardの双方に視覚的に警告表示する <!-- id:142 -->
 - [x] 【機能/中】meeting_records面談記録の講師向け過去履歴検索UI追加 — Dashboard内に埋もれている面談記録を独立セクション化し生徒名・日付で過去の面談チェック項目・メモを検索参照可能にする <!-- id:143 -->
