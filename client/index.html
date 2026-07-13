@@ -1523,6 +1523,8 @@
   }
   .zm-row:hover { background: rgba(255,255,255,.03); }
   .zm-row-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zm-pdf-link { color: var(--mode-zipmail); text-decoration: none; }
+  .zm-pdf-link:hover { text-decoration: underline; }
   .zm-row-size { color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
   .zm-footer {
@@ -3019,9 +3021,13 @@ async function showZipmailScreen(projPath, projName) {
       </div>`;
       for (const i of idxs) {
         const f = files[i];
+        const isPdf = f.name.toLowerCase().endsWith('.pdf');
+        const nameHtml = isPdf
+          ? `<a class="zm-pdf-link" href="/pdf-view?path=${encodeURIComponent(f.path)}" target="_blank" title="PDFをプレビュー">${escHtml(f.name)} 👁</a>`
+          : escHtml(f.name);
         inner += `<div class="zm-row">
           <input type="checkbox" data-zm-idx="${i}" data-zm-in="${escAttr(folder)}" onchange="zmUpdateCount()" />
-          <span class="zm-row-name" title="${escHtml(f.rel_path)}">${escHtml(f.name)}</span>
+          <span class="zm-row-name" title="${escHtml(f.rel_path)}">${nameHtml}</span>
           <span class="zm-row-size">${fmtSize(f.size)}</span>
         </div>`;
       }

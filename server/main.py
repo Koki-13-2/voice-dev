@@ -372,6 +372,23 @@ async def plan_delete_file(path: str):
     return JSONResponse({"ok": True})
 
 
+# ── PDFプレビュー（新タブ）──────────────────────────
+@app.get("/pdf-view")
+async def pdf_view(path: str):
+    pdf_path = Path(path)
+    if pdf_path.suffix.lower() != ".pdf" or not pdf_path.is_file():
+        return HTMLResponse("<p>PDFファイルが見つかりません</p>", status_code=404)
+    try:
+        pdf_path.resolve().relative_to(Path.home())
+    except ValueError:
+        return HTMLResponse("<p>不正なパスです</p>", status_code=403)
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "inline"},
+    )
+
+
 # ── 企画モード: MDファイル閲覧（新タブ）─────────────
 @app.get("/md-view")
 async def md_view(path: str):
