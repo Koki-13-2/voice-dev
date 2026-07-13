@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -614,6 +615,135 @@ async def test_gcloud():
         })
     except subprocess.TimeoutExpired:
         return JSONResponse({"error": "gcloud コマンドがタイムアウトしました"}, status_code=504)
+
+
+# ── ZIP送付モード ────────────────────────────────────
+ZIPMAIL_DEFAULT_TO = "koki.n.shukatsu@gmail.com"
+ZIPMAIL_MAX_ZIP_BYTES = 20 * 1024 * 1024  # Gmail添付上限25MBへの安全マージン
+
+
+@app.get("/api/zipmail/files")
+async def zipmail_files(project_path: str):
+    """送付対象のファイル一覧（サイズ上限なし・sizeを含む）"""
+    proj = Path(project_path)
+    try:
+        proj.resolve().relative_to(Path.home())
+    except ValueError:
+        return JSONResponse({"error": "不正なパスです"}, status_code=403)
+    if not proj.exists():
+        return JSONResponse([])
+    files = []
+    for f in sorted(proj.rglob("*")):
+        if not f.is_file():
+            continue
+        rel = f.relative_to(proj)
+        parts = rel.parts
+        if any(p in _IGNORE_DIRS or p.startswith('.') for p in parts[:-1]):
+            continue
+        if parts[-1].startswith('.'):
+            continue
+        try:
+            size = f.stat().st_size
+        except Exception:
+            continue
+        files.append({
+            "name": f.name,
+            "path": str(f),
+            "rel_path": str(rel),
+            "folder": str(rel.parent) if str(rel.parent) != "." else "",
+            "size": size,
+        })
+    return JSONResponse(files)
+
+
+@app.get("/api/zipmail/config")
+async def zipmail_config():
+    env = secrets_store.load_env("gmail")
+    return JSONResponse({
+        "configured": bool(env.get("GMAIL_ADDRESS") and env.get("GMAIL_APP_PASSWORD")),
+        "address": env.get("GMAIL_ADDRESS", ""),
+        "default_to": ZIPMAIL_DEFAULT_TO,
+    })
+
+
+def _send_gmail(from_addr: str, app_password: str, to_addr: str,
+                subject: str, body: str, zip_name: str, zip_bytes: bytes) -> None:
+    import smtplib
+    from email.message import EmailMessage
+    msg = EmailMessage()
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+    msg["Subject"] = subject
+    msg.set_content(body)
+    msg.add_attachment(zip_bytes, maintype="application", subtype="zip", filename=zip_name)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=60) as smtp:
+        smtp.login(from_addr, app_password)
+        smtp.send_message(msg)
+
+
+@app.post("/api/zipmail/send")
+async def zipmail_send(data: dict):
+    """選択ファイルをZIP化してGmailで送付する"""
+    import io
+    import zipfile
+    from datetime import datetime
+
+    project_path = Path(data["project_path"])
+    to_addr = (data.get("to") or ZIPMAIL_DEFAULT_TO).strip()
+    paths = data.get("paths") or []
+    if not paths:
+        return JSONResponse({"error": "ファイルが選択されていません"}, status_code=400)
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", to_addr):
+        return JSONResponse({"error": "宛先メールアドレスが不正です"}, status_code=400)
+
+    env = secrets_store.load_env("gmail")
+    from_addr = env.get("GMAIL_ADDRESS")
+    app_password = env.get("GMAIL_APP_PASSWORD")
+    if not from_addr or not app_password:
+        return JSONResponse({
+            "error": "秘密情報（アプリ名: gmail）に GMAIL_ADDRESS と GMAIL_APP_PASSWORD を登録してください"
+        }, status_code=400)
+
+    home = Path.home()
+    buf = io.BytesIO()
+    total_raw = 0
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for p in paths:
+            f = Path(p).resolve()
+            try:
+                f.relative_to(home)
+            except ValueError:
+                return JSONResponse({"error": f"不正なパスです: {p}"}, status_code=403)
+            if not f.is_file():
+                return JSONResponse({"error": f"ファイルが見つかりません: {p}"}, status_code=404)
+            try:
+                arcname = str(f.relative_to(project_path.resolve()))
+            except ValueError:
+                arcname = f.name
+            total_raw += f.stat().st_size
+            zf.write(f, arcname)
+
+    zip_bytes = buf.getvalue()
+    if len(zip_bytes) > ZIPMAIL_MAX_ZIP_BYTES:
+        return JSONResponse({
+            "error": f"ZIPサイズが上限（20MB）を超えています（{len(zip_bytes) / 1024 / 1024:.1f}MB）。選択ファイルを減らしてください"
+        }, status_code=400)
+
+    proj_name = project_path.name or "files"
+    stamp = datetime.now().strftime("%Y%m%d-%H%M")
+    zip_name = f"{proj_name}-{stamp}.zip"
+    subject = f"[Voice Dev] {proj_name} のファイル送付（{len(paths)}件）"
+    body = (f"Voice Dev からのファイル送付です。\n\n"
+            f"プロジェクト: {project_path}\n"
+            f"ファイル数: {len(paths)}件\n"
+            f"ZIPサイズ: {len(zip_bytes) / 1024:.0f}KB\n")
+    try:
+        await asyncio.to_thread(_send_gmail, from_addr, app_password, to_addr,
+                                subject, body, zip_name, zip_bytes)
+    except Exception as e:
+        return JSONResponse({"error": f"メール送信に失敗しました: {e}"}, status_code=502)
+    return JSONResponse({"ok": True, "zip_name": zip_name, "count": len(paths),
+                         "size_kb": round(len(zip_bytes) / 1024), "to": to_addr})
 
 
 # ── 追加提案蓄積モード ───────────────────────────────

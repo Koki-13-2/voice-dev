@@ -49,6 +49,7 @@
     --mode-dev: #5b9dff;
     --mode-plan: #e3b341;
     --mode-propose: #ff9254;
+    --mode-zipmail: #3fd68a;
 
     /* バブル */
     --user-bubble: linear-gradient(135deg, #2f6fed 0%, #5b4fd8 100%);
@@ -221,6 +222,11 @@
     color: var(--mode-propose);
     background: rgba(255,146,84,.12);
     box-shadow: inset 0 0 0 1px rgba(255,146,84,.32), 0 0 12px rgba(255,146,84,.10);
+  }
+  .mode-btn.zipmail.active {
+    color: var(--mode-zipmail);
+    background: rgba(63,214,138,.12);
+    box-shadow: inset 0 0 0 1px rgba(63,214,138,.32), 0 0 12px rgba(63,214,138,.10);
   }
 
   /* ============ ヘッダー内コントロール ============ */
@@ -1473,6 +1479,93 @@
   }
   .autodev-interval-select:focus { border-color: var(--accent); }
 
+  /* ============ ZIP送付モード ============ */
+  .zm-config {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 13px;
+  }
+  .zm-config-note { width: 100%; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+  .zm-folder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mode-zipmail);
+  }
+  .zm-folder input[type=checkbox], .zm-row input[type=checkbox] {
+    width: 17px; height: 17px;
+    accent-color: var(--mode-zipmail);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .zm-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px 7px 26px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    font-size: 13.5px;
+  }
+  .zm-row:hover { background: rgba(255,255,255,.03); }
+  .zm-row-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zm-row-size { color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+  .zm-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 10px 14px;
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .zm-count { font-size: 12.5px; color: var(--muted); flex: 1; min-width: 120px; }
+  .zm-to-input {
+    background: rgba(5,7,12,.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-size: 13px;
+    min-width: 220px;
+    flex: 2;
+  }
+  .zm-send-btn {
+    background: linear-gradient(135deg, #2ea043, #238636);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    border-radius: 10px;
+    padding: 9px 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity .15s, transform .12s;
+  }
+  .zm-send-btn:disabled { opacity: .45; cursor: default; }
+  .zm-send-btn:not(:disabled):active { transform: scale(.97); }
+
   /* ============ 秘密情報モーダル ============ */
   .secret-input {
     flex: 1;
@@ -1804,6 +1897,7 @@
       <button class="mode-btn dev active" onclick="switchMode('dev')">⚡ 実装</button>
       <button class="mode-btn plan" onclick="switchMode('plan')">📝 企画</button>
       <button class="mode-btn propose" onclick="switchMode('propose')">🔧 提案</button>
+      <button class="mode-btn zipmail" onclick="switchMode('zipmail')">📦 送付</button>
     </div>
   </div>
   <div class="header-controls">
@@ -1846,7 +1940,7 @@
 
 <script>
 // ---- モード管理 ----
-let currentMode = localStorage.getItem('mode') || 'dev'; // 'idea' | 'dev' | 'plan' | 'propose'
+let currentMode = localStorage.getItem('mode') || 'dev'; // 'idea' | 'dev' | 'plan' | 'propose' | 'zipmail'
 
 function setModeButtons(mode) {
   document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -2045,6 +2139,8 @@ function selectProject(path, name) {
     showPlanScreen(path, name);
   } else if (currentMode === 'propose') {
     showProposalScreen(path, name);
+  } else if (currentMode === 'zipmail') {
+    showZipmailScreen(path, name);
   } else {
     // クイックアクション表示（実装モードのみ）
     document.getElementById('quick-actions').style.display = 'flex';
@@ -2862,6 +2958,153 @@ async function setAutodevInterval(min) {
     }).then(r => r.json());
     showToast(`実行間隔を${res.interval_min}分に変更しました`, 'success');
   } catch(e) { showToast('間隔の変更に失敗しました', 'error'); }
+}
+
+// ===== ZIP送付モード =====
+let zmFiles = []; // [{name, path, rel_path, folder, size}]
+
+function fmtSize(bytes) {
+  if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB';
+  if (bytes >= 1024) return Math.round(bytes / 1024) + 'KB';
+  return bytes + 'B';
+}
+
+async function showZipmailScreen(projPath, projName) {
+  setInputEnabled(false);
+  document.getElementById('quick-actions').style.display = 'none';
+  let files = [], config = { configured: false, default_to: 'koki.n.shukatsu@gmail.com' };
+  try {
+    [files, config] = await Promise.all([
+      fetch(`/api/zipmail/files?project_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
+      fetch('/api/zipmail/config').then(r => r.json()),
+    ]);
+  } catch(e) {}
+  if (currentMode !== 'zipmail' || projectPath !== projPath) return;
+  if (!Array.isArray(files)) files = [];
+  zmFiles = files;
+
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+  const screen = document.createElement('div');
+  screen.className = 'plan-screen';
+  screen.id = 'zipmail-screen';
+
+  let inner = `<div class="plan-screen-header">
+    <span class="plan-screen-title">📦 ${escHtml(projName)} ファイル送付 <span class="plan-folder-count">${files.length}</span></span>
+    <div style="display:flex;gap:6px">
+      <button class="plan-action-btn" onclick="zmSelectAll(true)">全選択</button>
+      <button class="plan-action-btn" onclick="zmSelectAll(false)">全解除</button>
+    </div>
+  </div>
+  <div class="idea-hint">送りたいファイルにチェックを入れて送信します。フォルダ行のチェックで配下を一括選択できます。</div>`;
+
+  if (!config.configured) {
+    inner += `<div class="zm-config" id="zm-config">
+      <div class="zm-config-note">⚠ Gmail送信の設定が必要です。Googleアカウントの<b>アプリパスワード</b>（2段階認証の設定ページで発行）を登録してください。</div>
+      <input id="zm-gmail-addr" class="secret-input" placeholder="送信元Gmailアドレス" value="${escAttr(config.address || '')}" />
+      <input id="zm-gmail-pw" class="secret-input" type="password" placeholder="アプリパスワード（16桁）" />
+      <button class="fp-add-btn" onclick="zmSaveConfig()" style="flex-shrink:0">保存</button>
+    </div>`;
+  }
+
+  if (!files.length) {
+    inner += `<div class="plan-empty">送付できるファイルがありません</div>`;
+  } else {
+    // フォルダごとにグループ化して表示
+    const groups = {};
+    files.forEach((f, i) => {
+      (groups[f.folder] ||= []).push(i);
+    });
+    for (const folder of Object.keys(groups).sort()) {
+      const idxs = groups[folder];
+      inner += `<div class="zm-folder">
+        <input type="checkbox" onchange="zmToggleFolder('${escAttr(folder)}', this.checked)" data-zm-folder="${escAttr(folder)}" />
+        📂 ${folder ? escHtml(folder) : '（ルート直下）'} <span style="color:var(--muted);font-weight:400">${idxs.length}件</span>
+      </div>`;
+      for (const i of idxs) {
+        const f = files[i];
+        inner += `<div class="zm-row">
+          <input type="checkbox" data-zm-idx="${i}" data-zm-in="${escAttr(folder)}" onchange="zmUpdateCount()" />
+          <span class="zm-row-name" title="${escHtml(f.rel_path)}">${escHtml(f.name)}</span>
+          <span class="zm-row-size">${fmtSize(f.size)}</span>
+        </div>`;
+      }
+    }
+    inner += `<div class="zm-footer">
+      <span class="zm-count" id="zm-count">選択なし</span>
+      <input id="zm-to" class="zm-to-input" placeholder="宛先メールアドレス" value="${escAttr(config.default_to)}" />
+      <button id="zm-send-btn" class="zm-send-btn" onclick="sendZipmail()" disabled>📦 ZIP化して送信</button>
+    </div>`;
+  }
+
+  screen.innerHTML = inner;
+  messagesEl.appendChild(screen);
+  messagesEl.scrollTop = 0;
+}
+
+function zmCheckboxes() {
+  return [...document.querySelectorAll('#zipmail-screen input[data-zm-idx]')];
+}
+
+function zmToggleFolder(folder, checked) {
+  document.querySelectorAll(`#zipmail-screen input[data-zm-in="${CSS.escape(folder)}"]`)
+    .forEach(cb => { cb.checked = checked; });
+  zmUpdateCount();
+}
+
+function zmSelectAll(checked) {
+  zmCheckboxes().forEach(cb => { cb.checked = checked; });
+  document.querySelectorAll('#zipmail-screen input[data-zm-folder]')
+    .forEach(cb => { cb.checked = checked; });
+  zmUpdateCount();
+}
+
+function zmUpdateCount() {
+  const sel = zmCheckboxes().filter(cb => cb.checked);
+  const total = sel.reduce((s, cb) => s + (zmFiles[+cb.dataset.zmIdx]?.size || 0), 0);
+  const label = document.getElementById('zm-count');
+  const btn = document.getElementById('zm-send-btn');
+  if (label) label.textContent = sel.length ? `${sel.length}件選択 · ${fmtSize(total)}` : '選択なし';
+  if (btn) btn.disabled = sel.length === 0;
+}
+
+async function zmSaveConfig() {
+  const addr = document.getElementById('zm-gmail-addr')?.value.trim();
+  const pw = document.getElementById('zm-gmail-pw')?.value.trim().replace(/\s+/g, '');
+  if (!addr || !pw) { showToast('アドレスとアプリパスワードを入力してください', 'error'); return; }
+  try {
+    for (const [key, value] of [['GMAIL_ADDRESS', addr], ['GMAIL_APP_PASSWORD', pw]]) {
+      const res = await fetch('/api/secrets', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app_name: 'gmail', key, value }),
+      }).then(r => r.json());
+      if (res.error) throw new Error(res.error);
+    }
+    document.getElementById('zm-config')?.remove();
+    showToast('Gmail設定を保存しました', 'success');
+  } catch(e) { showToast(`保存に失敗しました: ${e.message}`, 'error'); }
+}
+
+async function sendZipmail() {
+  const paths = zmCheckboxes().filter(cb => cb.checked).map(cb => zmFiles[+cb.dataset.zmIdx]?.path).filter(Boolean);
+  if (!paths.length) return;
+  const to = document.getElementById('zm-to')?.value.trim();
+  const btn = document.getElementById('zm-send-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 送信中...';
+  try {
+    const res = await fetch('/api/zipmail/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_path: projectPath, paths, to }),
+    }).then(r => r.json());
+    if (res.error) throw new Error(res.error);
+    showToast(`✅ ${res.to} に ${res.zip_name}（${res.count}件・${res.size_kb}KB）を送信しました`, 'success');
+  } catch(e) {
+    showToast(`送信失敗: ${e.message}`, 'error');
+  } finally {
+    btn.textContent = '📦 ZIP化して送信';
+    zmUpdateCount();
+  }
 }
 
 // ===== 秘密情報（環境変数）モーダル =====
