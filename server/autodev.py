@@ -1,4 +1,4 @@
-"""自動開発スケジューラ — チェック済み提案を interval_min おきに1タスクずつ実行する"""
+"""自動開発スケジューラ — チェック済み提案を interval_min おきに実行する（並行稼働対応）"""
 import asyncio
 import json
 import os
@@ -20,11 +20,11 @@ DEFAULT_CONFIG = {
     "claim": None,  # 実行中タスクのクレーム {app, id, at} — プロセス跨ぎの多重実行防止
 }
 
-TASK_TIMEOUT_SEC = 25 * 60  # 30分間隔に収まるよう1タスク最大25分
+TASK_TIMEOUT_SEC = 25 * 60  # 1タスクの最大実行時間
 CLAIM_TTL_SEC = 30 * 60     # クレームの有効期間（プロセス死亡時の自動解放）
 
-# 実行中タスク情報（UI表示用）
-current_task: dict | None = None
+# 実行中タスク情報（UI表示用）— 複数タスクの並行実行に対応
+running_tasks: dict[str, dict] = {}  # key = "app#id"
 
 
 def get_config() -> dict:
@@ -75,10 +75,10 @@ def _log(app_name: str, task: dict, status: str, detail: str = "") -> None:
 
 
 async def _run_task(app_path: str, task: dict, model: str) -> None:
-    global current_task
     app_name = Path(app_path).name
-    current_task = {"app": app_name, "id": task["id"], "title": task["title"],
-                    "started": datetime.now().strftime("%H:%M")}
+    task_key = f"{app_name}#{task['id']}"
+    running_tasks[task_key] = {"app": app_name, "id": task["id"], "title": task["title"],
+                               "started": datetime.now().strftime("%H:%M")}
 
     # アイデア由来の要件定義書があれば、実装のインプットとして参照させる
     req_dir = Path(app_path) / "requirements"
@@ -130,7 +130,7 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
     except Exception as e:
         _log(app_name, task, f"⚠ エラー: {e}")
     finally:
-        current_task = None
+        running_tasks.pop(task_key, None)
         # 提案の完了状態と実行ログを確実に保管（best-effort）
         await gitutil.commit_and_push(
             [str(proposal_store._file_for(app_name)), str(LOG_FILE)],
@@ -145,9 +145,9 @@ async def autodev_loop() -> None:
         await asyncio.sleep(60)
         try:
             cfg = get_config()
-            if not cfg["enabled"] or current_task is not None:
+            if not cfg["enabled"]:
                 continue
-            # プロセス跨ぎの多重実行防止（uvicorn reload等でループが複数走った場合）
+            # プロセス跨ぎの多重ループ防止（uvicorn reload等でループが複数走った場合）
             if _claim_active(cfg):
                 continue
             last_run = cfg.get("last_run") or ""
@@ -158,17 +158,15 @@ async def autodev_loop() -> None:
             nxt = proposal_store.next_task()
             if nxt is None:
                 continue
+            # 同じタスクが既に実行中ならスキップ
             app_path, task = nxt
+            task_key = f"{Path(app_path).name}#{task['id']}"
+            if task_key in running_tasks:
+                continue
             now = datetime.now().isoformat(timespec="seconds")
-            set_config(
-                last_run=now,
-                claim={"app": Path(app_path).name, "id": task["id"], "at": now},
-            )
+            set_config(last_run=now)
             print(f"[autodev] タスク実行: {Path(app_path).name} #{task['id']} {task['title']}")
-            try:
-                await _run_task(app_path, task, cfg["model"])
-            finally:
-                set_config(claim=None)
+            asyncio.create_task(_run_task(app_path, task, cfg["model"]))
         except Exception as e:
             print(f"[autodev] ループエラー: {e}")
 
@@ -176,9 +174,11 @@ async def autodev_loop() -> None:
 def status() -> dict:
     cfg = get_config()
     nxt = proposal_store.next_task()
+    tasks_list = list(running_tasks.values())
     return {
         **cfg,
-        "running": current_task,
+        "running": tasks_list[0] if len(tasks_list) == 1 else None,
+        "running_tasks": tasks_list,
         "next_task": {"app": Path(nxt[0]).name, **nxt[1]} if nxt else None,
         "log_path": str(LOG_FILE) if LOG_FILE.exists() else "",
     }
