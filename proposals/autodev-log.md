@@ -2214,3 +2214,22 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-14 08:35 — gh_portal #111 Timeline投稿画像にユーザー入力alt属性を追加
+
+- 結果: ✅ 成功
+
+```
+実装完了です。変更内容をまとめます：
+
+**変更ファイル:**
+- `src/pages/Timeline.tsx` — `ImageAttachment.alt` フィールド追加、`updateImageAlt` ヘルパー、コンポーザーUIにalt入力欄、フィード表示のalt属性更新、DBへの `image_alts` 保存
+- `src/styles/globals.css` — `.composer-image-item` をflex columnに変更、`.composer-image-alt` スタイル追加
+- `src/lib/database.types.ts` — `posts` テーブルに `image_alts` カラムの型定義を追加
+
+**動作:**
+- 画像を添付するとサムネイル下に小さなテキスト入力欄「画像の説明（alt）」が表示される
+- 入力したalt文字列はDBの `image_alts` 列に保存される（**Supabaseで `image_alts text[]` カラムのマイグレーションが必要**）
+- フィード表示では `post.imageAlts?.[i]` を使用し、未入力・既存投稿の場合は `'投稿画像'` にフォールバックする（スクリーンリーダーが無視しない）
+
+```
+
