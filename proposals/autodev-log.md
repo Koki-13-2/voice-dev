@@ -2258,3 +2258,21 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-14 08:45 — gh_portal #114 Chat面談招待モーダルのmeetingsテーブルINSERT実装
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実施内容の整理：**
+
+コミット `aadc4f7` で `handleSendMeeting` の DB INSERT（meetings + messages テーブル）は既に実装済みでした。ただし **残存バグ**がありました：
+
+- `updateMeetingStatus` は `meetings.status` のみ更新するが、メッセージ本文の JSON に埋め込まれた `status` は更新しない
+- そのため、ページリロード後に `dbToChat` がメッセージ本文 JSON を解析すると、常に元の `"invited"` が表示されてしまう
+
+**今回の修正（`8c193d6`）：** `initRoom` でメッセージ読み込み後、`meetingInvite.meetingId` を持つメッセージの ID を一括収集し、`meetings` テーブルから最新ステータスを取得してローカル状態に上書きするステップを追加。これにより Dashboard の meetings テーブルと Chat のカード表示が完全に同期します。
+
+```
+
