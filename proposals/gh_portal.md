@@ -120,7 +120,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 done:2026-07-14T08:40 -->
 - [x] 【機能/小】Chat面談招待モーダルのmeetingsテーブルINSERT実装 — Chat.tsxのhandleSendMeetingがローカルstate更新のみで面談招待がDBに永続化されず、Dashboard側と断絶している <!-- id:114 done:2026-07-14T08:45 -->
 - [x] 【機能/中】AdminStudents宿題（添削）進捗セクションの実データ表示実装 — 「今後のアップデートで実装予定」プレースホルダーをhomework_tickets/correctionsの集計データに置き換え、講師が生徒の学習進捗を把握できるようにする <!-- id:115 done:2026-07-14T08:50 -->
-- [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 -->
+- [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 done:2026-07-14T08:54 -->
 - [ ] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
 - [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
 - [ ] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->

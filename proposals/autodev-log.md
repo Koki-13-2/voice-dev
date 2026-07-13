@@ -2292,3 +2292,21 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-14 08:54 — gh_portal #116 AdminStudentsチャット利用状況セクションの実データ表示実装
+
+- 結果: ✅ 成功
+
+```
+実装完了です。
+
+**変更内容（`AdminStudents.tsx`）:**
+
+- `ChatStats` インターフェース追加（`total` / `recent` / `lastMessageAt`）
+- `StudentDetail` に `chatStats` ステートを追加
+- `fetchProgress` にチャット統計のフェッチを追加（Supabase 3クエリ並列実行）
+  - `messages` テーブルから `sender_id = student.id && is_ai = false` を対象に集計
+  - 累計件数（count クエリ）・過去30日件数（gte フィルタ付き count クエリ）・最終発言タイムスタンプ
+- 「チャット利用状況」セクションのプレースホルダーを削除し、累計送信数 / 過去30日 / 最終発言日時を `admin-info-row` で表示（メッセージなしの場合は「チャット履歴なし」）
+
+```
+
