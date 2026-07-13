@@ -2233,3 +2233,28 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-14 08:40 — gh_portal #113 ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容のまとめ：**
+
+`Chat.tsx` の `initRoom` 関数（旧:791-829行）を 3 段階のパターンに置き換えました。
+
+1. **高速パス**（正規ルックアップ）: `teacher_student_assignments.consult_room_id` を参照。既にルームが登録されていればそのまま使用。
+
+2. **後方互換フォールバック**: `consult_room_id` が null の場合、旧来の `room_members` 積集合でルームを探し、見つかれば `consult_room_id` に移行登録する。
+
+3. **楽観的ロックによる新規作成**:
+   - `chat_rooms` に INSERT してルーム候補を作成
+   - `UPDATE ... WHERE consult_room_id IS NULL` で「まだ誰もルームを取っていない場合のみ」UPDATE を実行
+   - UPDATE が 0 行一致（誰かが先に確定）→ 相手が確定したルームを再取得して使う
+   - UPDATE が成功（自分が勝者）→ `room_members` に両者を追加してルームを確定
+
+これにより、講師・生徒が同時にチャットを開いても `consult_room_id IS NULL` 条件を満たせるのは一方だけになり、重複 DM ルームの作成を防げます。
+
+```
+

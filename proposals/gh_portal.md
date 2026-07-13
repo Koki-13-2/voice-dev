@@ -117,7 +117,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
 - [x] 【アクセシビリティ/小】Timeline投稿画像にユーザー入力alt属性を追加 — 全投稿画像がalt=""で出力されスクリーンリーダーに無視される（画像投稿UIにalt入力欄を追加） <!-- id:111 done:2026-07-14T08:35 -->
 - [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 done:2026-07-09T08:16 -->
-- [x] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 -->
+- [x] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 done:2026-07-14T08:40 -->
 - [x] 【機能/小】Chat面談招待モーダルのmeetingsテーブルINSERT実装 — Chat.tsxのhandleSendMeetingがローカルstate更新のみで面談招待がDBに永続化されず、Dashboard側と断絶している <!-- id:114 -->
 - [x] 【機能/中】AdminStudents宿題（添削）進捗セクションの実データ表示実装 — 「今後のアップデートで実装予定」プレースホルダーをhomework_tickets/correctionsの集計データに置き換え、講師が生徒の学習進捗を把握できるようにする <!-- id:115 -->
 - [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 -->
