@@ -1919,14 +1919,10 @@
     <span id="mic-label">タップして話す</span>
   </button>
   <div id="quick-actions" class="quick-actions" style="display:none">
-    <button class="qa-btn" onclick="quickSend('git statusと最近の変更を確認して教えて')">📊 git status</button>
-    <button class="qa-btn" onclick="quickSend('テストを実行して結果を教えて')">✅ テスト実行</button>
     <button class="qa-btn" onclick="quickSend('変更をgit add -A して適切なメッセージでgit commitして')">📝 commit</button>
-    <button class="qa-btn" onclick="quickSend('プロジェクトのディレクトリ構成と主要ファイルを教えて')">🔍 構成確認</button>
-    <button class="qa-btn" onclick="quickSend('エラーや警告を確認して修正して')">🔧 エラー修正</button>
-    <button class="qa-btn" onclick="quickSend('このアプリをHTTPSで起動して、スマホからアクセスできるURL（LAN/TailscaleのIP）を教えて')">📱 スマホ確認</button>
-    <button class="qa-btn" onclick="testLine()">📤 LINEテスト</button>
-    <button class="qa-btn" onclick="testGcloud()">☁ GCloud確認</button>
+    <button class="qa-btn" onclick="quickSend('git pushしてリモートに反映して。リモートが未設定なら状況を教えて')">⬆ push</button>
+    <button class="qa-btn" onclick="quickSend('このプロジェクトをVercelに本番デプロイして（vercel --prod）。プロジェクトが未リンクならセットアップから進めて')">🚀 deploy</button>
+    <button class="qa-btn" onclick="quickSend('リリースを一括実行して: テストがあれば実行し、問題なければ git add -A → commit → push → Vercel本番デプロイまで順に実行。途中で失敗したらそこで止めて原因を報告して')">⚡ すべて</button>
     <button class="qa-btn" onclick="openSecretsModal()">🔐 環境変数</button>
   </div>
   <div id="ctx-chips-bar" class="ctx-chips-bar" style="display:none"></div>
