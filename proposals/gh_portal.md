@@ -13,7 +13,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【性能/小】Dashboard.tsxのクエリ分割とキャッシュ — 4316行の巨大コンポーネントで講師ダッシュボードのfetchStudents()が5テーブルを同時にPromise.allで取得しており、担当生徒数増加時に重くなるためページネーションまたはSWR的キャッシュを導入する <!-- id:6 done:2026-07-07T10:58 -->
 - [x] 【運用/小】life_pattern_slotsテーブルの使途確認と整理 — database.types.tsにlife_pattern_slotsが定義されているがlife_patterns.blocksにJSONで同等データを格納しており二重管理状態なので不要なら型定義とテーブルを削除する <!-- id:7 done:2026-07-07T11:28 -->
 - [x] 【セキュリティ/小】AdminMessages画面のメッセージ送信DB保存 — AdminMessages.tsxはjobs/profilesのSELECTのみでメッセージ本文のINSERTがなく、送信ロジックが未実装のため送信結果のDB永続化を追加する <!-- id:8 done:2026-07-07T12:00 -->
-- [ ] 【テスト/中】画面別Supabaseクエリの統合テスト作成 — 44テーブルへの接続点がRLS等で保護されているか検証するため、各画面のCRUD操作に対してロール別（student/teacher/admin）の権限テストを作成する <!-- id:9 -->
+- [ ] 【テスト/中】画面別Supabaseクエリの統合テスト作成 — 44テーブルへの接続点がRLS等で保護されているか検証するため、各画面のCRUD操作に対してロール別（student/teacher/admin）の権限テストを作成する <!-- id:9 rejected:2026-07-14T08:19 -->
 - [x] 【UI/UX/小】get_university_rankingのRPCエラーハンドリング追加 — Dashboard.tsxのUniversityRankingPanelでsupabase.rpc呼び出しの失敗時にユーザーへのフィードバックがないため、エラー表示とリトライUIを追加する <!-- id:10 done:2026-07-07T12:28 -->
 - [ ] 【運用/中】Realtime購読の一元管理 — Dashboard/Chat/Job/AdminJobで個別にsupabase.channel()を管理しており購読漏れ（メモリリーク）のリスクがあるため、useRealtimeカスタムフックで購読ライフサイクルを統一する <!-- id:11 done:2026-07-07T18:46 -->
 - [x] 【セキュリティ/小】tutorialDone状態のDB永続化 — completeTutorial()がlocalStorageのみに書き込んでおりDB保存されないため、ブラウザデータ消去で状態がリセットされる問題をprofilesテーブルへの書き込みに修正する <!-- id:12 done:2026-07-07T13:01 -->
@@ -38,7 +38,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/小】Timeline投稿の画像添付UI実装 — posts.image_urlsカラムがDBに存在するが投稿作成UIに画像アップロード機能がなく常時null <!-- id:31 done:2026-07-07T19:44 -->
 - [x] 【UI・UX/小】announcements.body詳細表示の追加 — お知らせバナーがtitleのみ表示でbodyカラムの本文が閲覧不可 <!-- id:32 done:2026-07-07T19:47 -->
 - [x] 【UI・UX/小】ProfileSheet編集画面のフィールド拡充 — ProfileEditViewがdisplay_nameと電話番号のみ編集可でOnboardingで登録した性別・生年月日・住所等がプロフィールから変更できない <!-- id:33 done:2026-07-07T19:53 -->
-- [ ] 【機能/中】Chat AIルームのsetTimeout擬似応答をOpenAI API呼び出しに置換 — AI_SENDER・QUIZ_BANKをローカル定数で持つのをやめ、@AIメッセージ送信時にEdge Function経由でOpenAI APIを呼び出し実際のAI応答を返す <!-- id:34 -->
+- [ ] 【機能/中】Chat AIルームのsetTimeout擬似応答をOpenAI API呼び出しに置換 — AI_SENDER・QUIZ_BANKをローカル定数で持つのをやめ、@AIメッセージ送信時にEdge Function経由でOpenAI APIを呼び出し実際のAI応答を返す <!-- id:34 rejected:2026-07-14T08:19 -->
 - [x] 【機能/小】Practice演習問題QUESTIONSのDB化 — src/pages/Practice.tsx L149のハードコード2問を、exercise_questionsテーブルを新設しtest_questionsと同様にSupabaseから取得する <!-- id:35 done:2026-07-07T20:01 -->
 - [x] 【機能/小】Practice・TeacherPracticeのハードコード日付をnew Date()に修正 — Practice.tsx L981の`new Date('2026-04-16')`とTeacherPractice.tsx L147の`new Date('2026-04-14')`を現在日付に置換する <!-- id:36 done:2026-07-07T20:02 -->
 - [x] 【機能/中】Practice PdfViewerとTeacherPractice PdfPaneを実PDF表示に置換 — プレースホルダーのグレーボックスをSupabase StorageのPDF URLを取得しreact-pdfまたはiframeで実ファイルを表示するコンポーネントに差し替える <!-- id:37 done:2026-07-07T20:14 -->
@@ -158,3 +158,13 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 -->
 - [ ] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 -->
 - [x] 【運用/中】AdminMessagesの送信履歴にページネーション（load more）を追加 — 現在.limit(50)で取得しており50件超の過去ログが閲覧不能なため、カーソルベースの追加読み込みを実装する <!-- id:153 done:2026-07-13T15:05 -->
+- [ ] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
+- [ ] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
+- [ ] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 -->
+- [ ] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 -->
+- [ ] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 -->
+- [ ] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 -->
+- [ ] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
+- [ ] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 -->
+- [ ] 【運用/小】Viteビルドにhiddenソースマップを追加 — build.sourcemap: 'hidden'を設定し、本番デプロイ時にエラートラッキングサービス（Sentry等）でスタックトレースを元ファイルに解決可能にする <!-- id:162 -->
+- [ ] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
