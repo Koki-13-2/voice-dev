@@ -160,21 +160,21 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/中】AdminMessagesの送信履歴にページネーション（load more）を追加 — 現在.limit(50)で取得しており50件超の過去ログが閲覧不能なため、カーソルベースの追加読み込みを実装する <!-- id:153 done:2026-07-13T15:05 -->
 - [ ] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
 - [ ] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
-- [ ] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 -->
-- [ ] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 -->
+- [x] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 -->
+- [x] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 -->
 - [ ] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 -->
 - [ ] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 -->
 - [ ] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
 - [ ] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 -->
 - [ ] 【運用/小】Viteビルドにhiddenソースマップを追加 — build.sourcemap: 'hidden'を設定し、本番デプロイ時にエラートラッキングサービス（Sentry等）でスタックトレースを元ファイルに解決可能にする <!-- id:162 -->
 - [ ] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
-- [ ] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 -->
+- [x] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 -->
 - [ ] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 -->
 - [ ] 【運用/中】Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成 — 今後のアイコン追加時に同じ漏れが再発しないよう、コード中のアイコン名を抽出しindex.htmlのリストと差分を検出するCIチェックを追加する <!-- id:166 -->
 - [ ] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 -->
 - [ ] 【UI/UX/小】アイコンフォント読み込み完了までのフォールバック表示を追加 — document.fontsのready判定でmaterial-symbols-roundedロード前はアイコン要素を非表示にし文字化け状態のチラつきを防止する <!-- id:168 -->
 - [ ] 【セキュリティ/小】Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定 — 外部CDNからのフォント読み込みに対する改竄検知・制限がなく、悪意あるフォント差し替えリスクがある <!-- id:169 -->
 - [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 -->
-- [ ] 【機能/小】Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示 — icon_names漏れやタイポ時にも空白や文字化けではなくデフォルトアイコン(help_outline等)を表示させる <!-- id:171 -->
+- [x] 【機能/小】Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示 — icon_names漏れやタイポ時にも空白や文字化けではなくデフォルトアイコン(help_outline等)を表示させる <!-- id:171 done:2026-07-18T21:09 -->
 - [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 -->
 - [ ] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->

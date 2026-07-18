@@ -2310,3 +2310,19 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-18 21:09 — gh_portal #171 Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**変更内容 (`src/components/Icon.tsx`):**
+- `name` を必須 `string` → オプション `string?` に変更（後方互換）
+- `fallback?: string`（デフォルト: `'help_outline'`）prop を追加
+- レンダリング時に `name || fallback` で空/未定義を検出し代替グリフを表示
+
+`name={item.icon}` や `name={room.icon}` のような動的アイコン名が空や `undefined` になった場合でも `help_outline` が表示されるようになります。カスタムフォールバックが必要な箇所は `<Icon name={x} fallback="info" />` のように指定可能です。
+
+```
+
