@@ -2354,3 +2354,12 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-18 21:24 — gh_portal #164 index.htmlのicon_namesに不足している22個のアイコン名を追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。`index.html` の Google Fonts URL に22個のアイコン名（account_balance, apps, article, autorenew, calculate, check_box, error_outline, insert_drive_file, logout, manage_accounts, notes, payments, public, quiz, science, short_text, smart_display, table_chart, tag, translate, video_library, videocam）をアルファベット順に追加し、コミット・プッシュしました（合計103 → 125アイコン）。
+
+```
+
