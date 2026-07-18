@@ -161,7 +161,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
 - [ ] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
 - [x] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 done:2026-07-18T21:13 -->
-- [x] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 -->
+- [x] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 done:2026-07-18T21:18 -->
 - [ ] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 -->
 - [ ] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 -->
 - [ ] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
