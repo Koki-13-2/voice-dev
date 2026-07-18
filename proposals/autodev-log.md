@@ -2326,3 +2326,20 @@ Supabase の本番 DB にマイグレーションを適用するには `supabase
 
 ```
 
+## 2026-07-18 21:13 — gh_portal #156 Toast共通コンポーネントにsuccess/infoバリアント追加
+
+- 結果: ✅ 成功
+
+```
+完了しました。
+
+**実装内容:**
+
+- `Toast.tsx` に `type?: 'error' | 'success' | 'info'` prop を追加（デフォルト `'error'`）
+- `role` を type に応じて自動切り替え：`error` → `role="alert"`、`success`/`info` → `role="status"`（スクリーンリーダー対応）
+- `globals.css` に `.toast--success`（緑系）と `.toast--info`（青系）を追加
+
+既存の呼び出し箇所（`Onboarding.tsx`、`TeacherOnboarding.tsx`）は `type` を渡していないためデフォルト `'error'` が適用され、動作は変わりません。今後の保存完了通知などは `<Toast type="success" ... />` で利用可能です。
+
+```
+
