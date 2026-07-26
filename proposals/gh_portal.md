@@ -89,7 +89,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【運用/小】ProfileSheet保存後のwindow.location.reload()をAuthContext状態更新に置換 — プロフィール保存のたびにページ全体をリロードして全Reactステートが破棄されるため、AuthContextにrefreshProfile関数を追加して状態のみ更新する <!-- id:82 done:2026-07-08T16:19 -->
 - [x] 【機能/小】AdminMessages「プレビュー/確認」ボタンのonClickハンドラ実装 — disabled制御はあるがonClickが未定義のため、ボタンを押しても何も起こらない未実装状態を解消する <!-- id:83 done:2026-07-08T10:22 -->
 - [x] 【UI/UX/小】Chat入力のIMEコンポジション対応 — onKeyDownのEnter送信がIME確定操作（日本語入力中のEnter）で誤送信されるため、e.nativeEvent.isComposingチェックを追加する <!-- id:84 done:2026-07-08T16:25 -->
-- [ ] 【UI/UX/小】TabBarにaria-current="page"とラベルテキスト表示を追加 — 現在アクティブなタブがCSS class（is-active）のみで示されておりスクリーンリーダーに伝わらないため、aria-current属性と視覚的なラベル文字を追加する <!-- id:85 -->
+- [ ] 【UI/UX/小】TabBarにaria-current="page"とラベルテキスト表示を追加 — 現在アクティブなタブがCSS class（is-active）のみで示されておりスクリーンリーダーに伝わらないため、aria-current属性と視覚的なラベル文字を追加する <!-- id:85 rejected:2026-07-20T00:09 -->
 - [x] 【性能/小】PillDetailModalのsetIntervalタイマーをDate.now()差分方式に変更 — 1秒ごとのカウンター加算はブラウザタブがバックグラウンドになるとスロットリングされてズレるため、開始時刻との差分で経過秒を算出する <!-- id:86 done:2026-07-08T16:30 -->
 - [x] 【UI/UX/小】Chatメッセージ受信時のauto-scrollを実装 — Realtimeで新着メッセージを受信しても自動スクロールが発生せず、ユーザーが手動でスクロールしないと新しいメッセージが見えない <!-- id:87 done:2026-07-09T07:39 -->
 - [x] 【UI/UX/中】Timeline画像アップロードにファイルサイズ・件数上限バリデーションを追加 — accept属性のみでサイズ制限がなく、大容量ファイルのアップロードが無制限に可能 <!-- id:88 done:2026-07-08T16:36 -->
@@ -123,7 +123,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 done:2026-07-14T08:54 -->
 - [ ] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
 - [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
-- [ ] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->
+- [x] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 -->
 - [x] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 done:2026-07-09T08:22 -->
 - [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 done:2026-07-09T08:28 -->
 - [x] 【機能/小】添削結果閲覧時のcorrections.is_read_by_student既読フラグ更新 — 生徒がPracticeで返却済み添削を開いてもis_read_by_studentがDB更新されず、講師側TeacherPracticeの既読状態が常にfalseのまま <!-- id:122 done:2026-07-09T23:42 -->
