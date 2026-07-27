@@ -4109,3 +4109,12 @@ Not logged in · Please run /login
 
 ```
 
+## 2026-07-27 15:13 — gh_portal #119 announcements管理画面（AdminAnnouncements）の新設
+
+- 結果: ⚠ 失敗 (exit=1)
+
+```
+Not logged in · Please run /login
+
+```
+
