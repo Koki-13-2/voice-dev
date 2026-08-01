@@ -15318,3 +15318,19 @@ You've hit your weekly limit · resets 10am (Asia/Tokyo)
 
 ```
 
+## 2026-08-01 10:12 — gh_portal #136 homework_tickets生徒側の完了報告UI実装
+
+- 結果: ✅ 成功
+
+```
+実装完了・プッシュ済みです。
+
+**変更内容（`src/pages/Dashboard.tsx`）:**
+
+1. **`PillDetailModal` に `userId?: string` プロップ追加** — 投稿作成時の `author_id` に使用
+2. **「今すぐ完了」ボタン** — `not_started` 状態でタイマーを開始せずに直接 `homework_tickets.status = 'done'` + `completed_at` を DB 更新
+3. **投稿選択チェックボックス** — 要件書記載の機能。デフォルトoff。チェック済みで完了すると `posts` テーブルに `type: 'homework_complete'` のレコードを作成
+4. **呼び出し元に `userId={user?.id}` を渡す** — Dashboard コンポーネントの既存 `user` を活用
+
+```
+
