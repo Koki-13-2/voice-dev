@@ -15296,3 +15296,25 @@ You've hit your weekly limit · resets 10am (Asia/Tokyo)
 
 ```
 
+## 2026-08-01 10:06 — gh_portal #119 announcements管理画面（AdminAnnouncements）の新設
+
+- 結果: ✅ 成功
+
+```
+実装完了。変更内容のまとめ：
+
+**新規作成**
+- `src/pages/admin/AdminAnnouncements.tsx` — お知らせ管理画面
+
+**変更**
+- `src/pages/admin/AdminLayout.tsx` — ナビゲーションに「お知らせ」(campaign アイコン) を追加
+- `src/App.tsx` — lazy import と `/admin/announcements` ルートを登録
+
+**機能概要**
+- 一覧表示：ステータス（下書き/予約済み/公開中）・バナー色・対象者・公開日時を表示
+- 新規作成・編集フォーム：タイトル・本文・対象者（全員/生徒/講師）・バナー表示設定（6色スウォッチ＋カスタムカラーピッカー＋プレビュー）・公開日時
+- 今すぐ公開 / 非公開トグルボタン、削除確認ダイアログ
+- TypeScript型エラーなし、ビルド成功、push 完了
+
+```
+
