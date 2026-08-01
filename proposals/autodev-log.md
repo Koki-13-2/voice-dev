@@ -15334,3 +15334,24 @@ You've hit your weekly limit · resets 10am (Asia/Tokyo)
 
 ```
 
+## 2026-08-01 10:18 — gh_portal #142 homework_tickets期限切れアラートの表示実装
+
+- 結果: ✅ 成功
+
+```
+実装が完了しました。変更の概要：
+
+**生徒Dashboard (`Dashboard` 関数):**
+- `homeworkAlert` state (`{ overdue, dueSoon }`) を追加
+- `fetchDashboard` 内でチケットの集計後、期限超過数と期限間近数をカウント
+- 期限超過チケットがある場合 → 赤い `notice-card--error`「期限切れの宿題があります (N件)」を表示
+- 期限間近（今日・明日中、未完了）のみある場合 → 黄色い `notice-card--warning`「期限間近の宿題があります (N件)」を表示
+
+**講師Dashboard (`TeacherDashboard`):**
+- `TeacherStudentData` に `hasDueSoon` / `dueSoonDetail` フィールドを追加
+- 各生徒ごとに「今日または明日が期限で未完了」チケットがあるか判定
+- 生徒カードリスト・個人ダッシュボードヘッダーの両方に `badge-warning` を追加
+- 「アラートのみ」フィルタを `hasAlert || hasDueSoon` に拡張（期限間近も対象）
+
+```
+
