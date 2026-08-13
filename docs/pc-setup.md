@@ -63,14 +63,23 @@ cd ~/voice-dev
   Voice Dev を起動中...
 ===================================
 
-  PC アクセス:     http://localhost:8000
-  スマホアクセス:  http://100.65.1.43:8000
+  PC アクセス:     https://localhost:8000
+  スマホアクセス:  https://<マシン名>.<tailnet名>.ts.net:8000
 
   Ctrl+C で停止
 ===================================
 ```
 
-スマホからは `http://100.65.1.43:8000`（TailscaleのIP）でアクセスする。
+スマホからは表示された `https://xxxxx.ts.net:8000`（TailscaleのMagicDNS名）でアクセスする。
+
+サーバーは音声入力（マイクAPI）に必要な HTTPS で起動する。`start.sh` が起動のたびに
+TailscaleのMagicDNS名に対する信頼済みTLS証明書（Let's Encrypt発行）を
+`tailscale cert` で自動発行・更新し `server/cert.pem` / `server/key.pem` に保存する。
+
+**重要:** 必ずIPアドレス（`https://100.65.1.43:8000`など）ではなく、表示された `.ts.net` の
+ホスト名でアクセスすること。IPアドレスでアクセスすると証明書のCNと一致せず、特にiPhone Safariで
+「ページは開けるがWebSocketだけ繋がらない（接続マークが赤のまま）」という症状が起きる
+（自己署名証明書の警告を突破してもWebSocketはその信頼を引き継がないため）。
 
 ---
 
@@ -121,6 +130,22 @@ kill -9 <PID>
 
 ### スマホから繋がらない
 
-1. `tailscale ip -4` でIPを再確認する
-2. スマホのTailscaleアプリが起動しているか確認する
-3. サーバーが起動しているか確認する（`curl http://localhost:8000`）
+1. スマホのTailscaleアプリが起動・ログイン済みか確認する
+2. サーバーが起動しているか確認する（`curl -k https://localhost:8000`）
+3. スマホでは必ず `.ts.net` のホスト名でアクセスする（IPアドレスではなく）。
+   PC側で `tailscale status` を実行し `Self` の `DNSName` を確認する
+
+### アプリ画面は開けるが「サーバーに接続中です」から進まない（接続マークが赤のまま）
+
+WebSocket (wss://) が確立できていない状態。多くの場合、IPアドレスで自己署名証明書に
+アクセスしていることが原因（特にiPhone Safari）。
+
+1. スマホのURLがIPアドレスではなく `.ts.net` ホスト名になっているか確認する
+2. `.ts.net` ホスト名でもダメな場合、PC側で証明書を発行し直す：
+   ```bash
+   sudo tailscale set --operator=$USER   # 初回のみ
+   cd ~/voice-dev
+   TS_DNS_NAME=$(tailscale status --json | python3 -c "import json,sys; print(json.load(sys.stdin)['Self']['DNSName'].rstrip('.'))")
+   tailscale cert --cert-file=server/cert.pem --key-file=server/key.pem "$TS_DNS_NAME"
+   ```
+   その後 `./start.sh` でサーバーを再起動する
