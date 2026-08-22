@@ -246,7 +246,7 @@
   }
   #model-select:hover { border-color: var(--border-strong); color: var(--text); }
 
-  #reset-btn, #tts-btn {
+  #reset-btn, #tts-btn, #accounts-btn {
     background: rgba(5,7,12,.6);
     border: 1px solid var(--border);
     color: var(--muted);
@@ -257,7 +257,7 @@
     line-height: 1.2;
     transition: border-color .15s, color .15s, background .15s;
   }
-  #reset-btn:hover, #tts-btn:hover { border-color: var(--border-strong); color: var(--text); }
+  #reset-btn:hover, #tts-btn:hover, #accounts-btn:hover { border-color: var(--border-strong); color: var(--text); }
   #tts-btn.off { opacity: 0.4; }
 
   /* ============ 会話エリア ============ */
@@ -1362,6 +1362,18 @@
   .idea-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 
   /* ============ 提案モード ============ */
+  .proposal-count-select {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 6px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+  }
+  .proposal-count-select:focus { border-color: var(--mode-propose); }
+
   .proposal-row {
     display: flex;
     gap: 12px;
@@ -1426,6 +1438,68 @@
   .proposal-title { font-size: 13.5px; font-weight: 700; color: var(--text-strong); }
   .proposal-desc { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.55; }
   .proposal-done-at { font-size: 11px; color: var(--green); margin-top: 4px; font-family: var(--font-mono); }
+
+  .proposal-row.rejected { opacity: .5; }
+  .proposal-row.rejected .proposal-title { text-decoration: line-through; }
+
+  .proposal-action-btn {
+    flex-shrink: 0;
+    align-self: center;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .proposal-action-btn.reject:hover { border-color: #f85149; color: #f85149; background: rgba(248,81,73,.08); }
+  .proposal-action-btn.restore:hover { border-color: var(--green); color: var(--green); background: rgba(63,185,80,.08); }
+
+  .proposal-section-collapsed { margin-bottom: 8px; }
+  .proposal-section-collapsed summary { list-style: none; user-select: none; }
+  .proposal-section-collapsed summary::-webkit-details-marker { display: none; }
+  .proposal-section-collapsed summary .plan-screen-title::before { content: '▸ '; }
+  .proposal-section-collapsed[open] summary .plan-screen-title::before { content: '▾ '; }
+
+  /* ============ ブランチセレクタ ============ */
+  .branch-bar {
+    background:
+      radial-gradient(400px 80px at 8% 0%, rgba(136,192,208,.1), transparent 70%),
+      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
+      var(--surface);
+    border: 1px solid rgba(136,192,208,.35);
+    border-radius: var(--r-md);
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-1);
+    font-size: 13px;
+  }
+  .branch-bar-label { color: var(--muted); white-space: nowrap; }
+  .branch-select {
+    background: var(--bg); color: var(--text); border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm); padding: 5px 10px; font-size: 13px;
+    font-family: var(--font-mono); min-width: 160px; max-width: 260px;
+  }
+  .branch-select:focus { border-color: #88c0d0; outline: none; }
+  .branch-current { font-family: var(--font-mono); color: #88c0d0; font-weight: 600; font-size: 13px; }
+  .branch-new-btn {
+    background: none; border: 1px solid var(--border-strong); color: var(--muted);
+    border-radius: var(--r-sm); padding: 4px 10px; font-size: 12px; cursor: pointer;
+    transition: all .15s;
+  }
+  .branch-new-btn:hover { border-color: #88c0d0; color: #88c0d0; }
+  .branch-clear-btn {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 12px; padding: 4px 6px; transition: color .15s;
+  }
+  .branch-clear-btn:hover { color: #f85149; }
 
   /* ============ 自動開発バー ============ */
   .autodev-bar {
@@ -1888,6 +1962,31 @@
   </div>
 </div>
 
+<!-- Claude Codeアカウント管理モーダル -->
+<div id="accounts-overlay" class="fp-overlay" style="display:none" onclick="if(event.target===this)closeAccountsModal()">
+  <div class="fp-sheet">
+    <div class="sheet-handle"></div>
+    <div class="fp-header">
+      <span class="fp-title">👤 Claude Codeアカウント</span>
+      <button class="fp-close" onclick="closeAccountsModal()">×</button>
+    </div>
+    <div class="fp-list" id="accounts-list">
+      <div class="fp-empty">読み込み中...</div>
+    </div>
+    <div style="padding:10px 14px;border-top:1px solid var(--border)">
+      <div id="accounts-whoami" style="font-size:12px;color:var(--muted);margin-bottom:8px">現在ログイン中のアカウントを確認中...</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="account-label" class="secret-input" placeholder="このアカウントの名前（例: 仕事用）" style="flex:1" />
+        <button class="fp-add-btn" onclick="saveCurrentAccount()" style="flex-shrink:0">現在ログイン中のアカウントを保存</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted-2);margin-top:6px;line-height:1.6">
+        別アカウントを追加するには、ターミナルで <code>claude auth login</code> を実行してログインしてから保存してください。<br>
+        「累計使用トークン」はAnthropicの正式な残クォータAPIが存在しないための目安カウンターです（手動リセット可）。
+      </div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-left">
     <div class="brand" title="Voice Dev">
@@ -1909,6 +2008,7 @@
       <option value="claude-haiku-4-5">Haiku 4.5</option>
     </select>
     <button id="tts-btn" onclick="toggleTts()" title="読み上げON/OFF">🔊</button>
+    <button id="accounts-btn" onclick="openAccountsModal()" title="Claude Codeアカウント管理">👤</button>
     <button id="reset-btn" onclick="resetSession()">リセット</button>
   </div>
 </header>
@@ -2833,11 +2933,12 @@ async function doImplementIdea(id, workspace) {
 async function showProposalScreen(projPath, projName) {
   setInputEnabled(true);
   document.getElementById('quick-actions').style.display = 'none';
-  let data = { tasks: [] }, ad = {};
+  let data = { tasks: [], branch: '' }, ad = {}, branchInfo = { is_git: false, current: '', branches: [] };
   try {
-    [data, ad] = await Promise.all([
+    [data, ad, branchInfo] = await Promise.all([
       fetch(`/api/proposals?app_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
       fetch('/api/autodev').then(r => r.json()),
+      fetch(`/api/branches?project_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
     ]);
   } catch(e) {}
   if (currentMode !== 'propose' || projectPath !== projPath) return;
@@ -2848,13 +2949,39 @@ async function showProposalScreen(projPath, projName) {
   screen.className = 'plan-screen';
   screen.id = 'proposal-screen';
 
-  const pending = data.tasks.filter(t => !t.done);
+  const pending = data.tasks.filter(t => !t.done && !t.rejected);
+  const rejectedTasks = data.tasks.filter(t => t.rejected && !t.done);
   const doneTasks = data.tasks.filter(t => t.done);
+
+  let branchBarHtml = '';
+  if (branchInfo.is_git) {
+    const devBranch = data.branch || '';
+    const opts = branchInfo.branches
+      .map(b => `<option value="${escHtml(b)}" ${b === devBranch ? 'selected' : ''}>${escHtml(b)}</option>`)
+      .join('');
+    branchBarHtml = `<div class="branch-bar" id="branch-bar">
+      <span class="branch-bar-label">🌿 ブランチ:</span>
+      <span class="branch-current">${escHtml(branchInfo.current)}</span>
+      <select class="branch-select" id="branch-select" onchange="switchBranch(this.value)">
+        <option value="">-- デフォルト --</option>
+        ${opts}
+      </select>
+      <button class="branch-new-btn" onclick="createNewBranch()">+ 新規</button>
+      ${devBranch ? `<button class="branch-clear-btn" onclick="clearBranch()" title="ブランチ指定を解除">✕ 解除</button>` : ''}
+    </div>`;
+  }
 
   let inner = `<div class="plan-screen-header">
     <span class="plan-screen-title">🔧 ${escHtml(projName)} 改善提案 <span class="plan-folder-count">${data.tasks.length}</span></span>
+    <select id="proposal-count" class="proposal-count-select">
+      <option value="5">5件</option>
+      <option value="10" selected>10件</option>
+      <option value="15">15件</option>
+      <option value="20">20件</option>
+    </select>
     <button class="btn-new-file" onclick="generateProposals()">🤖 提案を生成</button>
   </div>
+  ${branchBarHtml}
   <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
   <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>`;
 
@@ -2863,6 +2990,13 @@ async function showProposalScreen(projPath, projName) {
   }
 
   for (const t of pending) inner += proposalRowHtml(t);
+  if (rejectedTasks.length) {
+    inner += `<details class="proposal-section-collapsed" style="margin-top:16px">
+      <summary class="plan-screen-header" style="cursor:pointer"><span class="plan-screen-title" style="font-size:13px;color:var(--muted)">🚫 不採用 ${rejectedTasks.length}</span></summary>
+      <div class="proposal-rejected-list">`;
+    for (const t of rejectedTasks) inner += proposalRowHtml(t, 'rejected');
+    inner += `</div></details>`;
+  }
   if (doneTasks.length) {
     inner += `<div class="plan-screen-header" style="margin-top:16px"><span class="plan-screen-title" style="font-size:13px;color:var(--muted)">✅ 実装済み ${doneTasks.length}</span></div>`;
     for (const t of doneTasks) inner += proposalRowHtml(t);
@@ -2873,21 +3007,97 @@ async function showProposalScreen(projPath, projName) {
   messagesEl.scrollTop = 0;
 }
 
-function proposalRowHtml(t) {
-  return `<div class="proposal-row${t.done ? ' done' : ''}">
-    <input type="checkbox" ${t.checked ? 'checked' : ''} ${t.done ? 'disabled' : ''}
+function proposalRowHtml(t, variant) {
+  const isRejected = variant === 'rejected';
+  const isDone = !!t.done;
+  return `<div class="proposal-row${isDone ? ' done' : ''}${isRejected ? ' rejected' : ''}">
+    <input type="checkbox" ${t.checked ? 'checked' : ''} ${isDone || isRejected ? 'disabled' : ''}
       onchange="toggleProposal(${t.id}, this.checked)" />
     <div style="flex:1;min-width:0">
       <div class="proposal-angle">【${escHtml(t.angle)}】#${t.id}</div>
       <div class="proposal-title">${escHtml(t.title)}</div>
       ${t.desc ? `<div class="proposal-desc">${escHtml(t.desc)}</div>` : ''}
-      ${t.done ? `<div class="proposal-done-at">✅ ${escHtml(t.done)} 実装済み</div>` : ''}
+      ${isDone ? `<div class="proposal-done-at">✅ ${escHtml(t.done)} 実装済み</div>` : ''}
+      ${isRejected ? `<div class="proposal-done-at" style="color:var(--muted)">🚫 ${escHtml(t.rejected)} 不採用</div>` : ''}
     </div>
+    ${isRejected
+      ? `<button class="proposal-action-btn restore" onclick="restoreProposal(${t.id})" title="復元">↩ 復元</button>`
+      : (!isDone ? `<button class="proposal-action-btn reject" onclick="rejectProposal(${t.id})" title="不採用">🚫</button>` : '')}
   </div>`;
 }
 
+async function switchBranch(branch) {
+  if (!projectPath) return;
+  try {
+    const res = await fetch('/api/proposals/branch', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, branch }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'ブランチ切替に失敗', 'error'); return; }
+    showToast(`ブランチ: ${branch || 'デフォルト'}`, 'ok');
+    showProposalScreen(projectPath, projectPath.split('/').pop());
+  } catch(e) { showToast('ブランチ切替に失敗しました', 'error'); }
+}
+
+async function createNewBranch() {
+  const name = prompt('新しいブランチ名を入力してください（例: feature/new-ui）');
+  if (!name || !name.trim()) return;
+  const branch = name.trim();
+  try {
+    const res = await fetch('/api/branches/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_path: projectPath, branch }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'ブランチ作成に失敗', 'error'); return; }
+    await fetch('/api/proposals/branch', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, branch }),
+    });
+    showToast(`ブランチ作成: ${branch}`, 'ok');
+    showProposalScreen(projectPath, projectPath.split('/').pop());
+  } catch(e) { showToast('ブランチ作成に失敗しました', 'error'); }
+}
+
+async function clearBranch() {
+  await switchBranch('');
+}
+
+let proposalGenerating = false;
+let proposalGenTimer = null;
+
 function generateProposals() {
-  send('このアプリの改善提案を生成してください。');
+  if (!projectPath) { showWorkspacePicker(); return; }
+  if (!wsReady) { addMessage('error', 'サーバーに接続中です。しばらく待ってから再送してください。'); return; }
+  proposalGenerating = true;
+  // ボタンをインジケーターに差し替え
+  const btn = document.querySelector('#proposal-screen .btn-new-file');
+  if (btn) {
+    const start = Date.now();
+    btn.disabled = true;
+    btn.innerHTML = '<span class="thinking-dots" style="display:inline-flex;vertical-align:middle;margin-right:6px"><span></span><span></span><span></span></span>提案を生成中… <span class="proposal-gen-timer">0秒</span>';
+    btn.style.opacity = '0.85';
+    proposalGenTimer = setInterval(() => {
+      const el = btn.querySelector('.proposal-gen-timer');
+      if (el) el.textContent = Math.floor((Date.now() - start) / 1000) + '秒';
+    }, 1000);
+  }
+  setInputEnabled(false);
+  const proposalCount = parseInt(document.getElementById('proposal-count')?.value || '10', 10);
+  ws.send(JSON.stringify({
+    type: 'chat',
+    text: 'このアプリの改善提案を生成してください。',
+    mode: currentMode,
+    project_path: projectPath,
+    model: selectedModel,
+    proposal_count: proposalCount,
+  }));
+}
+
+function clearProposalGenerating() {
+  proposalGenerating = false;
+  if (proposalGenTimer) { clearInterval(proposalGenTimer); proposalGenTimer = null; }
 }
 
 async function toggleProposal(id, checked) {
@@ -2897,6 +3107,28 @@ async function toggleProposal(id, checked) {
       body: JSON.stringify({ app_path: projectPath, id, checked }),
     });
     refreshAutodevBar();
+  } catch(e) { showToast('更新に失敗しました', 'error'); }
+}
+
+async function rejectProposal(id) {
+  try {
+    await fetch('/api/proposals/reject', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, id }),
+    });
+    showToast('不採用にしました', 'success');
+    showProposalScreen(projectPath, projectName);
+  } catch(e) { showToast('更新に失敗しました', 'error'); }
+}
+
+async function restoreProposal(id) {
+  try {
+    await fetch('/api/proposals/restore', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, id }),
+    });
+    showToast('提案を復元しました', 'success');
+    showProposalScreen(projectPath, projectName);
   } catch(e) { showToast('更新に失敗しました', 'error'); }
 }
 
@@ -3172,6 +3404,102 @@ async function deleteSecret(key) {
   renderSecrets();
 }
 
+// ===== Claude Codeアカウント管理 =====
+function openAccountsModal() {
+  document.getElementById('accounts-overlay').style.display = 'flex';
+  renderAccounts();
+  renderAccountsWhoami();
+}
+
+function closeAccountsModal() {
+  document.getElementById('accounts-overlay').style.display = 'none';
+}
+
+function fmtTokens(n) {
+  n = n || 0;
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return String(n);
+}
+
+async function renderAccountsWhoami() {
+  const el = document.getElementById('accounts-whoami');
+  try {
+    const who = await fetch('/api/accounts/whoami').then(r => r.json());
+    if (!who.loggedIn) {
+      el.innerHTML = '現在ログインしていません。ターミナルで <code>claude auth login</code> を実行してください。';
+      return;
+    }
+    el.innerHTML = `現在ログイン中: <b>${escHtml(who.email || '')}</b>（${escHtml(who.subscriptionType || '')}）`;
+  } catch (e) {
+    el.textContent = 'ログイン状態の確認に失敗しました';
+  }
+}
+
+async function renderAccounts() {
+  const list = document.getElementById('accounts-list');
+  let accounts;
+  try {
+    accounts = await fetch('/api/accounts').then(r => r.json());
+  } catch (e) {
+    list.innerHTML = '<div class="fp-empty">読み込みに失敗しました</div>';
+    return;
+  }
+  if (!Array.isArray(accounts) || !accounts.length) {
+    list.innerHTML = '<div class="fp-empty">保存済みアカウントはありません<br><small>下のフォームから現在ログイン中のアカウントを保存してください</small></div>';
+    return;
+  }
+  list.innerHTML = accounts.map(a => {
+    const u = a.usage || {};
+    const totalTokens = (u.input_tokens || 0) + (u.output_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0);
+    return `<div class="fp-file-row" style="cursor:default;align-items:flex-start">
+      <div class="fp-file-info">
+        <div class="fp-file-name">${a.active ? '🟢 ' : ''}${escHtml(a.label || a.name)}${a.active ? ' <span style="color:var(--muted-2);font-weight:400">（使用中）</span>' : ''}</div>
+        <div class="fp-file-path">${escHtml(a.email || '')} ・ ${escHtml(a.subscription_type || '不明')}</div>
+        <div class="fp-file-path">累計使用: 入力${fmtTokens(u.input_tokens)} / 出力${fmtTokens(u.output_tokens)} / 呼び出し${u.calls || 0}回</div>
+      </div>
+      <div class="plan-file-actions" style="flex-direction:column;align-items:flex-end">
+        ${a.active ? '' : `<button class="plan-action-btn" onclick="switchAccount('${escAttr(a.name)}')">切替</button>`}
+        <button class="plan-action-btn" onclick="resetAccountUsage('${escAttr(a.name)}')">使用量リセット</button>
+        <button class="plan-action-btn danger" onclick="deleteAccountEntry('${escAttr(a.name)}')">🗑 削除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function saveCurrentAccount() {
+  const label = document.getElementById('account-label').value.trim();
+  if (!label) { showToast('アカウント名を入力してください', 'error'); return; }
+  const res = await fetch('/api/accounts', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: label, label }),
+  }).then(r => r.json());
+  if (res.error) { showToast(res.error, 'error'); return; }
+  document.getElementById('account-label').value = '';
+  showToast(`「${label}」として保存しました`, 'success');
+  renderAccounts();
+}
+
+async function switchAccount(name) {
+  if (!confirm(`アカウントを「${name}」に切り替えますか？`)) return;
+  const res = await fetch(`/api/accounts/${encodeURIComponent(name)}/switch`, { method: 'POST' }).then(r => r.json());
+  if (res.error) { showToast(res.error, 'error'); return; }
+  showToast(`「${name}」に切り替えました`, 'success');
+  renderAccounts();
+  renderAccountsWhoami();
+}
+
+async function resetAccountUsage(name) {
+  await fetch(`/api/accounts/${encodeURIComponent(name)}/usage/reset`, { method: 'POST' });
+  renderAccounts();
+}
+
+async function deleteAccountEntry(name) {
+  if (!confirm(`保存済みアカウント「${name}」を削除しますか？（現在のログイン状態は変わりません）`)) return;
+  await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: 'DELETE' });
+  renderAccounts();
+}
+
 // ===== 本番接続テスト =====
 async function testLine() {
   if (!projectPath) { showToast('先にプロジェクトを選択してください', 'error'); return; }
@@ -3243,6 +3571,7 @@ const THINKING_STAGES = [
 
 function handleServerMessage(msg) {
   if (msg.type === 'thinking') {
+    if (proposalGenerating) return;
     removeThinking();
     thinkingDiv = document.createElement('div');
     thinkingDiv.className = 'thinking';
@@ -3272,9 +3601,10 @@ function handleServerMessage(msg) {
     return;
   }
 
-  removeThinking();
+  if (!proposalGenerating) removeThinking();
 
   if (msg.type === 'text' || msg.type === 'result_text') {
+    if (proposalGenerating) return;
     if (!currentAiDiv) {
       currentAiDiv = addMessage('ai', '');
       currentAiDiv._raw = '';
@@ -3295,6 +3625,7 @@ function handleServerMessage(msg) {
   }
 
   if (msg.type === 'tool_start') {
+    if (proposalGenerating) return;
     currentAiDiv = null;
     const card = document.createElement('div');
     card.className = 'message ai';
@@ -3312,9 +3643,12 @@ function handleServerMessage(msg) {
     window._lastToolCard = card;
   }
 
-  if (msg.type === 'tool_end' && window._lastToolCard) {
-    window._lastToolCard._resultEl.textContent = msg.result;
-    scrollBottom();
+  if (msg.type === 'tool_end') {
+    if (proposalGenerating) return;
+    if (window._lastToolCard) {
+      window._lastToolCard._resultEl.textContent = msg.result;
+      scrollBottom();
+    }
   }
 
   if (msg.type === 'idea_saved') {
@@ -3336,6 +3670,7 @@ function handleServerMessage(msg) {
   }
 
   if (msg.type === 'proposals_updated') {
+    clearProposalGenerating();
     if (msg.added > 0) {
       showToast(`${msg.added}件の提案を追加しました（${msg.parsed}件読み取り）`, 'success');
     } else if (msg.parsed > 0) {
@@ -3351,12 +3686,14 @@ function handleServerMessage(msg) {
   }
 
   if (msg.type === 'error') {
+    clearProposalGenerating();
     addMessage('error', '⚠ ' + msg.content);
     setInputEnabled(true);
     scrollBottom();
   }
 
   if (msg.type === 'done') {
+    clearProposalGenerating();
     if (currentAiDiv?._raw) {
       // :::choices ブロックを抽出してから最終レンダリング
       const { cleanText, choices } = parseChoices(currentAiDiv._raw);
@@ -3487,7 +3824,7 @@ function send(text) {
   }
   addMessage('user', text);
   setInputEnabled(false);
-  ws.send(JSON.stringify({
+  const payload = {
     type: 'chat',
     text,
     mode: currentMode,
@@ -3495,7 +3832,11 @@ function send(text) {
     model: selectedModel,
     plan_file: currentMode === 'plan' ? currentPlanFile : null,
     context_files: contextFiles.map(f => f.path),
-  }));
+  };
+  if (currentMode === 'propose') {
+    payload.proposal_count = parseInt(document.getElementById('proposal-count')?.value || '10', 10);
+  }
+  ws.send(JSON.stringify(payload));
 }
 
 function sendText() {

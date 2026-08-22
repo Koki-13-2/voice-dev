@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 import shutil
 import subprocess
 
+import account_store
 import autodev
 import gitutil
 import idea_store
@@ -588,6 +589,48 @@ async def delete_secret(app_name: str, key: str):
     return JSONResponse({"ok": True})
 
 
+# ── Claude Codeアカウント管理 ─────────────────────────
+@app.get("/api/accounts")
+async def list_accounts():
+    return JSONResponse(account_store.list_accounts())
+
+
+@app.get("/api/accounts/whoami")
+async def accounts_whoami():
+    return JSONResponse(account_store.whoami())
+
+
+@app.post("/api/accounts")
+async def save_account(data: dict):
+    try:
+        return JSONResponse(account_store.save_current_as(data["name"], data.get("label")))
+    except (ValueError, KeyError) as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.post("/api/accounts/{name}/switch")
+async def switch_account(name: str):
+    try:
+        return JSONResponse(account_store.switch_to(name))
+    except ValueError as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.delete("/api/accounts/{name}")
+async def remove_account(name: str):
+    if not account_store.delete_account(name):
+        return JSONResponse({"error": "アカウントが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+@app.post("/api/accounts/{name}/usage/reset")
+async def reset_account_usage(name: str):
+    try:
+        return JSONResponse(account_store.reset_usage(name))
+    except ValueError as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
 # ── 本番接続テスト ───────────────────────────────────
 @app.post("/api/test/line")
 async def test_line(data: dict):
@@ -763,6 +806,27 @@ async def zipmail_send(data: dict):
                          "size_kb": round(len(zip_bytes) / 1024), "to": to_addr})
 
 
+# ── ブランチ管理 ────────────────────────────────────
+@app.get("/api/branches")
+async def get_branches(project_path: str):
+    if not gitutil.is_git_repo(project_path):
+        return JSONResponse({"is_git": False, "current": "", "branches": []})
+    info = gitutil.list_branches(project_path)
+    return JSONResponse({"is_git": True, **info})
+
+
+@app.post("/api/branches/checkout")
+async def checkout_branch(data: dict):
+    project_path = data["project_path"]
+    branch = data["branch"]
+    if not gitutil.is_git_repo(project_path):
+        return JSONResponse({"error": "Gitリポジトリではありません"}, status_code=400)
+    result = gitutil.checkout_or_create(project_path, branch)
+    if result.startswith("error"):
+        return JSONResponse({"error": result}, status_code=400)
+    return JSONResponse({"ok": True, "result": result})
+
+
 # ── 追加提案蓄積モード ───────────────────────────────
 @app.get("/api/proposals")
 async def get_proposals(app_path: str):
@@ -775,6 +839,33 @@ async def toggle_proposal(data: dict):
     if not ok:
         return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
     return JSONResponse({"ok": True})
+
+
+@app.post("/api/proposals/reject")
+async def reject_proposal(data: dict):
+    ok = proposal_store.reject_task(data["app_path"], int(data["id"]))
+    if not ok:
+        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+@app.post("/api/proposals/restore")
+async def restore_proposal(data: dict):
+    ok = proposal_store.restore_task(data["app_path"], int(data["id"]))
+    if not ok:
+        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    return JSONResponse({"ok": True})
+
+
+@app.post("/api/proposals/branch")
+async def set_proposal_branch(data: dict):
+    app_path = data["app_path"]
+    branch = data.get("branch", "").strip()
+    proposal_store.set_branch(app_path, branch)
+    if branch and gitutil.is_git_repo(app_path):
+        result = gitutil.checkout_or_create(app_path, branch)
+        return JSONResponse({"ok": True, "result": result})
+    return JSONResponse({"ok": True, "result": "branch-cleared" if not branch else "saved"})
 
 
 @app.get("/api/autodev")
@@ -870,6 +961,10 @@ async def _run_chat(
         ):
             if chunk.get("_break"):
                 continue
+            if chunk.get("type") == "usage":
+                account_store.record_usage(
+                    account_store.get_active_name(), chunk.get("usage") or {}, chunk.get("cost_usd"))
+                continue
             await queue.put(chunk)
     except Exception as e:
         print(f"[バックグラウンドエラー] session={session_id}: {e}")
@@ -920,6 +1015,10 @@ async def _generate_oneshot(queue, prompt: str, model: str, *,
         elif chunk.get("type") == "result_text":
             result_buf.append(chunk["content"])
             continue  # resultテキストはUIに二重表示しない
+        elif chunk.get("type") == "usage":
+            account_store.record_usage(
+                account_store.get_active_name(), chunk.get("usage") or {}, chunk.get("cost_usd"))
+            continue
         await queue.put(chunk)
     return "".join(buf).strip(), "".join(result_buf).strip()
 
@@ -985,7 +1084,7 @@ async def _run_idea(session_id: str, text: str, model: str) -> None:
         await queue.put(None)
 
 
-PROPOSE_PROMPT = """あなたはこのアプリ（{app_name}）の改善提案の専門家です。コードベースを読み、改善提案を10件程度生成してください。
+PROPOSE_PROMPT = """あなたはこのアプリ（{app_name}）の改善提案の専門家です。コードベースを読み、改善提案を{count}件程度生成してください。
 
 【出力契約（システムが機械的に読み取るため厳守）】
 - 分析にはツール（ファイル読み取り）を使ってよいが、ファイルの変更・作成は一切行わないこと
@@ -1023,7 +1122,7 @@ def _parse_proposals(stream_text: str, result_text: str) -> tuple[list, str]:
     return [], "none"
 
 
-async def _run_propose(session_id: str, text: str, project_path: str, model: str) -> None:
+async def _run_propose(session_id: str, text: str, project_path: str, model: str, count: int = 10) -> None:
     """追加提案蓄積モード: アプリを解析して改善提案を生成・蓄積する。
     出力契約(sentinel) → 抽出 → パース → 0件なら1回だけ自動再生成。生出力は必ずキャッシュ。
     """
@@ -1041,7 +1140,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
         user_hint = f"\n【ユーザーからの観点指示】\n{text}\n" if text.strip() else ""
 
         prompt = PROPOSE_PROMPT.format(
-            app_name=app_name, existing_section=existing_section, user_hint=user_hint)
+            app_name=app_name, count=count, existing_section=existing_section, user_hint=user_hint)
 
         stream_text, result_text = await _generate_oneshot(
             queue, prompt, model, add_dir=project_path)
@@ -1156,7 +1255,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 if mode == "idea":
                     coro = _run_idea(session_id, text, model)
                 elif mode == "propose":
-                    coro = _run_propose(session_id, text, project_path, model)
+                    proposal_count = message.get("proposal_count", 10)
+                    coro = _run_propose(session_id, text, project_path, model, proposal_count)
                 else:
                     coro = _run_chat(session_id, client, text, project_path, model,
                                      plan_file, context_files)

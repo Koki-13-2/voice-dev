@@ -25,7 +25,8 @@ def extract_block(raw: str) -> tuple[str, str]:
 # 文字クラスに ー(長音) や -(ハイフン) を含めるとカタカナ語・英単語のタイトルが途中で切れるため使わない。
 _TASK_RE = re.compile(
     r"^- \[(?P<check>[ x])\] 【(?P<angle>[^】]+)】(?P<title>.+?)"
-    r"(?:\s+—\s+(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)(?: done:(?P<done>[^ >]+))? -->\s*$"
+    r"(?:\s+—\s+(?P<desc>.*?))?\s*<!-- id:(?P<id>\d+)"
+    r"(?: done:(?P<done>[^ >]+))?(?: rejected:(?P<rejected>[^ >]+))? -->\s*$"
 )
 
 _DASH_RE = r"[—–:：]"
@@ -71,6 +72,7 @@ def _parse_file(f: Path) -> tuple[dict, list[dict], list[str]]:
                 "desc": (m.group("desc") or "").strip(),
                 "checked": m.group("check") == "x",
                 "done": m.group("done") or "",
+                "rejected": m.group("rejected") or "",
                 "line_no": i,
             })
     return meta, tasks, lines
@@ -78,20 +80,22 @@ def _parse_file(f: Path) -> tuple[dict, list[dict], list[str]]:
 
 def _task_line(task: dict) -> str:
     check = "x" if task["checked"] else " "
-    done = f" done:{task['done']}" if task["done"] else ""
+    done = f" done:{task['done']}" if task.get("done") else ""
+    rejected = f" rejected:{task['rejected']}" if task.get("rejected") else ""
     desc = f" — {task['desc']}" if task["desc"] else ""
-    return f"- [{check}] 【{task['angle']}】{task['title']}{desc} <!-- id:{task['id']}{done} -->"
+    return f"- [{check}] 【{task['angle']}】{task['title']}{desc} <!-- id:{task['id']}{done}{rejected} -->"
 
 
 def load(app_path: str) -> dict:
     app_name = Path(app_path).name
     f = _file_for(app_name)
     if not f.exists():
-        return {"app": app_name, "app_path": app_path, "tasks": []}
+        return {"app": app_name, "app_path": app_path, "branch": "", "tasks": []}
     meta, tasks, _ = _parse_file(f)
     for t in tasks:
         t.pop("line_no", None)
-    return {"app": app_name, "app_path": meta.get("app_path", app_path), "tasks": tasks}
+    return {"app": app_name, "app_path": meta.get("app_path", app_path),
+            "branch": meta.get("branch", ""), "tasks": tasks}
 
 
 _FALLBACK_RE = re.compile(r"【(?P<angle>[^】]+)】\s*(?P<rest>.+)")
@@ -138,6 +142,52 @@ def parse_generated(text: str) -> list[dict]:
     return tasks
 
 
+def set_branch(app_path: str, branch: str) -> bool:
+    """プロジェクトの開発ブランチをフロントマターに保存する"""
+    PROPOSALS_DIR.mkdir(parents=True, exist_ok=True)
+    app_name = Path(app_path).name
+    f = _file_for(app_name)
+    if not f.exists():
+        f.write_text(
+            f"---\napp: {app_name}\napp_path: {app_path}\nbranch: {branch}\n---\n\n"
+            f"# {app_name} 改善提案\n\n",
+            encoding="utf-8",
+        )
+        return True
+    meta, _, lines = _parse_file(f)
+    new_lines = []
+    in_fm = False
+    branch_written = False
+    for i, line in enumerate(lines):
+        if i == 0 and line == "---":
+            in_fm = True
+            new_lines.append(line)
+            continue
+        if in_fm:
+            if line == "---":
+                if not branch_written:
+                    new_lines.append(f"branch: {branch}")
+                new_lines.append(line)
+                in_fm = False
+                continue
+            if line.startswith("branch:"):
+                new_lines.append(f"branch: {branch}")
+                branch_written = True
+                continue
+        new_lines.append(line)
+    f.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+    return True
+
+
+def get_branch(app_path: str) -> str:
+    app_name = Path(app_path).name
+    f = _file_for(app_name)
+    if not f.exists():
+        return ""
+    meta, _, _ = _parse_file(f)
+    return meta.get("branch", "")
+
+
 def add_tasks(app_path: str, new_tasks: list[dict]) -> int:
     """新規提案を追記する（タイトル重複はスキップ）。追加件数を返す"""
     PROPOSALS_DIR.mkdir(parents=True, exist_ok=True)
@@ -161,7 +211,7 @@ def add_tasks(app_path: str, new_tasks: list[dict]) -> int:
             continue
         lines.append(_task_line({
             "id": next_id, "angle": t["angle"], "title": t["title"],
-            "desc": t.get("desc", ""), "checked": False, "done": "",
+            "desc": t.get("desc", ""), "checked": False, "done": "", "rejected": "",
         }))
         existing_titles.add(t["title"])
         next_id += 1
@@ -192,6 +242,17 @@ def set_checked(app_path: str, task_id: int, checked: bool) -> bool:
 
 def mark_done(app_name: str, task_id: int) -> bool:
     return _update_task(app_name, task_id, done=datetime.now().strftime("%Y-%m-%dT%H:%M"))
+
+
+def reject_task(app_path: str, task_id: int) -> bool:
+    return _update_task(
+        Path(app_path).name, task_id,
+        checked=False, rejected=datetime.now().strftime("%Y-%m-%dT%H:%M"),
+    )
+
+
+def restore_task(app_path: str, task_id: int) -> bool:
+    return _update_task(Path(app_path).name, task_id, rejected="")
 
 
 def next_task() -> tuple[str, dict] | None:

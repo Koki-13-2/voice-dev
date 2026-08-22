@@ -145,6 +145,13 @@ class ClaudeClient:
                             "type": "error",
                             "content": event.get("error", "Claude CLIエラーが発生しました"),
                         }
+                    usage = event.get("usage")
+                    if usage:
+                        yield {
+                            "type": "usage",
+                            "usage": usage,
+                            "cost_usd": event.get("total_cost_usd"),
+                        }
 
         except Exception as e:
             print(f"[stdout読み込みエラー] {e}")
@@ -236,6 +243,13 @@ async def run_oneshot(
                 else:
                     yield {"type": "error",
                            "content": event.get("error", "Claude CLIエラーが発生しました")}
+                usage = event.get("usage")
+                if usage:
+                    yield {
+                        "type": "usage",
+                        "usage": usage,
+                        "cost_usd": event.get("total_cost_usd"),
+                    }
     except Exception as e:
         yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
     finally:

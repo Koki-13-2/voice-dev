@@ -80,6 +80,11 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
     running_tasks[task_key] = {"app": app_name, "id": task["id"], "title": task["title"],
                                "started": datetime.now().strftime("%H:%M")}
 
+    branch = proposal_store.get_branch(app_path)
+    if branch:
+        result = gitutil.checkout_or_create(app_path, branch)
+        print(f"[autodev] ブランチ切替: {branch} -> {result}")
+
     # アイデア由来の要件定義書があれば、実装のインプットとして参照させる
     req_dir = Path(app_path) / "requirements"
     req_hint = ""
