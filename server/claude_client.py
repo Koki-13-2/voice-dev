@@ -25,6 +25,12 @@ SYSTEM_PROMPT = """あなたはソフトウェア開発アシスタントです�
 
 _AUTH_ERROR_PATTERNS = ("401", "unauthorized", "oauth", "auth", "credential", "login")
 
+# claude CLIは ~/.claude/.credentials.json のOAuthトークン（ローテーション式・使い切り）を
+# 起動のたびに参照・更新する。PC/スマホなど複数デバイスからほぼ同時にCLIを起動すると
+# トークンリフレッシュが競合し401エラーになることがあるため、プロセス全体で
+# claude CLI呼び出しを直列化する。
+CLI_LOCK = asyncio.Lock()
+
 
 class ClaudeClient:
     def __init__(self):
@@ -120,103 +126,104 @@ class ClaudeClient:
         if extra_env:
             env.update(extra_env)
 
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            cwd=project_path,
-            env=env,
-            limit=8 * 1024 * 1024,
-        )
-        self._proc = proc
+        async with CLI_LOCK:
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=project_path,
+                env=env,
+                limit=8 * 1024 * 1024,
+            )
+            self._proc = proc
 
-        got_output = False
-        try:
-            async for raw_line in proc.stdout:
-                line = raw_line.decode().strip()
-                if not line:
-                    continue
-                try:
-                    event = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-
-                got_output = True
-                etype = event.get("type")
-
-                if etype == "assistant":
-                    for block in event.get("message", {}).get("content", []):
-                        btype = block.get("type")
-                        if btype == "text" and block.get("text"):
-                            yield {"type": "text", "content": block["text"]}
-                        elif btype == "tool_use":
-                            tool_id = block.get("id", "")
-                            tool_name = block.get("name", "")
-                            self._pending_tools[tool_id] = tool_name
-                            yield {
-                                "type": "tool_start",
-                                "tool": tool_name,
-                                "input": block.get("input", {}),
-                            }
-
-                elif etype == "user":
-                    for block in event.get("message", {}).get("content", []):
-                        if block.get("type") == "tool_result":
-                            tool_id = block.get("tool_use_id", "")
-                            tool_name = self._pending_tools.pop(tool_id, "")
-                            content = block.get("content", "")
-                            if isinstance(content, list):
-                                content = "\n".join(
-                                    b.get("text", "") for b in content
-                                    if b.get("type") == "text"
-                                )
-                            yield {
-                                "type": "tool_end",
-                                "tool": tool_name,
-                                "result": str(content)[:500],
-                            }
-
-                elif etype == "result":
-                    sid = event.get("session_id")
-                    if sid:
-                        self.claude_session_id = sid
-                    if event.get("subtype") != "success":
-                        self.claude_session_id = None
-                        err_msg = event.get("error", "")
-                        if not _retry and self._is_auth_error(err_msg):
-                            yield {"_auth_retry": True}
-                            return
-                        yield {
-                            "type": "error",
-                            "content": err_msg or "Claude CLIエラーが発生しました",
-                        }
-                    usage = event.get("usage")
-                    if usage:
-                        yield {
-                            "type": "usage",
-                            "usage": usage,
-                            "cost_usd": event.get("total_cost_usd"),
-                        }
-
-        except Exception as e:
-            print(f"[stdout読み込みエラー] {e}")
-            yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
-        finally:
+            got_output = False
             try:
-                proc.kill()
-            except ProcessLookupError:
-                pass
-            self._proc = None
+                async for raw_line in proc.stdout:
+                    line = raw_line.decode().strip()
+                    if not line:
+                        continue
+                    try:
+                        event = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
 
-        rc = await proc.wait()
-        if rc != 0:
-            stderr_data = await proc.stderr.read()
-            err_text = stderr_data.decode().strip()
-            if err_text:
-                if not _retry and not got_output and self._is_auth_error(err_text):
-                    yield {"_auth_retry": True}
-                    return
-                yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}
+                    got_output = True
+                    etype = event.get("type")
+
+                    if etype == "assistant":
+                        for block in event.get("message", {}).get("content", []):
+                            btype = block.get("type")
+                            if btype == "text" and block.get("text"):
+                                yield {"type": "text", "content": block["text"]}
+                            elif btype == "tool_use":
+                                tool_id = block.get("id", "")
+                                tool_name = block.get("name", "")
+                                self._pending_tools[tool_id] = tool_name
+                                yield {
+                                    "type": "tool_start",
+                                    "tool": tool_name,
+                                    "input": block.get("input", {}),
+                                }
+
+                    elif etype == "user":
+                        for block in event.get("message", {}).get("content", []):
+                            if block.get("type") == "tool_result":
+                                tool_id = block.get("tool_use_id", "")
+                                tool_name = self._pending_tools.pop(tool_id, "")
+                                content = block.get("content", "")
+                                if isinstance(content, list):
+                                    content = "\n".join(
+                                        b.get("text", "") for b in content
+                                        if b.get("type") == "text"
+                                    )
+                                yield {
+                                    "type": "tool_end",
+                                    "tool": tool_name,
+                                    "result": str(content)[:500],
+                                }
+
+                    elif etype == "result":
+                        sid = event.get("session_id")
+                        if sid:
+                            self.claude_session_id = sid
+                        if event.get("subtype") != "success":
+                            self.claude_session_id = None
+                            err_msg = event.get("error", "")
+                            if not _retry and self._is_auth_error(err_msg):
+                                yield {"_auth_retry": True}
+                                return
+                            yield {
+                                "type": "error",
+                                "content": err_msg or "Claude CLIエラーが発生しました",
+                            }
+                        usage = event.get("usage")
+                        if usage:
+                            yield {
+                                "type": "usage",
+                                "usage": usage,
+                                "cost_usd": event.get("total_cost_usd"),
+                            }
+
+            except Exception as e:
+                print(f"[stdout読み込みエラー] {e}")
+                yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
+            finally:
+                try:
+                    proc.kill()
+                except ProcessLookupError:
+                    pass
+                self._proc = None
+
+            rc = await proc.wait()
+            if rc != 0:
+                stderr_data = await proc.stderr.read()
+                err_text = stderr_data.decode().strip()
+                if err_text:
+                    if not _retry and not got_output and self._is_auth_error(err_text):
+                        yield {"_auth_retry": True}
+                        return
+                    yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}
 
     @staticmethod
     def _is_auth_error(text: str) -> bool:
@@ -231,8 +238,32 @@ async def run_oneshot(
     system_prompt: str | None = None,
 ) -> AsyncGenerator[dict, None]:
     """セッション継続なしのワンショット実行（要件定義書生成・提案生成用）。
-    send_message と同じチャンク形式を yield する。
+    send_message と同じチャンク形式を yield する。401 OAuthエラー検知時は
+    send_message と同様に一度だけ再試行する。
     """
+    async for chunk in _run_oneshot_impl(
+        prompt, model, work_dir=work_dir, add_dir=add_dir,
+        system_prompt=system_prompt, _retry=False,
+    ):
+        if chunk.get("_auth_retry"):
+            print("[認証エラー] ワンショット実行を再試行します")
+            async for retry_chunk in _run_oneshot_impl(
+                prompt, model, work_dir=work_dir, add_dir=add_dir,
+                system_prompt=system_prompt, _retry=True,
+            ):
+                if not retry_chunk.get("_auth_retry"):
+                    yield retry_chunk
+            return
+        yield chunk
+
+
+async def _run_oneshot_impl(
+    prompt: str, model: str = DEFAULT_MODEL,
+    work_dir: str | None = None,
+    add_dir: str | None = None,
+    system_prompt: str | None = None,
+    _retry: bool = False,
+) -> AsyncGenerator[dict, None]:
     cmd = [
         "claude", "-p", prompt,
         "--output-format", "stream-json",
@@ -248,73 +279,83 @@ async def run_oneshot(
     env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
     cwd = work_dir or add_dir or str(Path.home())
 
-    proc = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        cwd=cwd,
-        env=env,
-        limit=8 * 1024 * 1024,
-    )
+    async with CLI_LOCK:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=cwd,
+            env=env,
+            limit=8 * 1024 * 1024,
+        )
 
-    pending_tools: dict[str, str] = {}
-    try:
-        async for raw_line in proc.stdout:
-            line = raw_line.decode().strip()
-            if not line:
-                continue
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-
-            etype = event.get("type")
-            if etype == "assistant":
-                for block in event.get("message", {}).get("content", []):
-                    btype = block.get("type")
-                    if btype == "text" and block.get("text"):
-                        yield {"type": "text", "content": block["text"]}
-                    elif btype == "tool_use":
-                        pending_tools[block.get("id", "")] = block.get("name", "")
-                        yield {"type": "tool_start", "tool": block.get("name", ""),
-                               "input": block.get("input", {})}
-            elif etype == "user":
-                for block in event.get("message", {}).get("content", []):
-                    if block.get("type") == "tool_result":
-                        tool_name = pending_tools.pop(block.get("tool_use_id", ""), "")
-                        content = block.get("content", "")
-                        if isinstance(content, list):
-                            content = "\n".join(
-                                b.get("text", "") for b in content if b.get("type") == "text"
-                            )
-                        yield {"type": "tool_end", "tool": tool_name,
-                               "result": str(content)[:500]}
-            elif etype == "result":
-                if event.get("subtype") == "success":
-                    result_text = event.get("result", "")
-                    if result_text:
-                        yield {"type": "result_text", "content": result_text}
-                else:
-                    yield {"type": "error",
-                           "content": event.get("error", "Claude CLIエラーが発生しました")}
-                usage = event.get("usage")
-                if usage:
-                    yield {
-                        "type": "usage",
-                        "usage": usage,
-                        "cost_usd": event.get("total_cost_usd"),
-                    }
-    except Exception as e:
-        yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
-    finally:
+        pending_tools: dict[str, str] = {}
+        got_output = False
         try:
-            proc.kill()
-        except ProcessLookupError:
-            pass  # 既に正常終了している場合
+            async for raw_line in proc.stdout:
+                line = raw_line.decode().strip()
+                if not line:
+                    continue
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
 
-    rc = await proc.wait()
-    if rc != 0:
-        stderr_data = await proc.stderr.read()
-        err_text = stderr_data.decode().strip()
-        if err_text:
-            yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}
+                got_output = True
+                etype = event.get("type")
+                if etype == "assistant":
+                    for block in event.get("message", {}).get("content", []):
+                        btype = block.get("type")
+                        if btype == "text" and block.get("text"):
+                            yield {"type": "text", "content": block["text"]}
+                        elif btype == "tool_use":
+                            pending_tools[block.get("id", "")] = block.get("name", "")
+                            yield {"type": "tool_start", "tool": block.get("name", ""),
+                                   "input": block.get("input", {})}
+                elif etype == "user":
+                    for block in event.get("message", {}).get("content", []):
+                        if block.get("type") == "tool_result":
+                            tool_name = pending_tools.pop(block.get("tool_use_id", ""), "")
+                            content = block.get("content", "")
+                            if isinstance(content, list):
+                                content = "\n".join(
+                                    b.get("text", "") for b in content if b.get("type") == "text"
+                                )
+                            yield {"type": "tool_end", "tool": tool_name,
+                                   "result": str(content)[:500]}
+                elif etype == "result":
+                    if event.get("subtype") == "success":
+                        result_text = event.get("result", "")
+                        if result_text:
+                            yield {"type": "result_text", "content": result_text}
+                    else:
+                        err_msg = event.get("error", "")
+                        if not _retry and ClaudeClient._is_auth_error(err_msg):
+                            yield {"_auth_retry": True}
+                            return
+                        yield {"type": "error",
+                               "content": err_msg or "Claude CLIエラーが発生しました"}
+                    usage = event.get("usage")
+                    if usage:
+                        yield {
+                            "type": "usage",
+                            "usage": usage,
+                            "cost_usd": event.get("total_cost_usd"),
+                        }
+        except Exception as e:
+            yield {"type": "error", "content": f"ストリーム読み込みエラー: {e}"}
+        finally:
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass  # 既に正常終了している場合
+
+        rc = await proc.wait()
+        if rc != 0:
+            stderr_data = await proc.stderr.read()
+            err_text = stderr_data.decode().strip()
+            if err_text:
+                if not _retry and not got_output and ClaudeClient._is_auth_error(err_text):
+                    yield {"_auth_retry": True}
+                    return
+                yield {"type": "error", "content": f"claude CLI エラー: {err_text}"}
