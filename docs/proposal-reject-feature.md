@@ -47,7 +47,20 @@ MDファイルのHTMLコメントに `rejected:` フィールドを追加:
 - rejected 提案をメインリストから除外
 - 折りたたみ式「不採用提案集」セクションを追加（復元ボタン付き）
 
+## バグ修正: 除外ボタン押下時の ReferenceError (2026-08-23)
+
+### 原因
+
+`rejectProposal()` / `restoreProposal()` 内で `showProposalScreen(projectPath, projectName)` を呼んでいるが、`projectName` がグローバル変数として宣言されていない。`ReferenceError` が catch ブロックに入り「更新に失敗しました」が表示される（サーバー側の処理自体は成功）。
+
+### 修正内容
+
+- `projectName` を `projectPath` と同様にグローバル変数として宣言・管理
+- `selectProject()` で保存、`switchMode()` / `switchProject()` / `resetSession()` でリセット
+- `rejectProposal` / `restoreProposal` / `toggleProposal` に `response.ok` チェックを追加
+
 ## ステータス
 
 - [x] 実装方針策定
 - [x] 実装済み
+- [x] バグ修正: projectName 未定義による ReferenceError

@@ -2067,11 +2067,13 @@ function switchMode(mode) {
 
   // セッションリセットして初期画面へ
   projectPath = '';
+  projectName = '';
   currentPlanFile = null;
   currentPlanProjectPath = null;
   currentPlanProjectName = null;
   contextFiles = [];
   localStorage.removeItem('projectPath');
+  localStorage.removeItem('projectName');
   renderContextChips();
   document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
@@ -2115,6 +2117,7 @@ const SESSION_ID = (() => {
   return id;
 })();
 let projectPath = localStorage.getItem('projectPath') || '';
+let projectName = localStorage.getItem('projectName') || '';
 
 // ---- プロジェクト選択（2段階） ----
 let _projectsCache = null;
@@ -2244,7 +2247,9 @@ async function createProject(wsName) {
 
 function selectProject(path, name) {
   projectPath = path;
+  projectName = name;
   localStorage.setItem('projectPath', path);
+  localStorage.setItem('projectName', name);
   document.getElementById('project-picker')?.remove();
 
   if (currentMode === 'plan') {
@@ -2934,7 +2939,9 @@ async function doImplementIdea(id, workspace) {
   localStorage.setItem('mode', 'dev');
   setModeButtons('dev');
   projectPath = res.path;
+  projectName = res.name;
   localStorage.setItem('projectPath', res.path);
+  localStorage.setItem('projectName', res.name);
   contextFiles = [{ path: res.plan_file, name: '要件定義書.md' }];
   renderContextChips();
   document.getElementById('messages').innerHTML = '';
@@ -3116,20 +3123,22 @@ function clearProposalGenerating() {
 
 async function toggleProposal(id, checked) {
   try {
-    await fetch('/api/proposals/toggle', {
+    const res = await fetch('/api/proposals/toggle', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ app_path: projectPath, id, checked }),
     });
+    if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     refreshAutodevBar();
   } catch(e) { showToast('更新に失敗しました', 'error'); }
 }
 
 async function rejectProposal(id) {
   try {
-    await fetch('/api/proposals/reject', {
+    const res = await fetch('/api/proposals/reject', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ app_path: projectPath, id }),
     });
+    if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     showToast('不採用にしました', 'success');
     showProposalScreen(projectPath, projectName);
   } catch(e) { showToast('更新に失敗しました', 'error'); }
@@ -3137,10 +3146,11 @@ async function rejectProposal(id) {
 
 async function restoreProposal(id) {
   try {
-    await fetch('/api/proposals/restore', {
+    const res = await fetch('/api/proposals/restore', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ app_path: projectPath, id }),
     });
+    if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     showToast('提案を復元しました', 'success');
     showProposalScreen(projectPath, projectName);
   } catch(e) { showToast('更新に失敗しました', 'error'); }
@@ -3892,11 +3902,13 @@ function switchProject() {
   document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
   projectPath = '';
+  projectName = '';
   currentPlanFile = null;
   currentPlanProjectPath = null;
   currentPlanProjectName = null;
   contextFiles = [];
   localStorage.removeItem('projectPath');
+  localStorage.removeItem('projectName');
   renderContextChips();
   if (wsReady) ws.send(JSON.stringify({ type: 'reset' }));
   showWorkspacePicker();
@@ -4038,11 +4050,13 @@ function toggleTts() {
 // ---- リセット ----
 function resetSession() {
   projectPath = '';
+  projectName = '';
   currentPlanFile = null;
   currentPlanProjectPath = null;
   currentPlanProjectName = null;
   contextFiles = [];
   localStorage.removeItem('projectPath');
+  localStorage.removeItem('projectName');
   renderContextChips();
   document.getElementById('proj-badge')?.style.setProperty('display', 'none');
   document.getElementById('quick-actions').style.display = 'none';
