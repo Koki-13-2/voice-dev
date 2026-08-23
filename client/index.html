@@ -464,6 +464,20 @@
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+  .sync-log-btn {
+    margin-left: auto;
+    padding: 4px 10px;
+    font-size: 11px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--accent);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, opacity .15s;
+  }
+  .sync-log-btn:hover { background: var(--hover); }
+  .sync-log-btn:active { opacity: .7; }
 
   @keyframes bounce {
     0%, 60%, 100% { transform: translateY(0); }
@@ -3585,7 +3599,8 @@ function handleServerMessage(msg) {
       <div class="thinking-info">
         <div class="thinking-status" id="thinking-status">考え中...</div>
         <div class="thinking-timer" id="thinking-timer">0秒経過</div>
-      </div>`;
+      </div>
+      <button class="sync-log-btn" onclick="syncLog()" title="最新ログを取得">&#x21bb; 更新</button>`;
     document.getElementById('messages').appendChild(thinkingDiv);
     scrollBottom();
     currentAiDiv = null;
@@ -3753,6 +3768,14 @@ function renderChoiceButtons(choices) {
 function removeThinking() {
   if (thinkingTimerInterval) { clearInterval(thinkingTimerInterval); thinkingTimerInterval = null; }
   if (thinkingDiv) { thinkingDiv.remove(); thinkingDiv = null; }
+}
+
+function syncLog() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'sync' }));
+  } else {
+    showToast('接続が切れています。再接続を待ってください', 'error');
+  }
 }
 
 // ---- TTS読み上げ ----

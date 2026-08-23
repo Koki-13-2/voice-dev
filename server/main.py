@@ -1269,6 +1269,15 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 # タスク完了または切断まで配信
                 await _drain_queue(session_id, websocket)
 
+            elif msg_type == "sync":
+                if task_manager.is_running(session_id):
+                    print(f"[sync] キューを再ドレイン session={session_id}")
+                    await _drain_queue(session_id, websocket)
+                else:
+                    await websocket.send_text(json.dumps({
+                        "type": "notice", "content": "最新の状態です",
+                    }))
+
             elif msg_type == "reset":
                 client.reset()
                 await websocket.send_text(json.dumps({
