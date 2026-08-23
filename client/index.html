@@ -3484,7 +3484,10 @@ async function switchAccount(name) {
   if (!confirm(`アカウントを「${name}」に切り替えますか？`)) return;
   const res = await fetch(`/api/accounts/${encodeURIComponent(name)}/switch`, { method: 'POST' }).then(r => r.json());
   if (res.error) { showToast(res.error, 'error'); return; }
-  showToast(`「${name}」に切り替えました`, 'success');
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'reset' }));
+  }
+  showToast(`「${name}」に切り替えました（会話をリセットしました）`, 'success');
   renderAccounts();
   renderAccountsWhoami();
 }
