@@ -611,9 +611,10 @@ async def save_account(data: dict):
 @app.post("/api/accounts/{name}/switch")
 async def switch_account(name: str):
     try:
-        result = account_store.switch_to(name)
+        # 全セッションの実行中CLIプロセスを停止してからセッションリセット
         for client in sessions.values():
-            client.reset()
+            await client.cancel()
+        result = account_store.switch_to(name)
         return JSONResponse(result)
     except ValueError as e:
         return JSONResponse({"error": str(e)}, status_code=400)
