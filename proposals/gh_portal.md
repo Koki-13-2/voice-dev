@@ -105,7 +105,7 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【UI/UX/小】index.html viewport maximum-scale=1.0の削除 — ピンチズームがブロックされWCAG SC 1.4.4違反となり弱視ユーザーが拡大できないため、maximum-scale制限を外す <!-- id:98 rejected:2026-08-23T10:53 -->
 - [x] 【性能/中】Material Symbols Roundedフォントのサブセット化 — 全可変軸（推定500KB+）をロードしているが使用アイコンのみにサブセットまたはセルフホストしてFirst Contentful Paintを改善する <!-- id:99 done:2026-07-09T08:46 -->
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 rejected:2026-08-23T11:07 -->
-- [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 -->
+- [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 rejected:2026-08-23T22:32 -->
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
 - [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->
 - [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 -->
@@ -188,3 +188,13 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
 - [ ] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 -->
 - [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 -->
+- [ ] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 -->
+- [ ] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 -->
+- [ ] 【UI/UX/小】LoadingScreen文字色（#999）のWCAG AA準拠修正 — App.tsxのLoadingScreenのcolor:#999は白背景でコントラスト比約2.8:1となりAA基準4.5:1を満たしておらず、既修正の--color-mutedと同様に#717171以下へ変更が必要 <!-- id:186 -->
+- [ ] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 -->
+- [ ] 【運用/中】Dashboard・Chat間のScheduleTimeSelector等5件の重複コードをsharedモジュールに抽出 — MeetingInvitation型・MeetingStatus型・MEETING_HOURS定数・getPillForHour関数・ScheduleTimeSelectorコンポーネントが両ファイルにほぼ同一でコピペされている <!-- id:188 -->
+- [ ] 【機能/小】AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行 — new Date()がモジュール読み込み時に1度だけ実行されるため、月境界を跨いでタブを開き続けると当月がドロップダウンに現れなくなる <!-- id:189 -->
+- [ ] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 -->
+- [ ] 【UI/UX/小】UniversityComboboxのキーボード操作・ARIA属性追加 — Onboarding.tsxの大学選択UIがonMouseDownのみで矢印キーナビゲーション不可、role="listbox"・aria-expanded・aria-activedescendant等のARIA属性も欠如している <!-- id:191 -->
+- [ ] 【性能/小】utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化 — fmtDateFull・fmtDateTimeが呼び出しごとにnew Intl.DateTimeFormatを生成しておりGC圧とインスタンス化コストが無駄に発生している <!-- id:192 -->
+- [ ] 【機能/小】AdminMessagesテンプレートのハードコード配列をDB取得に統一 — AdminMessages.tsxではテンプレート4件がハードコード配列だがAdminStudents.tsxではmessage_templatesテーブルから動的取得しており、管理画面間でテンプレート一覧が不一致になる <!-- id:193 -->
