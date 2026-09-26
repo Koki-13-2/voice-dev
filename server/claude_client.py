@@ -26,10 +26,9 @@ SYSTEM_PROMPT = """あなたはソフトウェア開発アシスタントです�
 _AUTH_ERROR_PATTERNS = ("401", "unauthorized", "oauth", "auth", "credential", "login")
 
 # claude CLIは ~/.claude/.credentials.json のOAuthトークン（ローテーション式・使い切り）を
-# 起動のたびに参照・更新する。PC/スマホなど複数デバイスからほぼ同時にCLIを起動すると
-# トークンリフレッシュが競合し401エラーになることがあるため、プロセス全体で
-# claude CLI呼び出しを直列化する。
-CLI_LOCK = asyncio.Lock()
+# 起動のたびに参照・更新する。完全直列化は廃止し最大3並行を許容。
+# 競合時の401エラーは send_message/_run_oneshot_impl の _auth_retry 機構でリカバリする。
+CLI_LOCK = asyncio.Semaphore(3)
 
 
 class ClaudeClient:

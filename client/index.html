@@ -1478,6 +1478,48 @@
   .proposal-section-collapsed summary .plan-screen-title::before { content: '▸ '; }
   .proposal-section-collapsed[open] summary .plan-screen-title::before { content: '▾ '; }
 
+  /* ---- フィルタバー ---- */
+  .proposal-filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .proposal-filter-btn {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .proposal-filter-btn:hover {
+    border-color: var(--mode-propose);
+    color: var(--text);
+  }
+  .proposal-filter-btn.active {
+    background: rgba(255,146,84,.12);
+    border-color: rgba(255,146,84,.5);
+    color: var(--mode-propose);
+  }
+  .proposal-filter-count {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .proposal-filter-btn.active .proposal-filter-count {
+    background: rgba(255,146,84,.2);
+  }
+
   /* ============ ブランチセレクタ ============ */
   .branch-bar {
     background:
@@ -2951,6 +2993,53 @@ async function doImplementIdea(id, workspace) {
 }
 
 // ===== 追加提案蓄積モード =====
+let proposalFilters = { queued: true, unselected: true, done: false, rejected: false };
+let _proposalCache = null;
+
+function getProposalStatus(t) {
+  if (t.done) return 'done';
+  if (t.rejected) return 'rejected';
+  if (t.checked) return 'queued';
+  return 'unselected';
+}
+
+function proposalFilterBarHtml(tasks) {
+  const counts = { queued: 0, unselected: 0, done: 0, rejected: 0 };
+  for (const t of tasks) counts[getProposalStatus(t)]++;
+  const labels = { queued: '実装待ち', unselected: '未選択', done: '実装済み', rejected: '非表示' };
+  return `<div class="proposal-filter-bar">${
+    ['queued', 'unselected', 'done', 'rejected'].map(k =>
+      `<button class="proposal-filter-btn${proposalFilters[k] ? ' active' : ''}" data-filter="${k}" onclick="toggleProposalFilter('${k}')">
+        ${labels[k]} <span class="proposal-filter-count">${counts[k]}</span>
+      </button>`
+    ).join('')
+  }</div>`;
+}
+
+function renderProposalItems() {
+  if (!_proposalCache) return;
+  const listEl = document.getElementById('proposal-list');
+  if (!listEl) return;
+  const filtered = _proposalCache.tasks.filter(t => proposalFilters[getProposalStatus(t)]);
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="plan-empty">該当する提案はありません</div>';
+  } else {
+    listEl.innerHTML = filtered.map(t =>
+      proposalRowHtml(t, getProposalStatus(t) === 'rejected' ? 'rejected' : undefined)
+    ).join('');
+  }
+  const countEl = document.querySelector('#proposal-screen .plan-folder-count');
+  if (countEl) countEl.textContent = `${filtered.length}/${_proposalCache.tasks.length}`;
+}
+
+function toggleProposalFilter(key) {
+  proposalFilters[key] = !proposalFilters[key];
+  document.querySelectorAll('.proposal-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', proposalFilters[btn.dataset.filter]);
+  });
+  renderProposalItems();
+}
+
 async function showProposalScreen(projPath, projName) {
   setInputEnabled(true);
   document.getElementById('quick-actions').style.display = 'none';
@@ -2970,9 +3059,7 @@ async function showProposalScreen(projPath, projName) {
   screen.className = 'plan-screen';
   screen.id = 'proposal-screen';
 
-  const pending = data.tasks.filter(t => !t.done && !t.rejected);
-  const rejectedTasks = data.tasks.filter(t => t.rejected && !t.done);
-  const doneTasks = data.tasks.filter(t => t.done);
+  _proposalCache = data;
 
   let branchBarHtml = '';
   if (branchInfo.is_git) {
@@ -3004,26 +3091,16 @@ async function showProposalScreen(projPath, projName) {
   </div>
   ${branchBarHtml}
   <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
-  <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>`;
+  <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>
+  ${proposalFilterBarHtml(data.tasks)}
+  <div id="proposal-list"></div>`;
 
   if (!data.tasks.length) {
     inner += `<div class="plan-empty">提案がまだありません<br><small>「🤖 提案を生成」でAIがコードを解析して改善案を提案します</small></div>`;
   }
 
-  for (const t of pending) inner += proposalRowHtml(t);
-  if (rejectedTasks.length) {
-    inner += `<details class="proposal-section-collapsed" style="margin-top:16px">
-      <summary class="plan-screen-header" style="cursor:pointer"><span class="plan-screen-title" style="font-size:13px;color:var(--muted)">🚫 不採用 ${rejectedTasks.length}</span></summary>
-      <div class="proposal-rejected-list">`;
-    for (const t of rejectedTasks) inner += proposalRowHtml(t, 'rejected');
-    inner += `</div></details>`;
-  }
-  if (doneTasks.length) {
-    inner += `<div class="plan-screen-header" style="margin-top:16px"><span class="plan-screen-title" style="font-size:13px;color:var(--muted)">✅ 実装済み ${doneTasks.length}</span></div>`;
-    for (const t of doneTasks) inner += proposalRowHtml(t);
-  }
-
   screen.innerHTML = inner;
+  if (data.tasks.length) renderProposalItems();
   messagesEl.appendChild(screen);
   messagesEl.scrollTop = 0;
 }
