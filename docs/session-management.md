@@ -45,5 +45,14 @@
 
 ## ステータス
 
-- [ ] 実装中
-- [ ] 実装完了
+- [x] 実装中
+- [x] 実装完了
+
+### 実装メモ
+
+- `SessionMeta`（id/client/name/project_path/created_at/last_active）を追加し、`sessions: dict[str, SessionMeta]` に変更
+- `TaskManager.cancel()` を追加（実行中asyncio.Taskをキャンセル→キュークリーンアップ、全モード共通で使用）
+- REST API 4種（`GET/POST /api/sessions`, `POST /api/sessions/{id}/cancel`, `DELETE /api/sessions/{id}`）を実装
+- フロントエンドの `SESSION_ID` を `sessionStorage` のみに変更（新タブ=新規セッション）。`?session_id=` / `?new_session=1` クエリに対応
+- ヘッダーに🗂セッション管理ボタンとモーダル（一覧・中断・削除・新規セッションを新タブで開く）を追加
+- セッション名は未指定時、最初のチャット送信時の `project_path` のディレクトリ名を自動設定（リネームAPIは今回のスコープ外）

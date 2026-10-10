@@ -2043,6 +2043,23 @@
   </div>
 </div>
 
+<!-- セッション管理モーダル -->
+<div id="sessions-overlay" class="fp-overlay" style="display:none" onclick="if(event.target===this)closeSessionsModal()">
+  <div class="fp-sheet">
+    <div class="sheet-handle"></div>
+    <div class="fp-header">
+      <span class="fp-title">🗂 セッション管理</span>
+      <button class="fp-close" onclick="closeSessionsModal()">×</button>
+    </div>
+    <div class="fp-list" id="sessions-list">
+      <div class="fp-empty">読み込み中...</div>
+    </div>
+    <div style="padding:10px 14px;border-top:1px solid var(--border)">
+      <button class="fp-add-btn" onclick="openNewSessionTab()">➕ 新規セッション（新タブで開く）</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-left">
     <div class="brand" title="Voice Dev">
@@ -2065,6 +2082,7 @@
     </select>
     <button id="tts-btn" onclick="toggleTts()" title="読み上げON/OFF">🔊</button>
     <button id="accounts-btn" onclick="openAccountsModal()" title="Claude Codeアカウント管理">👤</button>
+    <button id="sessions-btn" onclick="openSessionsModal()" title="セッション管理">🗂</button>
     <button id="reset-btn" onclick="resetSession()">リセット</button>
   </div>
 </header>
@@ -2148,13 +2166,23 @@ function generateId() {
   });
 }
 const SESSION_ID = (() => {
-  // localStorage を使用: ページリロード・タブ再開後も同じセッションIDを維持し、
-  // 実行中タスクへの再接続を可能にする
+  // sessionStorageのみを使用: 新しいタブは自動的に独立した新規セッションを取得する。
+  // 同一タブ内のリロードでは同じIDを維持し、実行中タスクへの再接続を可能にする。
+  const params = new URLSearchParams(location.search);
+  const forcedId = params.get('session_id');
+  if (forcedId) {
+    sessionStorage.setItem('sessionId', forcedId);
+    return forcedId;
+  }
+  if (params.get('new_session') === '1') {
+    const id = generateId();
+    sessionStorage.setItem('sessionId', id);
+    return id;
+  }
   let id = sessionStorage.getItem('sessionId');
   if (!id) {
-    id = localStorage.getItem('sessionId') || generateId();
+    id = generateId();
     sessionStorage.setItem('sessionId', id);
-    localStorage.setItem('sessionId', id);
   }
   return id;
 })();
@@ -3604,6 +3632,90 @@ async function deleteAccountEntry(name) {
   if (!confirm(`保存済みアカウント「${name}」を削除しますか？（現在のログイン状態は変わりません）`)) return;
   await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: 'DELETE' });
   renderAccounts();
+}
+
+// ===== セッション管理 =====
+function openSessionsModal() {
+  document.getElementById('sessions-overlay').style.display = 'flex';
+  renderSessions();
+}
+
+function closeSessionsModal() {
+  document.getElementById('sessions-overlay').style.display = 'none';
+}
+
+function fmtRelTime(ts) {
+  if (!ts) return '不明';
+  const diffSec = Math.max(0, (Date.now() / 1000) - ts);
+  if (diffSec < 60) return '今';
+  if (diffSec < 3600) return Math.floor(diffSec / 60) + '分前';
+  if (diffSec < 86400) return Math.floor(diffSec / 3600) + '時間前';
+  return Math.floor(diffSec / 86400) + '日前';
+}
+
+async function renderSessions() {
+  const list = document.getElementById('sessions-list');
+  let items;
+  try {
+    items = await fetch('/api/sessions').then(r => r.json());
+  } catch (e) {
+    list.innerHTML = '<div class="fp-empty">読み込みに失敗しました</div>';
+    return;
+  }
+  if (!Array.isArray(items) || !items.length) {
+    list.innerHTML = '<div class="fp-empty">セッションはありません</div>';
+    return;
+  }
+  list.innerHTML = items.map(s => {
+    const isCurrent = s.id === SESSION_ID;
+    const label = s.name || s.project_name || ('セッション ' + s.id.slice(0, 8));
+    return `<div class="fp-file-row" style="cursor:default;align-items:flex-start">
+      <div class="fp-file-info">
+        <div class="fp-file-name">${s.running ? '🟢 ' : '⚪ '}${escHtml(label)}${isCurrent ? ' <span style="color:var(--muted-2);font-weight:400">（このタブ）</span>' : ''}</div>
+        <div class="fp-file-path">${escHtml(s.project_name || '（プロジェクト未選択）')} ・ 最終アクティブ: ${fmtRelTime(s.last_active)}</div>
+      </div>
+      <div class="plan-file-actions" style="flex-direction:column;align-items:flex-end">
+        ${s.running ? `<button class="plan-action-btn" onclick="cancelSessionEntry('${escAttr(s.id)}')">⏸ 中断</button>` : ''}
+        <button class="plan-action-btn danger" onclick="deleteSessionEntry('${escAttr(s.id)}')">🗑 削除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function cancelSessionEntry(id) {
+  await fetch(`/api/sessions/${encodeURIComponent(id)}/cancel`, { method: 'POST' });
+  showToast('セッションを中断しました', 'success');
+  renderSessions();
+}
+
+async function deleteSessionEntry(id) {
+  const isCurrent = id === SESSION_ID;
+  const msg = isCurrent
+    ? 'このタブで使用中のセッションです。削除すると会話がリセットされます。削除しますか？'
+    : 'このセッションを削除しますか？';
+  if (!confirm(msg)) return;
+  await fetch(`/api/sessions/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (isCurrent) {
+    document.getElementById('messages').innerHTML = '';
+    if (wsReady) ws.send(JSON.stringify({ type: 'reset' }));
+  }
+  showToast('セッションを削除しました', 'success');
+  renderSessions();
+}
+
+async function openNewSessionTab() {
+  let id;
+  try {
+    const res = await fetch('/api/sessions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}),
+    }).then(r => r.json());
+    id = res.id;
+  } catch (e) {
+    showToast('新規セッションの作成に失敗しました', 'error');
+    return;
+  }
+  window.open(location.origin + '/?session_id=' + encodeURIComponent(id), '_blank');
+  closeSessionsModal();
 }
 
 // ===== 本番接続テスト =====

@@ -2,6 +2,9 @@ import asyncio
 import json
 import os
 import re
+import time
+import uuid
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -612,8 +615,8 @@ async def save_account(data: dict):
 async def switch_account(name: str):
     try:
         # 全セッションの実行中CLIプロセスを停止してからセッションリセット
-        for client in sessions.values():
-            await client.cancel()
+        for meta in sessions.values():
+            await meta.client.cancel()
         result = account_store.switch_to(name)
         return JSONResponse(result)
     except ValueError as e:
@@ -899,7 +902,17 @@ async def autodev_log():
 
 
 # ── セッションストア ─────────────────────────────────
-sessions: dict[str, ClaudeClient] = {}
+@dataclass
+class SessionMeta:
+    id: str
+    client: ClaudeClient
+    name: str | None = None
+    project_path: str = ""
+    created_at: float = field(default_factory=time.time)
+    last_active: float = field(default_factory=time.time)
+
+
+sessions: dict[str, SessionMeta] = {}
 
 
 # ── バックグラウンドタスク管理 ────────────────────────
@@ -940,8 +953,65 @@ class TaskManager:
     def pop_pending(self, session_id: str) -> object | None:
         return self._pending.pop(session_id, None)
 
+    async def cancel(self, session_id: str) -> None:
+        """実行中タスクをキャンセルし、紐づくQueueをクリーンアップする"""
+        task = self._tasks.get(session_id)
+        if task and not task.done():
+            task.cancel()
+            try:
+                await task
+            except (asyncio.CancelledError, Exception):
+                pass
+        self.cleanup(session_id)
+
 
 task_manager = TaskManager()
+
+
+# ── セッション管理API ───────────────────────────────
+@app.get("/api/sessions")
+async def list_sessions():
+    result = []
+    for sid, meta in sessions.items():
+        result.append({
+            "id": sid,
+            "name": meta.name,
+            "project_path": meta.project_path,
+            "project_name": Path(meta.project_path).name if meta.project_path else "",
+            "created_at": meta.created_at,
+            "last_active": meta.last_active,
+            "running": task_manager.is_running(sid),
+        })
+    result.sort(key=lambda s: s["last_active"], reverse=True)
+    return JSONResponse(result)
+
+
+@app.post("/api/sessions")
+async def create_session(data: dict):
+    sid = str(uuid.uuid4())
+    sessions[sid] = SessionMeta(id=sid, client=ClaudeClient(), name=(data.get("name") or None))
+    return JSONResponse({"id": sid, "name": sessions[sid].name})
+
+
+@app.post("/api/sessions/{session_id}/cancel")
+async def cancel_session_api(session_id: str):
+    meta = sessions.get(session_id)
+    if meta is None:
+        return JSONResponse({"error": "セッションが見つかりません"}, status_code=404)
+    await task_manager.cancel(session_id)
+    await meta.client.cancel()
+    return JSONResponse({"ok": True})
+
+
+@app.delete("/api/sessions/{session_id}")
+async def delete_session_api(session_id: str):
+    meta = sessions.get(session_id)
+    if meta is None:
+        return JSONResponse({"error": "セッションが見つかりません"}, status_code=404)
+    await task_manager.cancel(session_id)
+    await meta.client.cancel()
+    sessions.pop(session_id, None)
+    return JSONResponse({"ok": True})
 
 
 async def _run_chat(
@@ -1226,9 +1296,11 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     print(f"[接続] session={session_id}")
 
     if session_id not in sessions:
-        sessions[session_id] = ClaudeClient()
+        sessions[session_id] = SessionMeta(id=session_id, client=ClaudeClient())
 
-    client = sessions[session_id]
+    meta = sessions[session_id]
+    meta.last_active = time.time()
+    client = meta.client
 
     try:
         # 再接続時: 進行中タスクのバッファを即座に配信
@@ -1250,6 +1322,11 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 plan_file = message.get("plan_file")
                 context_files = message.get("context_files", [])
                 mode = message.get("mode", "dev")
+
+                meta.project_path = project_path
+                meta.last_active = time.time()
+                if not meta.name and project_path:
+                    meta.name = Path(project_path).name
 
                 print(f"[受信] [{mode}/{model}] {text[:80]}")
 
