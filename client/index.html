@@ -3250,6 +3250,8 @@ async function showProposalScreen(projPath, projName) {
   let inner = `<div class="plan-screen-header">
     <span class="plan-screen-title">🔧 ${escHtml(projName)} 改善提案 <span class="plan-folder-count">${data.tasks.length}</span></span>
     <select id="proposal-count" class="proposal-count-select">
+      <option value="1">1件</option>
+      <option value="3">3件</option>
       <option value="5">5件</option>
       <option value="10" selected>10件</option>
       <option value="15">15件</option>
