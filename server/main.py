@@ -17,10 +17,12 @@ import subprocess
 
 import account_store
 import autodev
+import chatlog_store
 import gitutil
 import idea_store
 import proposal_store
 import secrets_store
+import session_store
 from claude_client import ClaudeClient, run_oneshot
 
 # 生成AIの生出力キャッシュ（パース失敗時の復旧・デバッグ用、gitignore対象）
@@ -48,6 +50,7 @@ WORKSPACES = [Path.home() / "private-dev", Path.home() / "hennyujuku"]
 
 @app.on_event("startup")
 async def _startup():
+    _restore_sessions()
     asyncio.create_task(autodev.autodev_loop())
 
 
@@ -684,6 +687,49 @@ async def test_gcloud():
         return JSONResponse({"error": "gcloud コマンドがタイムアウトしました"}, status_code=504)
 
 
+@app.post("/api/test/pay-slip-send")
+async def test_pay_slip_send(data: dict):
+    """pay-slipジョブで指定講師IDにLINE送付を行う。teacher_id="ALL" で全員送付。"""
+    teacher_id = data.get("teacher_id", "").strip()
+    send_mode = data.get("send_mode", "confirmed")
+    is_all = teacher_id.upper() == "ALL"
+
+    if not teacher_id:
+        return JSONResponse({"error": "teacher_id を指定してください"}, status_code=400)
+    if send_mode not in ("preview", "confirmed"):
+        return JSONResponse({"error": "send_mode は preview または confirmed を指定してください"}, status_code=400)
+    if not is_all and not re.match(r'^[a-zA-Z0-9_,-]+$', teacher_id):
+        return JSONResponse({"error": "teacher_id の形式が不正です"}, status_code=400)
+
+    if shutil.which("gcloud") is None:
+        return JSONResponse({"error": "gcloud CLI がインストールされていません"}, status_code=400)
+
+    # 全員送付時は ONLY_TEACHERS を渡さない（バッチ側で全件取得）
+    env_vars = f"SEND_MODE={send_mode}" if is_all else f"ONLY_TEACHERS={teacher_id},SEND_MODE={send_mode}"
+    cmd = [
+        "gcloud", "run", "jobs", "execute", "pay-slip-batch",
+        "--region=asia-northeast1",
+        "--project=study-management-478302",
+        f"--update-env-vars={env_vars}",
+        "--wait",
+    ]
+    mode_label = "速報" if send_mode == "preview" else "確定"
+    target_label = "全員" if is_all else teacher_id
+    try:
+        result = await asyncio.to_thread(
+            subprocess.run, cmd,
+            capture_output=True, text=True, timeout=300
+        )
+        if result.returncode == 0:
+            return JSONResponse({"ok": True, "detail": f"{target_label} に{mode_label}版を送付しました"})
+        return JSONResponse(
+            {"error": f"gcloud エラー ({result.returncode}): {(result.stderr or result.stdout).strip()[:500]}"},
+            status_code=502,
+        )
+    except subprocess.TimeoutExpired:
+        return JSONResponse({"error": "ジョブがタイムアウトしました（300秒）"}, status_code=504)
+
+
 # ── ZIP送付モード ────────────────────────────────────
 ZIPMAIL_DEFAULT_TO = "koki.n.shukatsu@gmail.com"
 ZIPMAIL_MAX_ZIP_BYTES = 20 * 1024 * 1024  # Gmail添付上限25MBへの安全マージン
@@ -886,6 +932,7 @@ async def set_autodev(data: dict):
         enabled=data.get("enabled"),
         interval_min=data.get("interval_min"),
         model=data.get("model"),
+        max_parallel_agents=data.get("max_parallel_agents"),
     )
     # ONにした直後は次のtick（60秒以内）で1件目が動くよう last_run をクリア
     if data.get("enabled"):
@@ -901,6 +948,43 @@ async def autodev_log():
     return JSONResponse({"content": content[-8000:]})
 
 
+@app.post("/api/autodev/run-now")
+async def autodev_run_now(data: dict):
+    """指定タスクをworktree分離で即時並列起動する（方針E）"""
+    app_path = data["app_path"]
+    try:
+        ids = [int(i) for i in data.get("ids", [])]
+    except (TypeError, ValueError):
+        return JSONResponse({"error": "タスクIDの形式が不正です"}, status_code=400)
+    if not ids:
+        return JSONResponse({"error": "タスクIDを指定してください"}, status_code=400)
+    return JSONResponse(autodev.run_now(app_path, ids, model=data.get("model")))
+
+
+@app.get("/api/autodev/worktrees")
+async def autodev_worktrees(app_path: str):
+    """統合待ちタスクworktree（ブランチ）一覧"""
+    if not gitutil.is_git_repo(app_path):
+        return JSONResponse([])
+    return JSONResponse(await asyncio.to_thread(gitutil.list_worktrees, app_path))
+
+
+@app.post("/api/autodev/merge")
+async def autodev_merge(data: dict):
+    """統合待ちブランチを統合先へマージする。成功時はworktreeを削除する（方針D）"""
+    app_path = data["app_path"]
+    branch = data["branch"]
+    into = proposal_store.get_branch(app_path)
+    result = await asyncio.to_thread(gitutil.merge_branch, app_path, branch, into)
+    if result == "merged":
+        task_id = data.get("task_id", "")
+        if task_id:
+            await asyncio.to_thread(gitutil.remove_worktree, app_path, task_id)
+        push_result = await asyncio.to_thread(gitutil.push, app_path)
+        return JSONResponse({"ok": True, "result": "merged", "push": push_result})
+    return JSONResponse({"error": result}, status_code=409 if result == "conflict" else 400)
+
+
 # ── セッションストア ─────────────────────────────────
 @dataclass
 class SessionMeta:
@@ -913,6 +997,35 @@ class SessionMeta:
 
 
 sessions: dict[str, SessionMeta] = {}
+
+
+def _restore_sessions() -> None:
+    """永続化されたセッションメタを復元する（claude_session_idにより会話も--resumeで継続可能）"""
+    for sid, m in session_store.load_all().items():
+        if sid in sessions:
+            continue
+        client = ClaudeClient()
+        client.claude_session_id = m.get("claude_session_id") or None
+        sessions[sid] = SessionMeta(
+            id=sid, client=client, name=m.get("name"),
+            project_path=m.get("project_path", ""),
+            created_at=m.get("created_at", time.time()),
+            last_active=m.get("last_active", time.time()),
+        )
+    if sessions:
+        print(f"[セッション復元] {len(sessions)}件")
+
+
+def _persist_sessions() -> None:
+    session_store.save_all({
+        sid: {
+            "name": meta.name,
+            "project_path": meta.project_path,
+            "created_at": meta.created_at,
+            "last_active": meta.last_active,
+            "claude_session_id": meta.client.claude_session_id,
+        } for sid, meta in sessions.items()
+    })
 
 
 # ── バックグラウンドタスク管理 ────────────────────────
@@ -968,6 +1081,23 @@ class TaskManager:
 task_manager = TaskManager()
 
 
+class _LoggedQueue:
+    """Queueへの投入と同時にチャットログへ永続記録し、チャンクに log_seq を付与する。
+    クライアントは履歴復元済みのseq以下のチャンクを無視して二重表示を防ぐ。
+    """
+
+    def __init__(self, queue: asyncio.Queue, session_id: str) -> None:
+        self._queue = queue
+        self._session_id = session_id
+
+    async def put(self, chunk) -> None:
+        if isinstance(chunk, dict):
+            seq = chatlog_store.append_chunk(self._session_id, chunk)
+            if seq:
+                chunk["log_seq"] = seq
+        await self._queue.put(chunk)
+
+
 # ── セッション管理API ───────────────────────────────
 @app.get("/api/sessions")
 async def list_sessions():
@@ -981,6 +1111,7 @@ async def list_sessions():
             "created_at": meta.created_at,
             "last_active": meta.last_active,
             "running": task_manager.is_running(sid),
+            "has_log": chatlog_store.exists(sid),
         })
     result.sort(key=lambda s: s["last_active"], reverse=True)
     return JSONResponse(result)
@@ -990,7 +1121,17 @@ async def list_sessions():
 async def create_session(data: dict):
     sid = str(uuid.uuid4())
     sessions[sid] = SessionMeta(id=sid, client=ClaudeClient(), name=(data.get("name") or None))
+    _persist_sessions()
     return JSONResponse({"id": sid, "name": sessions[sid].name})
+
+
+@app.get("/api/sessions/{session_id}/log")
+async def get_session_log(session_id: str, limit: int = 500):
+    """セッションのチャットログ（履歴復元用）。runningで進行中タスクの有無も返す"""
+    return JSONResponse({
+        "entries": chatlog_store.read(session_id, limit=limit),
+        "running": task_manager.is_running(session_id),
+    })
 
 
 @app.post("/api/sessions/{session_id}/cancel")
@@ -1011,6 +1152,8 @@ async def delete_session_api(session_id: str):
     await task_manager.cancel(session_id)
     await meta.client.cancel()
     sessions.pop(session_id, None)
+    chatlog_store.delete(session_id)
+    _persist_sessions()
     return JSONResponse({"ok": True})
 
 
@@ -1023,8 +1166,8 @@ async def _run_chat(
     plan_file: str | None,
     context_files: list,
 ) -> None:
-    """Claude処理をバックグラウンドで実行し、結果をQueueに積む"""
-    queue = task_manager.get_or_create_queue(session_id)
+    """Claude処理をバックグラウンドで実行し、結果をQueueに積む（チャットログにも永続記録）"""
+    queue = _LoggedQueue(task_manager.get_or_create_queue(session_id), session_id)
     # 秘密ストアの接続情報を注入（本番接続テストをAIが実行できるように）
     extra_env = secrets_store.load_env(Path(project_path).name) if project_path else {}
     try:
@@ -1044,6 +1187,7 @@ async def _run_chat(
         print(f"[バックグラウンドエラー] session={session_id}: {e}")
         await queue.put({"type": "error", "content": str(e)})
     finally:
+        _persist_sessions()  # claude_session_id の更新を保存（--resume 継続用）
         await queue.put({"type": "done"})
         await queue.put(None)  # 終了sentinel
 
@@ -1112,7 +1256,7 @@ async def _run_idea(session_id: str, text: str, model: str) -> None:
     """要件定義モード: 1送信を要件定義書MDに変換してアイデアDBに保存する。
     出力契約(sentinel) → 抽出 → 検証 → 違反時は1回だけ自動再生成。生出力は必ずキャッシュ。
     """
-    queue = task_manager.get_or_create_queue(session_id)
+    queue = _LoggedQueue(task_manager.get_or_create_queue(session_id), session_id)
     from datetime import datetime
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     cache_file = ""
@@ -1200,7 +1344,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
     """追加提案蓄積モード: アプリを解析して改善提案を生成・蓄積する。
     出力契約(sentinel) → 抽出 → パース → 0件なら1回だけ自動再生成。生出力は必ずキャッシュ。
     """
-    queue = task_manager.get_or_create_queue(session_id)
+    queue = _LoggedQueue(task_manager.get_or_create_queue(session_id), session_id)
     app_name = Path(project_path).name
     from datetime import datetime
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -1330,7 +1474,31 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                 print(f"[受信] [{mode}/{model}] {text[:80]}")
 
+                # 別画面に移っても参照できるよう、ユーザー発話を永続ログに記録（方針F）
+                chatlog_store.append_user(session_id, text, mode)
+                _persist_sessions()
+
                 await websocket.send_text(json.dumps({"type": "thinking"}))
+
+                # 提案モード: 「#3 と #5 を並列実行」のような並列タスク指示（方針E）
+                if mode == "propose":
+                    parallel_ids = autodev.parse_parallel_request(text)
+                    if parallel_ids:
+                        res = autodev.run_now(project_path, parallel_ids)
+                        lines = []
+                        if res["launched"]:
+                            lines.append("🚀 並列起動しました: " + "、".join(
+                                f"#{t['id']} {t['title']}" for t in res["launched"]))
+                        if res["skipped"]:
+                            lines.append("⏭ スキップ: " + "、".join(
+                                f"#{s['id']}（{s['reason']}）" for s in res["skipped"]))
+                        reply = "\n\n".join(lines) or "対象のタスクが見つかりませんでした"
+                        seq = chatlog_store.append_chunk(
+                            session_id, {"type": "text", "content": reply})
+                        await websocket.send_text(json.dumps(
+                            {"type": "text", "content": reply, "log_seq": seq}))
+                        await websocket.send_text(json.dumps({"type": "done"}))
+                        continue
 
                 # モードに応じたバックグラウンドタスクとして起動
                 if mode == "idea":

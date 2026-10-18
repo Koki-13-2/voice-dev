@@ -50,6 +50,7 @@
     --mode-plan: #e3b341;
     --mode-propose: #ff9254;
     --mode-zipmail: #3fd68a;
+    --mode-payslip: #e8a838;
 
     /* バブル */
     --user-bubble: linear-gradient(135deg, #2f6fed 0%, #5b4fd8 100%);
@@ -227,6 +228,11 @@
     color: var(--mode-zipmail);
     background: rgba(63,214,138,.12);
     box-shadow: inset 0 0 0 1px rgba(63,214,138,.32), 0 0 12px rgba(63,214,138,.10);
+  }
+  .mode-btn.payslip.active {
+    color: var(--mode-payslip);
+    background: rgba(232,168,56,.12);
+    box-shadow: inset 0 0 0 1px rgba(232,168,56,.32), 0 0 12px rgba(232,168,56,.10);
   }
 
   /* ============ ヘッダー内コントロール ============ */
@@ -1698,6 +1704,136 @@
   .zm-send-btn:disabled { opacity: .45; cursor: default; }
   .zm-send-btn:not(:disabled):active { transform: scale(.97); }
 
+  /* ============ 給与明細送付モード ============ */
+  .payslip-screen {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 6px 0;
+    animation: msgIn .3s ease both;
+  }
+
+  .ps-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--mode-payslip);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ps-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ps-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted-2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .ps-mode-toggle {
+    display: flex;
+    gap: 8px;
+  }
+
+  .ps-mode-btn {
+    flex: 1;
+    background: rgba(5,7,12,.5);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+  }
+  .ps-mode-btn:hover { border-color: var(--mode-payslip); color: var(--text); }
+  .ps-mode-btn.active {
+    background: rgba(232,168,56,.12);
+    border-color: rgba(232,168,56,.6);
+    color: var(--mode-payslip);
+    box-shadow: 0 0 12px rgba(232,168,56,.1);
+  }
+
+  .ps-id-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ps-teacher-input {
+    flex: 1;
+    background: rgba(5,7,12,.6);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    padding: 10px 13px;
+    font-size: 14px;
+    font-family: var(--font-mono);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ps-teacher-input:focus { border-color: var(--mode-payslip); box-shadow: 0 0 0 3px rgba(232,168,56,.14); }
+  .ps-teacher-input::placeholder { color: var(--muted-2); font-family: inherit; }
+  .ps-teacher-input:disabled { opacity: .5; }
+
+  .ps-all-btn {
+    background: rgba(232,168,56,.1);
+    border: 1px solid rgba(232,168,56,.45);
+    border-radius: var(--r-sm);
+    color: var(--mode-payslip);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .ps-all-btn:hover { background: rgba(232,168,56,.2); }
+  .ps-all-btn:active { transform: scale(.97); }
+
+  .ps-send-btn {
+    background: linear-gradient(135deg, #e8a838, #c8841c);
+    color: #1a0e00;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(232,168,56,.35);
+    transition: filter .15s, transform .12s, opacity .15s;
+    letter-spacing: .01em;
+  }
+  .ps-send-btn:hover { filter: brightness(1.08); }
+  .ps-send-btn:active { transform: scale(.98); }
+  .ps-send-btn:disabled { opacity: .4; cursor: default; filter: none; transform: none; }
+
+  .ps-result {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 13px 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    animation: msgIn .25s ease both;
+  }
+  .ps-result.success { border-color: rgba(63,214,138,.45); color: var(--green); }
+  .ps-result.error   { border-color: rgba(255,93,93,.45); color: #ff8a8a; }
+  .ps-result.loading { color: var(--muted); }
+
   /* ============ 秘密情報モーダル ============ */
   .secret-input {
     flex: 1;
@@ -2072,6 +2208,7 @@
       <button class="mode-btn plan" onclick="switchMode('plan')">📝 企画</button>
       <button class="mode-btn propose" onclick="switchMode('propose')">🔧 提案</button>
       <button class="mode-btn zipmail" onclick="switchMode('zipmail')">📦 送付</button>
+      <button class="mode-btn payslip" onclick="switchMode('payslip')">📩 給与</button>
     </div>
   </div>
   <div class="header-controls">
@@ -2144,6 +2281,8 @@ function switchMode(mode) {
 function goModeHome() {
   if (currentMode === 'idea') {
     showIdeaScreen();
+  } else if (currentMode === 'payslip') {
+    showPaySlipScreen();
   } else {
     showWorkspacePicker();
   }
@@ -3071,12 +3210,13 @@ function toggleProposalFilter(key) {
 async function showProposalScreen(projPath, projName) {
   setInputEnabled(true);
   document.getElementById('quick-actions').style.display = 'none';
-  let data = { tasks: [], branch: '' }, ad = {}, branchInfo = { is_git: false, current: '', branches: [] };
+  let data = { tasks: [], branch: '' }, ad = {}, branchInfo = { is_git: false, current: '', branches: [] }, worktrees = [];
   try {
-    [data, ad, branchInfo] = await Promise.all([
+    [data, ad, branchInfo, worktrees] = await Promise.all([
       fetch(`/api/proposals?app_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
       fetch('/api/autodev').then(r => r.json()),
       fetch(`/api/branches?project_path=${encodeURIComponent(projPath)}`).then(r => r.json()),
+      fetch(`/api/autodev/worktrees?app_path=${encodeURIComponent(projPath)}`).then(r => r.json()).catch(() => []),
     ]);
   } catch(e) {}
   if (currentMode !== 'propose' || projectPath !== projPath) return;
@@ -3096,7 +3236,7 @@ async function showProposalScreen(projPath, projName) {
       .map(b => `<option value="${escHtml(b)}" ${b === devBranch ? 'selected' : ''}>${escHtml(b)}</option>`)
       .join('');
     branchBarHtml = `<div class="branch-bar" id="branch-bar">
-      <span class="branch-bar-label">🌿 ブランチ:</span>
+      <span class="branch-bar-label">🌿 統合先ブランチ:</span>
       <span class="branch-current">${escHtml(branchInfo.current)}</span>
       <select class="branch-select" id="branch-select" onchange="switchBranch(this.value)">
         <option value="">-- デフォルト --</option>
@@ -3116,10 +3256,12 @@ async function showProposalScreen(projPath, projName) {
       <option value="20">20件</option>
     </select>
     <button class="btn-new-file" onclick="generateProposals()">🤖 提案を生成</button>
+    <button class="btn-new-file" onclick="runCheckedProposals()" title="チェック済みタスクをworktree分離で即時並列実行">▶ 並列実行</button>
   </div>
   ${branchBarHtml}
   <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
-  <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>
+  ${worktreeSectionHtml(worktrees)}
+  <div class="idea-hint">チェックを入れたタスクが自動開発の対象になります。「▶ 並列実行」または「#3 と #5 を並列実行」と話すと即時に並列起動します。🎤 で観点を話すと（例:「セキュリティ観点で」）その角度の提案を生成します。</div>
   ${proposalFilterBarHtml(data.tasks)}
   <div id="proposal-list"></div>`;
 
@@ -3148,7 +3290,7 @@ function proposalRowHtml(t, variant) {
     </div>
     ${isRejected
       ? `<button class="proposal-action-btn restore" onclick="restoreProposal(${t.id})" title="復元">↩ 復元</button>`
-      : (!isDone ? `<button class="proposal-action-btn reject" onclick="rejectProposal(${t.id})" title="不採用">🚫</button>` : '')}
+      : (!isDone ? `<button class="proposal-action-btn" onclick="runProposalNow(${t.id})" title="今すぐworktreeで実行">▶</button><button class="proposal-action-btn reject" onclick="rejectProposal(${t.id})" title="不採用">🚫</button>` : '')}
   </div>`;
 }
 
@@ -3261,6 +3403,72 @@ async function restoreProposal(id) {
   } catch(e) { showToast('更新に失敗しました', 'error'); }
 }
 
+// ===== 並列実行（worktree分離） =====
+async function runProposalNow(ids) {
+  if (!projectPath) { showToast('先にプロジェクトを選択してください', 'error'); return; }
+  const idList = Array.isArray(ids) ? ids : [ids];
+  try {
+    const res = await fetch('/api/autodev/run-now', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, ids: idList }),
+    }).then(r => r.json());
+    if (res.error) { showToast(res.error, 'error'); return; }
+    if (res.launched?.length) {
+      showToast(`${res.launched.length}件のタスクをworktreeで並列起動しました`, 'success');
+    }
+    if (res.skipped?.length) {
+      showToast('スキップ: ' + res.skipped.map(s => `#${s.id}（${s.reason}）`).join('、'), 'info');
+    }
+    refreshAutodevBar();
+  } catch(e) { showToast('並列起動に失敗しました', 'error'); }
+}
+
+function runCheckedProposals() {
+  if (!_proposalCache) return;
+  const ids = _proposalCache.tasks
+    .filter(t => t.checked && !t.done && !t.rejected)
+    .map(t => t.id);
+  if (!ids.length) { showToast('チェック済みの未実装タスクがありません', 'info'); return; }
+  runProposalNow(ids);
+}
+
+function worktreeSectionHtml(worktrees) {
+  if (!Array.isArray(worktrees) || !worktrees.length) return '';
+  const rows = worktrees.map(w => `
+    <div class="fp-file-row" style="cursor:default">
+      <div class="fp-file-info">
+        <div class="fp-file-name">🔀 ${escHtml(w.branch || w.task_id)}</div>
+        <div class="fp-file-path">${escHtml(w.head)} ・ ${escHtml(w.path)}</div>
+      </div>
+      <div class="plan-file-actions">
+        <button class="plan-action-btn" onclick="mergeWorktree('${escAttr(w.branch)}', '${escAttr(w.task_id)}')">🔀 マージ</button>
+      </div>
+    </div>`).join('');
+  return `<div class="proposal-section-collapsed" style="margin:8px 0">
+    <div class="plan-screen-title" style="font-size:13px;margin-bottom:4px">🔀 統合待ちブランチ <span class="plan-folder-count">${worktrees.length}</span></div>
+    ${rows}
+  </div>`;
+}
+
+async function mergeWorktree(branch, taskId) {
+  if (!confirm(`ブランチ「${branch}」を統合先にマージしますか？`)) return;
+  try {
+    const res = await fetch('/api/autodev/merge', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath, branch, task_id: taskId }),
+    });
+    const body = await res.json();
+    if (body.ok) {
+      showToast(`マージしました（${body.push || ''}）`, 'success');
+      showProposalScreen(projectPath, projectName);
+    } else if (res.status === 409) {
+      showToast('コンフリクトのため自動マージできません。手動で解決してください', 'error');
+    } else {
+      showToast(body.error || 'マージに失敗しました', 'error');
+    }
+  } catch(e) { showToast('マージに失敗しました', 'error'); }
+}
+
 function autodevBarHtml(ad) {
   const tasks = ad.running_tasks || (ad.running ? [ad.running] : []);
   let statusLine;
@@ -3275,12 +3483,16 @@ function autodevBarHtml(ad) {
     statusLine = 'キューは空です（実装したい提案にチェックを入れてください）';
   }
   const intervalVal = ad.interval_min ?? 30;
+  const parallelVal = ad.max_parallel_agents ?? 3;
   return `<button class="autodev-toggle${ad.enabled ? ' on' : ''}" onclick="toggleAutodev()" title="自動開発 ON/OFF"></button>
     <div class="autodev-info">
       <strong style="color:${ad.enabled ? '#3fb950' : '#8b949e'}">🤖 自動開発 ${ad.enabled ? 'ON' : 'OFF'}</strong>
       · <select class="autodev-interval-select" onchange="setAutodevInterval(this.value)" title="実行間隔">
         ${[5,10,15,20,30,45,60].map(m => `<option value="${m}"${m === intervalVal ? ' selected' : ''}>${m}分</option>`).join('')}
-      </select>おきに実行<br>${statusLine}
+      </select>おきに
+      · <select class="autodev-interval-select" onchange="setAutodevParallel(this.value)" title="同時実行エージェント数の上限">
+        ${[1,2,3,4,5].map(n => `<option value="${n}"${n === parallelVal ? ' selected' : ''}>${n}並列</option>`).join('')}
+      </select>で実行<br>${statusLine}
     </div>
     ${ad.log_path ? `<a class="plan-action-btn" href="/md-view?path=${encodeURIComponent(ad.log_path)}" target="_blank">📜 ログ</a>` : ''}`;
 }
@@ -3317,6 +3529,16 @@ async function setAutodevInterval(min) {
     }).then(r => r.json());
     showToast(`実行間隔を${res.interval_min}分に変更しました`, 'success');
   } catch(e) { showToast('間隔の変更に失敗しました', 'error'); }
+}
+
+async function setAutodevParallel(n) {
+  try {
+    const res = await fetch('/api/autodev', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ max_parallel_agents: parseInt(n, 10) }),
+    }).then(r => r.json());
+    showToast(`同時実行エージェント数を${res.max_parallel_agents}に変更しました`, 'success');
+  } catch(e) { showToast('並列数の変更に失敗しました', 'error'); }
 }
 
 // ===== ZIP送付モード =====
@@ -3675,11 +3897,17 @@ async function renderSessions() {
         <div class="fp-file-path">${escHtml(s.project_name || '（プロジェクト未選択）')} ・ 最終アクティブ: ${fmtRelTime(s.last_active)}</div>
       </div>
       <div class="plan-file-actions" style="flex-direction:column;align-items:flex-end">
+        ${!isCurrent ? `<button class="plan-action-btn" onclick="openSessionEntry('${escAttr(s.id)}')" title="このタブでセッションを開く（ログ復元）">📂 開く</button>` : ''}
         ${s.running ? `<button class="plan-action-btn" onclick="cancelSessionEntry('${escAttr(s.id)}')">⏸ 中断</button>` : ''}
         <button class="plan-action-btn danger" onclick="deleteSessionEntry('${escAttr(s.id)}')">🗑 削除</button>
       </div>
     </div>`;
   }).join('');
+}
+
+function openSessionEntry(id) {
+  // 同タブでセッションを切替（?session_id= 経由でログ復元・実行中タスクへの再接続が行われる）
+  location.href = location.origin + '/?session_id=' + encodeURIComponent(id);
 }
 
 async function cancelSessionEntry(id) {
@@ -3773,6 +4001,51 @@ function connect() {
   ws.onmessage = (e) => handleServerMessage(JSON.parse(e.data));
 }
 
+// ---- チャットログ復元（方針F: 別画面に移っても裏で記録されたログを復元する）----
+let restoredMaxSeq = 0;
+
+async function restoreHistory() {
+  // チャット系モードのみ復元（提案/ZIP/給与明細などの画面モードでは復元しない）
+  if (currentMode !== 'dev' && currentMode !== 'plan') return;
+  let res;
+  try {
+    res = await fetch(`/api/sessions/${encodeURIComponent(SESSION_ID)}/log`).then(r => r.json());
+  } catch(e) { return; }
+  const entries = res.entries || [];
+  if (!entries.length) return;
+  const divider = document.createElement('div');
+  divider.style.cssText = 'text-align:center;color:var(--muted);font-size:11px;margin:10px 0;opacity:.7';
+  divider.textContent = '── 以前の会話ログ ──';
+  document.getElementById('messages').appendChild(divider);
+  entries.forEach(renderLogEntry);
+  restoredMaxSeq = Math.max(0, ...entries.map(e => e.seq || 0));
+  const divider2 = document.createElement('div');
+  divider2.style.cssText = divider.style.cssText;
+  divider2.textContent = '── ここから新しい会話 ──';
+  document.getElementById('messages').appendChild(divider2);
+  scrollBottom();
+}
+
+function renderLogEntry(e) {
+  if (e.role === 'user') {
+    addMessage('user', e.text || '');
+  } else if (e.role === 'ai') {
+    const { cleanText } = parseChoices(e.text || '');
+    addMessage('ai', cleanText || e.text || '');
+  } else if (e.role === 'tool') {
+    const card = document.createElement('div');
+    card.className = 'message ai';
+    card.style.padding = '0';
+    card.innerHTML = `<div class="tool-card"><div class="tool-header">⚙ ${escHtml(e.tool || '')}<span style="color:var(--muted);font-size:11px">${escHtml(e.input || '')}</span></div></div>`;
+    document.getElementById('messages').appendChild(card);
+  } else if (e.role === 'error') {
+    addMessage('error', '⚠ ' + (e.text || ''));
+  } else if (e.role === 'event') {
+    addMessage('ai', '📌 ' + (e.text || ''));
+  }
+  // tool_end は履歴表示では省略（直前のtoolカードに集約済みの要約情報のため）
+}
+
 // ---- サーバーメッセージ処理 ----
 let currentAiDiv = null;
 let thinkingDiv = null;
@@ -3788,6 +4061,9 @@ const THINKING_STAGES = [
 ];
 
 function handleServerMessage(msg) {
+  // 履歴復元済みのチャンクは無視（再接続時のバッファ再送との二重表示防止）
+  if (msg.log_seq && msg.log_seq <= restoredMaxSeq) return;
+
   if (msg.type === 'thinking') {
     if (proposalGenerating) return;
     removeThinking();
@@ -4253,8 +4529,109 @@ function resetSession() {
   showWorkspacePicker();
 }
 
+// ===== 給与明細送付モード =====
+let psMode = 'confirmed'; // 'confirmed' | 'preview'
+
+function showPaySlipScreen() {
+  setInputEnabled(false);
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+
+  const screen = document.createElement('div');
+  screen.className = 'payslip-screen';
+  screen.id = 'payslip-screen';
+  screen.innerHTML = `
+    <div class="ps-title">📩 給与明細 LINE送付</div>
+
+    <div class="ps-section">
+      <div class="ps-label">送付モード</div>
+      <div class="ps-mode-toggle">
+        <button class="ps-mode-btn${psMode === 'confirmed' ? ' active' : ''}" id="ps-btn-confirmed" onclick="setPsMode('confirmed')">📋 確定版</button>
+        <button class="ps-mode-btn${psMode === 'preview' ? ' active' : ''}" id="ps-btn-preview" onclick="setPsMode('preview')">👁 速報版</button>
+      </div>
+    </div>
+
+    <div class="ps-section">
+      <div class="ps-label">送付対象</div>
+      <div class="ps-id-row">
+        <input type="text" id="ps-teacher-id" class="ps-teacher-input"
+          placeholder="講師ID（例: t26001）" />
+        <button class="ps-all-btn" onclick="setPsAllTeachers()">全員</button>
+      </div>
+    </div>
+
+    <button class="ps-send-btn" id="ps-send-btn" onclick="sendPaySlip()">📨 送付する</button>
+
+    <div id="ps-result" style="display:none" class="ps-result"></div>`;
+
+  messagesEl.appendChild(screen);
+  messagesEl.scrollTop = 0;
+}
+
+function setPsMode(mode) {
+  psMode = mode;
+  document.getElementById('ps-btn-confirmed')?.classList.toggle('active', mode === 'confirmed');
+  document.getElementById('ps-btn-preview')?.classList.toggle('active', mode === 'preview');
+}
+
+function setPsAllTeachers() {
+  const input = document.getElementById('ps-teacher-id');
+  if (input) {
+    input.value = 'ALL';
+    input.focus();
+  }
+}
+
+async function sendPaySlip() {
+  const teacherId = (document.getElementById('ps-teacher-id')?.value || '').trim();
+  if (!teacherId) {
+    showPsResult('error', '講師IDを入力するか「全員」を選択してください');
+    return;
+  }
+
+  const isAll = teacherId.toUpperCase() === 'ALL';
+  const modeLabel = psMode === 'confirmed' ? '確定版' : '速報版';
+  const targetLabel = isAll ? '全員' : teacherId;
+
+  const sendBtn = document.getElementById('ps-send-btn');
+  if (sendBtn) sendBtn.disabled = true;
+  showPsResult('loading', `${targetLabel} に${modeLabel}を送付中...`);
+
+  try {
+    const body = isAll
+      ? { teacher_id: 'ALL', send_mode: psMode }
+      : { teacher_id: teacherId, send_mode: psMode };
+
+    const res = await fetch('/api/test/pay-slip-send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(r => r.json());
+
+    if (res.ok) {
+      showPsResult('success', `✅ ${res.detail}`);
+      showToast(res.detail, 'success');
+    } else {
+      showPsResult('error', `❌ ${res.error}`);
+      showToast(res.error, 'error');
+    }
+  } catch(e) {
+    showPsResult('error', `❌ 通信エラー: ${e.message}`);
+    showToast('通信エラー', 'error');
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+function showPsResult(type, text) {
+  const el = document.getElementById('ps-result');
+  if (!el) return;
+  el.style.display = 'block';
+  el.className = `ps-result ${type}`;
+  el.textContent = text;
+}
+
 // ---- 初期化 ----
-connect();
 document.getElementById('model-select').value = selectedModel;
 
 window.addEventListener('load', async () => {
@@ -4262,6 +4639,9 @@ window.addEventListener('load', async () => {
   setModeButtons(currentMode);
   await loadProjects();
   goModeHome();
+  // 履歴を復元してからWS接続（接続時のバッファ再送はlog_seqで重複排除される）
+  await restoreHistory();
+  connect();
 });
 </script>
 </body>

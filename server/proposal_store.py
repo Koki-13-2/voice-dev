@@ -255,10 +255,19 @@ def restore_task(app_path: str, task_id: int) -> bool:
     return _update_task(Path(app_path).name, task_id, rejected="")
 
 
-def next_task() -> tuple[str, dict] | None:
-    """全提案ファイルから「チェック済み・未完了」の先頭タスクを返す (app_path, task)"""
-    if not PROPOSALS_DIR.exists():
-        return None
+def task_branch_name(app_name: str, task: dict) -> str:
+    """タスク専用ブランチ名（1タスク1ブランチ）: task/<app>/<id>[-<slug>]"""
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", task.get("title", "")).strip("-").lower()[:24].rstrip("-")
+    base = f"task/{app_name}/{task['id']}"
+    return f"{base}-{slug}" if slug else base
+
+
+def next_tasks(limit: int = 1) -> list[tuple[str, dict]]:
+    """全提案ファイルから「チェック済み・未完了・不採用でない」タスクを
+    最大limit件返す [(app_path, task), ...]（並列スケジューラ用）"""
+    results: list[tuple[str, dict]] = []
+    if not PROPOSALS_DIR.exists() or limit <= 0:
+        return results
     for f in sorted(PROPOSALS_DIR.glob("*.md")):
         if f.name == "autodev-log.md":
             continue
@@ -267,7 +276,15 @@ def next_task() -> tuple[str, dict] | None:
         if not app_path or not Path(app_path).exists():
             continue
         for t in tasks:
-            if t["checked"] and not t["done"]:
+            if t["checked"] and not t["done"] and not t["rejected"]:
                 t.pop("line_no", None)
-                return app_path, t
-    return None
+                results.append((app_path, t))
+                if len(results) >= limit:
+                    return results
+    return results
+
+
+def next_task() -> tuple[str, dict] | None:
+    """「チェック済み・未完了」の先頭タスクを返す（互換API）"""
+    found = next_tasks(1)
+    return found[0] if found else None
