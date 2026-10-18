@@ -1,6 +1,7 @@
 ---
 app: gh_portal
 app_path: /home/kokinagano/hennyujuku/gh_portal
+branch: stu-ui
 ---
 
 # gh_portal 改善提案
@@ -107,8 +108,8 @@ app_path: /home/kokinagano/hennyujuku/gh_portal
 - [ ] 【UI/UX/中】Admin画面向けのデスクトップレスポンシブ対応 — 全画面がmax-width:480pxに固定されており講師・管理者がデスクトップで使う際にレイアウト幅が不足しているため、min-width:768pxブレークポイントを追加する <!-- id:100 rejected:2026-08-23T11:07 -->
 - [ ] 【性能/小】Dashboard studentsCacheのモジュールスコープ変数をuseRefに移行 — モジュールスコープの可変キャッシュがStrictModeの二重マウント時にstaleデータを返しうるため、コンポーネントライフサイクルに紐づくuseRefに移行する <!-- id:101 rejected:2026-08-23T22:32 -->
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
-- [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 -->
-- [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 -->
+- [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 rejected:2026-10-18T22:50 -->
+- [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 done:2026-10-18T22:55 -->
 - [ ] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
 - [ ] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 -->
 - [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 done:2026-07-09T07:54 -->

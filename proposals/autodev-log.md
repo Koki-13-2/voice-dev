@@ -15355,3 +15355,24 @@ You've hit your weekly limit · resets 10am (Asia/Tokyo)
 
 ```
 
+## 2026-10-18 22:55 — gh_portal #104 MathMarkdownにrehype-sanitizeを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了。変更内容：
+
+- **`rehype-sanitize` パッケージを追加**（v6.0.0）
+- **`MathMarkdown.tsx` を更新**：rehype-katex の前に rehype-sanitize を実行するよう配置
+- **カスタムスキーマ**：remark-math が生成する `div.math.math-display` / `span.math.math-inline` 要素は許可リストに追加し、数式レンダリングを維持しながらその他の危険なHTMLを無害化
+- TypeScript型チェック通過・コミット・プッシュ完了
+
+```
+
+## 2026-10-18 22:55 — gh_portal #104 MathMarkdownにrehype-sanitizeを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/104-mathmarkdown-rehype-sani → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
