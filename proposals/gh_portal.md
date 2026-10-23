@@ -123,7 +123,7 @@ branch:
 - [x] 【機能/中】AdminStudents宿題（添削）進捗セクションの実データ表示実装 — 「今後のアップデートで実装予定」プレースホルダーをhomework_tickets/correctionsの集計データに置き換え、講師が生徒の学習進捗を把握できるようにする <!-- id:115 done:2026-07-14T08:50 -->
 - [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 done:2026-07-14T08:54 -->
 - [x] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
-- [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
+- [x] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
 - [x] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 done:2026-08-01T10:06 -->
 - [x] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 done:2026-07-09T08:22 -->
 - [x] 【機能/小】AdminStudents生徒メモ（student_profiles.memo）の編集UI追加 — 現在は表示のみで講師・管理者が生徒への申し送り事項や面談メモを記録・更新できない <!-- id:121 done:2026-07-09T08:28 -->
@@ -140,7 +140,7 @@ branch:
 - [x] 【機能/小】AdminPayrollコマ数自動集計のmeeting_records連携 — AdminPayroll.tsx:305でコマ数が手動入力前提（lesson_count）のため、meeting_recordsの面談実施件数から自動集計する仕組みがなく運用負荷が高い <!-- id:132 done:2026-07-09T10:29 -->
 - [x] 【機能/小】PillDetailModal「教材詳細」ボタンのonClickハンドラ実装 — Dashboard.tsx:4475の「教材詳細」ボタンにonClickが未設定でクリックしても何も起こらないため、生徒が宿題実施中に教材情報を参照できない <!-- id:133 done:2026-07-09T10:07 -->
 - [x] 【運用/小】TeacherPractice handleReturn添削返却のエラーハンドリング追加 — correction_comments INSERTとcorrections UPDATE の2DB操作にtry-catchがなく、失敗時にUIフィードバックがないため添削が中途半端な状態で残りうる <!-- id:134 done:2026-07-09T23:30 -->
-- [ ] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 -->
+- [x] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 -->
 - [x] 【機能/小】homework_tickets生徒側の完了報告UI実装 — 生徒が宿題完了を報告しhomework_ticketsのステータスを更新するボタンとDB処理を追加する <!-- id:136 done:2026-08-01T10:12 -->
 - [x] 【機能/中】corrections提出時の担当講師へのアプリ内通知実装 — 生徒がPDF提出でcorrectionsレコードを作成した際に担当講師のDashboardに未添削通知を表示する仕組みを追加する <!-- id:137 done:2026-07-10T00:14 -->
 - [x] 【機能/中】content_progress視聴進捗の講師側確認UI追加 — 担当生徒のコンテンツ視聴進捗率（content_progress.watch_pct）を講師がDashboard上で一覧確認できるセクションを追加する <!-- id:138 done:2026-07-10T00:17 -->
@@ -151,10 +151,10 @@ branch:
 - [x] 【機能/中】meeting_records面談記録の講師向け過去履歴検索UI追加 — Dashboard内に埋もれている面談記録を独立セクション化し生徒名・日付で過去の面談チェック項目・メモを検索参照可能にする <!-- id:143 done:2026-07-10T00:33 -->
 - [x] 【性能/小】全ページのSupabase非同期呼び出しにAbortControllerを導入 — useEffect内のfetch/supabaseクエリがアンマウント後も完了してsetStateを呼ぶ問題を、AbortControllerのcleanupで防止する（まずDashboard BookDetailModalとPractice FeedbackDashboardの2箇所から着手） <!-- id:144 -->
 - [x] 【UI/UX/小】createPortal直書きモーダル群をFocusTrapDialogに統一 — Dashboard（BookDetailModal・MeetingInviteModal等）とChat（MeetingInviteModal・ThreadPanel）のcreatePortal直書きモーダルにEscキー・フォーカストラップ・aria-modal属性が欠けているため、既存のFocusTrapDialogコンポーネントに置換する <!-- id:145 -->
-- [ ] 【機能/小】AdminMessages送信成功後のフォーム状態リセット — 生徒向け送信後にselectedStudentIdsが、案件リマインド送信後にjobMessage・selectedJobがクリアされず再送誤操作のリスクがあるため、送信成功時に各stateを初期化する <!-- id:146 -->
+- [x] 【機能/小】AdminMessages送信成功後のフォーム状態リセット — 生徒向け送信後にselectedStudentIdsが、案件リマインド送信後にjobMessage・selectedJobがクリアされず再送誤操作のリスクがあるため、送信成功時に各stateを初期化する <!-- id:146 -->
 - [x] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 -->
 - [x] 【性能/中】Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割 — useDailySchedule・useMeetingInvitation・useTeacherStudents等のカスタムフックに状態とロジックをまとめ、不要な再レンダリングの表面積を縮小する <!-- id:148 -->
-- [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 -->
+- [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 rejected:2026-10-23T21:02 -->
 - [x] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 -->
 - [x] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 -->
 - [x] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 -->
@@ -168,14 +168,14 @@ branch:
 - [x] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
 - [x] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 -->
 - [x] 【運用/小】Viteビルドにhiddenソースマップを追加 — build.sourcemap: 'hidden'を設定し、本番デプロイ時にエラートラッキングサービス（Sentry等）でスタックトレースを元ファイルに解決可能にする <!-- id:162 -->
-- [ ] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
+- [x] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
 - [x] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 done:2026-07-18T21:24 -->
-- [ ] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 -->
-- [ ] 【運用/中】Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成 — 今後のアイコン追加時に同じ漏れが再発しないよう、コード中のアイコン名を抽出しindex.htmlのリストと差分を検出するCIチェックを追加する <!-- id:166 -->
-- [ ] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 -->
-- [ ] 【UI/UX/小】アイコンフォント読み込み完了までのフォールバック表示を追加 — document.fontsのready判定でmaterial-symbols-roundedロード前はアイコン要素を非表示にし文字化け状態のチラつきを防止する <!-- id:168 -->
-- [ ] 【セキュリティ/小】Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定 — 外部CDNからのフォント読み込みに対する改竄検知・制限がなく、悪意あるフォント差し替えリスクがある <!-- id:169 -->
-- [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 -->
+- [x] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 -->
+- [x] 【運用/中】Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成 — 今後のアイコン追加時に同じ漏れが再発しないよう、コード中のアイコン名を抽出しindex.htmlのリストと差分を検出するCIチェックを追加する <!-- id:166 -->
+- [x] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 -->
+- [x] 【UI/UX/小】アイコンフォント読み込み完了までのフォールバック表示を追加 — document.fontsのready判定でmaterial-symbols-roundedロード前はアイコン要素を非表示にし文字化け状態のチラつきを防止する <!-- id:168 -->
+- [x] 【セキュリティ/小】Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定 — 外部CDNからのフォント読み込みに対する改竄検知・制限がなく、悪意あるフォント差し替えリスクがある <!-- id:169 -->
+- [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 rejected:2026-10-23T21:01 -->
 - [x] 【機能/小】Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示 — icon_names漏れやタイポ時にも空白や文字化けではなくデフォルトアイコン(help_outline等)を表示させる <!-- id:171 done:2026-07-18T21:09 -->
 - [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 -->
 - [ ] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->
