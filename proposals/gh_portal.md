@@ -1,7 +1,7 @@
 ---
 app: gh_portal
 app_path: /home/kokinagano/hennyujuku/gh_portal
-branch: stu-ui
+branch: 
 ---
 
 # gh_portal 改善提案
@@ -110,19 +110,19 @@ branch: stu-ui
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
 - [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 rejected:2026-10-18T22:50 -->
 - [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 done:2026-10-18T22:55 -->
-- [ ] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
-- [ ] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 -->
+- [x] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
+- [x] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 -->
 - [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 done:2026-07-09T07:54 -->
 - [x] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 done:2026-07-09T08:02 -->
 - [x] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 done:2026-07-09T08:13 -->
-- [ ] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
+- [x] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
 - [x] 【アクセシビリティ/小】Timeline投稿画像にユーザー入力alt属性を追加 — 全投稿画像がalt=""で出力されスクリーンリーダーに無視される（画像投稿UIにalt入力欄を追加） <!-- id:111 done:2026-07-14T08:35 -->
 - [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 done:2026-07-09T08:16 -->
 - [x] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 done:2026-07-14T08:40 -->
 - [x] 【機能/小】Chat面談招待モーダルのmeetingsテーブルINSERT実装 — Chat.tsxのhandleSendMeetingがローカルstate更新のみで面談招待がDBに永続化されず、Dashboard側と断絶している <!-- id:114 done:2026-07-14T08:45 -->
 - [x] 【機能/中】AdminStudents宿題（添削）進捗セクションの実データ表示実装 — 「今後のアップデートで実装予定」プレースホルダーをhomework_tickets/correctionsの集計データに置き換え、講師が生徒の学習進捗を把握できるようにする <!-- id:115 done:2026-07-14T08:50 -->
 - [x] 【機能/中】AdminStudentsチャット利用状況セクションの実データ表示実装 — 同じくプレースホルダーをmessagesテーブルから直近メッセージ数・最終発言日時を集計表示に置き換える <!-- id:116 done:2026-07-14T08:54 -->
-- [ ] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
+- [x] 【機能/小】AdminPayrollコマ数入力フィールドの追加 — lesson_countの編集UIが存在せず常に0で給与計算されるため、月別コマ数を手動入力できるフォームを追加する <!-- id:117 -->
 - [ ] 【機能/中】講師用テスト手動解禁（teacher_manual）UIの実装 — test_unlock_conditionsにtrigger_type='teacher_manual'の条件が設定可能だが、講師がTeacherPracticeから実際にテストを解禁する操作画面が存在しない <!-- id:118 -->
 - [x] 【機能/中】announcements管理画面（AdminAnnouncements）の新設 — Timeline.tsxがannouncementsテーブルを表示するが、お知らせを作成・編集・公開するadmin画面がなく運用できない <!-- id:119 done:2026-08-01T10:06 -->
 - [x] 【セキュリティ/小】Register.tsx招待トークンの検証と消費の実装 — AdminUsersで発行した招待トークン（?invite=パラメータ）をRegister側で検証しておらず、招待なしで誰でも任意ロールで登録できる状態にある <!-- id:120 done:2026-07-09T08:22 -->
@@ -188,8 +188,8 @@ branch: stu-ui
 - [ ] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
 - [ ] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
 - [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 -->
-- [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 -->
-- [ ] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 -->
+- [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 rejected:2026-10-23T20:43 -->
+- [x] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 -->
 - [x] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 -->
 - [x] 【UI/UX/小】LoadingScreen文字色（#999）のWCAG AA準拠修正 — App.tsxのLoadingScreenのcolor:#999は白背景でコントラスト比約2.8:1となりAA基準4.5:1を満たしておらず、既修正の--color-mutedと同様に#717171以下へ変更が必要 <!-- id:186 -->
 - [x] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 -->
