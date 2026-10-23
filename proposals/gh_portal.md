@@ -155,18 +155,18 @@ branch:
 - [x] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 -->
 - [x] 【性能/中】Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割 — useDailySchedule・useMeetingInvitation・useTeacherStudents等のカスタムフックに状態とロジックをまとめ、不要な再レンダリングの表面積を縮小する <!-- id:148 -->
 - [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 -->
-- [ ] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 -->
-- [ ] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 -->
-- [ ] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 -->
+- [x] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 -->
+- [x] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 -->
+- [x] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 -->
 - [x] 【運用/中】AdminMessagesの送信履歴にページネーション（load more）を追加 — 現在.limit(50)で取得しており50件超の過去ログが閲覧不能なため、カーソルベースの追加読み込みを実装する <!-- id:153 done:2026-07-13T15:05 -->
-- [ ] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
-- [ ] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
+- [x] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
+- [x] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
 - [x] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 done:2026-07-18T21:13 -->
 - [x] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 done:2026-07-18T21:18 -->
 - [ ] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 -->
-- [ ] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 -->
-- [ ] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
-- [ ] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 -->
+- [x] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 -->
+- [x] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 -->
+- [x] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 -->
 - [ ] 【運用/小】Viteビルドにhiddenソースマップを追加 — build.sourcemap: 'hidden'を設定し、本番デプロイ時にエラートラッキングサービス（Sentry等）でスタックトレースを元ファイルに解決可能にする <!-- id:162 -->
 - [ ] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
 - [x] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 done:2026-07-18T21:24 -->
