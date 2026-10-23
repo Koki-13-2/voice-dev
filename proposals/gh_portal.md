@@ -198,7 +198,7 @@ branch: stu-ui
 - [ ] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 -->
 - [ ] 【UI/UX/小】UniversityComboboxのキーボード操作・ARIA属性追加 — Onboarding.tsxの大学選択UIがonMouseDownのみで矢印キーナビゲーション不可、role="listbox"・aria-expanded・aria-activedescendant等のARIA属性も欠如している <!-- id:191 -->
 - [ ] 【性能/小】utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化 — fmtDateFull・fmtDateTimeが呼び出しごとにnew Intl.DateTimeFormatを生成しておりGC圧とインスタンス化コストが無駄に発生している <!-- id:192 -->
-- [ ] 【機能/小】AdminMessagesテンプレートのハードコード配列をDB取得に統一 — AdminMessages.tsxではテンプレート4件がハードコード配列だがAdminStudents.tsxではmessage_templatesテーブルから動的取得しており、管理画面間でテンプレート一覧が不一致になる <!-- id:193 -->
-- [ ] 【機能/小】AI_ROOMS の unread・preview・time ハードコード除去 — Chat.tsx の `AI_ROOMS` 定数（149–154行）から `unread: 2` などのサンプル値を削除し、未読数は `getRoomUnreadCounts` の実DB結果、preview/time はメッセージ最終行から動的に生成するよう修正する <!-- id:194 -->
-- [ ] 【機能/小】Chat.tsx モックデータ死コード4変数の削除 — `CHANNEL_MESSAGES`・`STUDENTS`・`TEACHER_MESSAGES`・`INIT_STUDENT_MESSAGES`（107–139行）はいずれも UI に到達しない未参照変数のため一括削除する <!-- id:195 -->
-- [ ] 【UI/UX/小】Timeline.tsx 「もっと読み込む」ボタンの永続disabled バグ修正 — `loadOlderPosts`/`loadNewerPosts` でSupabaseエラー発生時に`setLoadingOlder(false)`が`finally`でなく`if`ブランチ内にあるため、ネットワーク失敗後にローディング状態が解除されずボタンが永久に押せなくなる。 <!-- id:196 -->
+- [x] 【機能/小】AdminMessagesテンプレートのハードコード配列をDB取得に統一 — AdminMessages.tsxではテンプレート4件がハードコード配列だがAdminStudents.tsxではmessage_templatesテーブルから動的取得しており、管理画面間でテンプレート一覧が不一致になる <!-- id:193 -->
+- [x] 【機能/小】AI_ROOMS の unread・preview・time ハードコード除去 — Chat.tsx の `AI_ROOMS` 定数（149–154行）から `unread: 2` などのサンプル値を削除し、未読数は `getRoomUnreadCounts` の実DB結果、preview/time はメッセージ最終行から動的に生成するよう修正する <!-- id:194 -->
+- [x] 【機能/小】Chat.tsx モックデータ死コード4変数の削除 — `CHANNEL_MESSAGES`・`STUDENTS`・`TEACHER_MESSAGES`・`INIT_STUDENT_MESSAGES`（107–139行）はいずれも UI に到達しない未参照変数のため一括削除する <!-- id:195 -->
+- [x] 【UI/UX/小】Timeline.tsx 「もっと読み込む」ボタンの永続disabled バグ修正 — `loadOlderPosts`/`loadNewerPosts` でSupabaseエラー発生時に`setLoadingOlder(false)`が`finally`でなく`if`ブランチ内にあるため、ネットワーク失敗後にローディング状態が解除されずボタンが永久に押せなくなる。 <!-- id:196 -->

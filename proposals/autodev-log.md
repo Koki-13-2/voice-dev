@@ -15376,3 +15376,13 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-23 20:37 — gh_portal #194 AI_ROOMS の unread・preview・time ハードコード除去
+
+- 結果: ⚠ 失敗 (exit=1)
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+You've hit your weekly limit · resets Oct 24, 11pm (Etc/GMT-9)
+
+```
+
