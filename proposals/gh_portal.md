@@ -149,11 +149,11 @@ branch:
 - [x] 【機能/中】auto_score_results自動採点結果の講師側閲覧UI追加 — TeacherPracticeに担当生徒の確認テスト自動採点結果を生徒別に一覧表示・フィルタリングできるセクションを追加する <!-- id:141 done:2026-07-10T00:28 -->
 - [x] 【機能/小】homework_tickets期限切れアラートの表示実装 — 宿題の期限超過・期限間近（例: 残り1日以内）を生徒Dashboard・講師Dashboardの双方に視覚的に警告表示する <!-- id:142 done:2026-08-01T10:18 -->
 - [x] 【機能/中】meeting_records面談記録の講師向け過去履歴検索UI追加 — Dashboard内に埋もれている面談記録を独立セクション化し生徒名・日付で過去の面談チェック項目・メモを検索参照可能にする <!-- id:143 done:2026-07-10T00:33 -->
-- [ ] 【性能/小】全ページのSupabase非同期呼び出しにAbortControllerを導入 — useEffect内のfetch/supabaseクエリがアンマウント後も完了してsetStateを呼ぶ問題を、AbortControllerのcleanupで防止する（まずDashboard BookDetailModalとPractice FeedbackDashboardの2箇所から着手） <!-- id:144 -->
-- [ ] 【UI/UX/小】createPortal直書きモーダル群をFocusTrapDialogに統一 — Dashboard（BookDetailModal・MeetingInviteModal等）とChat（MeetingInviteModal・ThreadPanel）のcreatePortal直書きモーダルにEscキー・フォーカストラップ・aria-modal属性が欠けているため、既存のFocusTrapDialogコンポーネントに置換する <!-- id:145 -->
+- [x] 【性能/小】全ページのSupabase非同期呼び出しにAbortControllerを導入 — useEffect内のfetch/supabaseクエリがアンマウント後も完了してsetStateを呼ぶ問題を、AbortControllerのcleanupで防止する（まずDashboard BookDetailModalとPractice FeedbackDashboardの2箇所から着手） <!-- id:144 -->
+- [x] 【UI/UX/小】createPortal直書きモーダル群をFocusTrapDialogに統一 — Dashboard（BookDetailModal・MeetingInviteModal等）とChat（MeetingInviteModal・ThreadPanel）のcreatePortal直書きモーダルにEscキー・フォーカストラップ・aria-modal属性が欠けているため、既存のFocusTrapDialogコンポーネントに置換する <!-- id:145 -->
 - [ ] 【機能/小】AdminMessages送信成功後のフォーム状態リセット — 生徒向け送信後にselectedStudentIdsが、案件リマインド送信後にjobMessage・selectedJobがクリアされず再送誤操作のリスクがあるため、送信成功時に各stateを初期化する <!-- id:146 -->
-- [ ] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 -->
-- [ ] 【性能/中】Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割 — useDailySchedule・useMeetingInvitation・useTeacherStudents等のカスタムフックに状態とロジックをまとめ、不要な再レンダリングの表面積を縮小する <!-- id:148 -->
+- [x] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 -->
+- [x] 【性能/中】Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割 — useDailySchedule・useMeetingInvitation・useTeacherStudents等のカスタムフックに状態とロジックをまとめ、不要な再レンダリングの表面積を縮小する <!-- id:148 -->
 - [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 -->
 - [ ] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 -->
 - [ ] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 -->
