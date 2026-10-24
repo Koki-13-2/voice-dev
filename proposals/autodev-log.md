@@ -24618,3 +24618,27 @@ PostgreSQLのPL/pgSQL関数内の複数ステートメントは暗黙的に同�
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/161-savestudentsubjects-dele → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:49 — gh_portal #162 Viteビルドにhiddenソースマップを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+`vite.config.ts` に `build: { sourcemap: 'hidden' }` を追加しました。これにより：
+
+- 本番ビルド時にソースマップファイル（`.map`）が生成される
+- バンドルされたJSファイルには `//# sourceMappingURL=` コメントが付かないため、ブラウザからは参照されない
+- Sentryなどのエラートラッキングサービスはソースマップをアップロードすることでスタックトレースを元のソースコードに解決できる
+
+コミット・プッシュ済みです（ブランチ: `task/gh_portal/162-vite-hidden`）。
+
+```
+
+## 2026-10-24 23:49 — gh_portal #162 Viteビルドにhiddenソースマップを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/162-vite-hidden → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
