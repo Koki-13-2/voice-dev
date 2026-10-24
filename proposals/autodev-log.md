@@ -25126,3 +25126,23 @@ git push は SSH 鍵の設定が必要なため実行できませんでした。
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:25 — gh_portal #196 Timeline.tsx 「もっと読み込む」ボタンの永続disabled バグ修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**修正内容:** `src/pages/Timeline.tsx` の `loadOlderPosts`（line 268）と `loadNewerPosts`（line 300）で、Supabaseへのawait呼び出しを `try/finally` ブロックで囲み、ネットワーク例外が発生した場合でも `setLoadingOlder(false)` / `setLoadingNewer(false)` が必ず実行されるようにしました。
+
+これにより、ネットワーク障害後にボタンが永久に disabled になるバグが解消されます。コミット・プッシュ済みです。
+
+```
+
+## 2026-10-25 00:25 — gh_portal #196 Timeline.tsx 「もっと読み込む」ボタンの永続disabled バグ修正
+
+- 結果: 🔀 統合完了: task/gh_portal/196-timeline-tsx-disabled → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
