@@ -24079,3 +24079,29 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:02 — gh_portal #110 MtgFeedbackScreen送信ボタンに送信中disabled状態を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。
+
+**変更内容（`src/pages/Dashboard.tsx:2038`付近）:**
+
+- `const [submitting, setSubmitting] = useState(false)` を追加
+- `handleSubmit` 冒頭で `if (!allRated || submitting) return` のガードを追加
+- `setSubmitting(true)` で送信開始、`try/finally` で `setSubmitting(false)` に確実にリセット
+- 送信ボタンを `disabled={!allRated || submitting}` に変更
+- 送信中はボタンのスタイルをグレーアウトし、ラベルを「送信中...」に変更
+
+これにより、非同期のSupabase insertが完了する前にボタンを連打しても2回目以降の実行はブロックされ、`meeting_feedbacks`テーブルへの重複insertが防止されます。コミット&pushも完了しました。
+
+```
+
+## 2026-10-24 23:02 — gh_portal #110 MtgFeedbackScreen送信ボタンに送信中disabled状態を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/110-mtgfeedbackscreen-disabl → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+

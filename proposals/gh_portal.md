@@ -115,7 +115,7 @@ branch:
 - [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 done:2026-07-09T07:54 -->
 - [x] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 done:2026-07-09T08:02 -->
 - [x] 【信頼性/中】AdminJob全体（28箇所のSupabase呼び出し）にtry-catchとエラー通知を追加 — 3028行のファイルにtry/catchが一切なく、案件承認・差戻し等の管理操作が無言で失敗し得る <!-- id:109 done:2026-07-09T08:13 -->
-- [x] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 -->
+- [x] 【UX/小】MtgFeedbackScreen送信ボタンに送信中disabled状態を追加 — 非同期送信中にボタンが有効なまま残り、連打でmeeting_feedbacksに重複行が挿入される <!-- id:110 done:2026-10-24T23:02 -->
 - [x] 【アクセシビリティ/小】Timeline投稿画像にユーザー入力alt属性を追加 — 全投稿画像がalt=""で出力されスクリーンリーダーに無視される（画像投稿UIにalt入力欄を追加） <!-- id:111 done:2026-07-14T08:35 -->
 - [x] 【データ整合性/小】Timelineいいねトグルにデバウンスまたはロック機構を追加 — 連打時にINSERTとDELETEが競合しUI上は「いいね解除」でもDB側にlikeレコードが残る <!-- id:112 done:2026-07-09T08:16 -->
 - [x] 【データ整合性/小】ChatのDMルーム作成にunique制約またはfindOrCreateパターンを適用 — 講師と生徒が同時にチャットを開くと両者がINSERTし同一ペアのDMルームが重複作成される <!-- id:113 done:2026-07-14T08:40 -->
