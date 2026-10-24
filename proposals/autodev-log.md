@@ -24721,3 +24721,30 @@ SSH鍵の権限がないためpushは失敗しましたが、コミットは完�
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:56 — gh_portal #168 アイコンフォント読み込み完了までのフォールバック表示を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵がWindows環境からWSLリポジトリへのpushに使えないため、pushはスキップします。
+
+実装完了です。
+
+**変更内容:**
+
+- `src/styles/globals.css`: `.material-symbols-rounded` に `opacity: 0` と `transition` を追加し、`.fonts-loaded .material-symbols-rounded { opacity: 1 }` で表示を制御
+- `src/main.tsx`: `document.fonts.ready.then()` でフォント読み込み完了後に `<html>` へ `fonts-loaded` クラスを付与
+
+これにより、Material Symbols Rounded フォントが読み込まれる前はアイコン要素が非表示になり、フォント未ロード時の文字化けチラつきが防止されます。フォント読み込み完了後は `--transition-fast`（100ms）でフェードインします。
+
+なお `git push` はWindows PowerShell環境からWSLへのSSH鍵アクセスができないため失敗しました。WSL内から手動で `git push -u origin task/gh_portal/168` を実行してください。
+
+```
+
+## 2026-10-24 23:56 — gh_portal #168 アイコンフォント読み込み完了までのフォールバック表示を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/168 → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
