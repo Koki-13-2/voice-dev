@@ -170,7 +170,7 @@ branch:
 - [x] 【運用/小】Viteビルドにhiddenソースマップを追加 — build.sourcemap: 'hidden'を設定し、本番デプロイ時にエラートラッキングサービス（Sentry等）でスタックトレースを元ファイルに解決可能にする <!-- id:162 done:2026-10-24T23:49 -->
 - [x] 【UI/UX/小】uploadToDeliverablesの非ASCII（日本語）ファイル名保持 — 現在の正規表現が日本語文字をすべてアンダースコアに置換するため、Unicode文字を許容するか、オリジナルファイル名をメタデータに別途保存する <!-- id:163 -->
 - [x] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 done:2026-07-18T21:24 -->
-- [x] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 -->
+- [x] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 done:2026-10-24T23:50 -->
 - [x] 【運用/中】Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成 — 今後のアイコン追加時に同じ漏れが再発しないよう、コード中のアイコン名を抽出しindex.htmlのリストと差分を検出するCIチェックを追加する <!-- id:166 -->
 - [x] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 -->
 - [x] 【UI/UX/小】アイコンフォント読み込み完了までのフォールバック表示を追加 — document.fontsのready判定でmaterial-symbols-roundedロード前はアイコン要素を非表示にし文字化け状態のチラつきを防止する <!-- id:168 -->
