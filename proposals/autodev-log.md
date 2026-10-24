@@ -24287,3 +24287,29 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/135-test-unlock-conditions-u → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:17 — gh_portal #146 AdminMessages送信成功後のフォーム状態リセット
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実施内容:**
+
+`src/pages/admin/AdminMessages.tsx` の2箇所を修正しました:
+
+1. **`handleSendStudents()`** (line 155): 送信成功時に `setSelectedStudentIds(new Set())` を追加 → 個別選択した生徒のチェックが自動クリアされる
+
+2. **`handleSendJobRemind()`** (lines 176-177): 送信成功時に `setJobMessage('')` と `setSelectedJob('')` を追加 → 案件選択とメッセージ本文が自動クリアされる
+
+コミット・プッシュ済みです (`task/gh_portal/146-adminmessages`)。
+
+```
+
+## 2026-10-24 23:17 — gh_portal #146 AdminMessages送信成功後のフォーム状態リセット
+
+- 結果: 🔀 統合完了: task/gh_portal/146-adminmessages → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
