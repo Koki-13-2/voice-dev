@@ -24339,3 +24339,35 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:24 — gh_portal #150 Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSHキーがWindows/Bash環境から利用できないためプッシュは失敗しました（SSHキーはWSL内にのみあります）。コミットは正常に完了しています。
+
+---
+
+## 実装完了
+
+`src/pages/Job.tsx` に以下の変更を加えました（コミット `7df8867`）：
+
+**追加した機能：**
+
+1. **キーワード検索** — 案件名をリアルタイムで絞り込むテキスト入力フィールド（検索アイコン付き、入力クリアボタン付き）
+
+2. **カテゴリタグフィルター** — 現在のタブ（アクティブ/過去）に存在するタグをチップとして表示し、タップで絞り込み（複数選択可、まとめてクリアボタン付き）
+
+3. **空状態の分岐** — 元々案件がない場合は従来メッセージ、フィルターで0件になった場合は「条件に一致する案件がありません」と表示
+
+**変更スコープ：** `Job()` 関数内のみ。`JobDetail`・`PinnedJobSection` など既存コンポーネントは無変更。
+
+```
+
+## 2026-10-24 23:24 — gh_portal #150 Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/150-job → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
