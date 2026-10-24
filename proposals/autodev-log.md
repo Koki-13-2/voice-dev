@@ -24748,3 +24748,36 @@ SSH鍵がWindows環境からWSLリポジトリへのpushに使えないため、
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:56 — gh_portal #166 Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限がないためpushは失敗しましたが、ローカルコミットは完了しています。
+
+---
+
+**実装内容のまとめ:**
+
+**追加ファイル: `scripts/check-icons.mjs`**
+- `src/` 以下の全 `.tsx/.ts` ファイルから静的に解決可能なアイコン名を抽出（`<Icon name="..."` と `icon: '...'` パターン）
+- `index.html` の `icon_names=` リストと比較
+- 使用中だが未宣言 → **exit 1**（CI ブロック）
+- 宣言済みだが未使用 → **警告のみ**（exit 0）
+- `--fix` フラグで修正済みの icon_names 値を出力
+
+**修正: `index.html`**
+- `filter_list_off`（Job.tsx で使用）と `key`（AdminEnrollmentCodes/AdminLayout で使用）を追加
+
+**`package.json`**
+- `"check:icons": "node scripts/check-icons.mjs"` スクリプト追加
+
+push は SSH 鍵がないため失敗しました。手動で `git push -u origin task/gh_portal/166-icon-icon-names` を実行してください。
+
+```
+
+## 2026-10-24 23:56 — gh_portal #166 Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/166-icon-icon-names → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
