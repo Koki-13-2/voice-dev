@@ -24400,3 +24400,34 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:27 — gh_portal #151 Practice過去問アップロードのクライアント側ファイルサイズ検証追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。
+
+## 変更内容
+
+`src/pages/Practice.tsx` の `PastExamDetail` コンポーネントに以下を追加しました。
+
+**ファイルサイズ検証ロジック（onChangeハンドラ）:**
+- `file.size > 20 * 1024 * 1024` の場合、エラーメッセージをセットしてファイルを選択状態にしない
+- `e.target.value = ''` でinputをリセットし、再選択できるようにする
+- サイズが正常なら `fileSizeError` をクリアしてファイルをセット
+
+**エラー表示UI:**
+- ファイル選択ラベルの直下に赤いエラーメッセージを表示（実際のサイズも「○○MB」で表示）
+- 送信ボタンは `disabled={!uploadFile}` のままなので、エラー時は押せない
+
+要件書の「PDF / JPG / PNG・最大 20MB」という仕様と整合しており、既存機能（提出・添削依頼フロー）への影響はありません。
+
+```
+
+## 2026-10-24 23:27 — gh_portal #151 Practice過去問アップロードのクライアント側ファイルサイズ検証追加
+
+- 結果: 🔀 統合完了: task/gh_portal/151-practice → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
