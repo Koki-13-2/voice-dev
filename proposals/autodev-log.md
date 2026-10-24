@@ -25007,3 +25007,34 @@ Chat.tsx と同じパターン（`!e.nativeEvent.isComposing`）で統一して�
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:14 — gh_portal #189 AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容：**
+
+`src/pages/admin/AdminPayroll.tsx` の38-39行目にあったモジュールスコープの定数を削除し、コンポーネント内の `useMemo` に移行しました。
+
+```diff
+- const MONTHS = recentMonths(6)
+- const CURRENT_MONTH = MONTHS[0]
+
+// AdminPayroll コンポーネント内
++ const months = useMemo(() => recentMonths(6), [])
++ const [month, setMonth] = useState(months[0])
+```
+
+**効果：** `new Date()` の評価がモジュール読み込み時から**コンポーネントマウント時**に変わります。月境界を跨いでページを開き直す（コンポーネントが再マウントされる）たびに当月を含む直近6か月が再計算されます。コミット・プッシュ済みです。
+
+```
+
+## 2026-10-25 00:14 — gh_portal #189 AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行
+
+- 結果: 🔀 統合完了: task/gh_portal/189-adminpayroll-months-usem → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
