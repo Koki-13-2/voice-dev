@@ -24540,3 +24540,25 @@ TypeScript チェック・Vite ビルド共にエラーなし。コミット＆�
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/148-dashboard-77-usestate → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:44 — gh_portal #159 loginWithGoogleの連打防止ガード追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。
+
+**変更内容：**
+
+- `Login.tsx`: `useState`を追加し`pending`フラグを実装。ボタンクリック時に`pending=true`にセットし`disabled`を付与、エラー時のみ`false`にリセット。テキストも「処理中...」に切り替わる。
+- `Register.tsx`: 同様に`pending`フラグを追加。既存の`sessionStorage`操作の前にガードを挿入。
+- `Enroll.tsx`: 既に`submitting`フラグが実装済みのため変更不要。
+
+コミット `0dbff11` をブランチ `task/gh_portal/159-loginwithgoogle` としてリモートへプッシュしました。
+
+```
+
+## 2026-10-24 23:44 — gh_portal #159 loginWithGoogleの連打防止ガード追加
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/159-loginwithgoogle → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
