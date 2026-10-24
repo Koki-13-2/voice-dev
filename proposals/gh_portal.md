@@ -172,7 +172,7 @@ branch:
 - [x] 【バグ修正/小】index.htmlのicon_namesに不足している22個のアイコン名を追加 — Google Fonts URLのicon_namesホワイトリストにaccount_balance,apps,article,autorenew,calculate,check_box,error_outline,insert_drive_file,logout,manage_accounts,notes,payments,public,quiz,science,short_text,smart_display,table_chart,tag,translate,video_library,videocamが欠落しており該当アイコンが文字化けしている <!-- id:164 done:2026-07-18T21:24 -->
 - [x] 【運用/小】icon_namesホワイトリストの未使用エントリ(chat_bubble)を削除 — chat_bubbleはフォントに含まれているがコード上ではchat_bubble_outlineのみ使用されており不要なデータを読み込んでいる <!-- id:165 done:2026-10-24T23:50 -->
 - [x] 【運用/中】Icon使用箇所とicon_namesリストの同期チェックスクリプトを作成 — 今後のアイコン追加時に同じ漏れが再発しないよう、コード中のアイコン名を抽出しindex.htmlのリストと差分を検出するCIチェックを追加する <!-- id:166 -->
-- [x] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 -->
+- [x] 【性能/小】icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加 — link rel="preload"でフォントCSSの取得を早め、アイコン表示までのFOUT（Flash of Unstyled Text）を軽減する <!-- id:167 done:2026-10-24T23:55 -->
 - [x] 【UI/UX/小】アイコンフォント読み込み完了までのフォールバック表示を追加 — document.fontsのready判定でmaterial-symbols-roundedロード前はアイコン要素を非表示にし文字化け状態のチラつきを防止する <!-- id:168 -->
 - [x] 【セキュリティ/小】Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定 — 外部CDNからのフォント読み込みに対する改竄検知・制限がなく、悪意あるフォント差し替えリスクがある <!-- id:169 -->
 - [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 rejected:2026-10-23T21:01 -->

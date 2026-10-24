@@ -24695,3 +24695,29 @@ push 完了。
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:55 — gh_portal #167 icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限がないためpushは失敗しましたが、コミットは完了しています。
+
+---
+
+実装完了です。
+
+**変更内容:** `index.html` の Material Symbols Rounded フォントCSS `<link rel="stylesheet">` の直前に、同一URLの `<link rel="preload" as="style">` タグを追加しました。
+
+**効果:** ブラウザがHTMLパース中にアイコンフォントCSSの取得を高優先度で開始するため、`rel="stylesheet"` が評価される時点ではリソースがキャッシュ済みになっており、FOUTが軽減されます。`icon_names` ホワイトリストのURLはそのまま維持されています。
+
+**注意:** git push はSSH鍵の権限エラーにより失敗しました。コミット自体はローカルブランチ `task/gh_portal/167-icon-names-hint` に正常に記録されています。
+
+```
+
+## 2026-10-24 23:55 — gh_portal #167 icon_namesホワイトリスト方式を維持しつつフォントプリロードhintを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/167-icon-names-hint → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
