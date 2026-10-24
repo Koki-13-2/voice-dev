@@ -152,7 +152,7 @@ branch:
 - [x] 【性能/小】全ページのSupabase非同期呼び出しにAbortControllerを導入 — useEffect内のfetch/supabaseクエリがアンマウント後も完了してsetStateを呼ぶ問題を、AbortControllerのcleanupで防止する（まずDashboard BookDetailModalとPractice FeedbackDashboardの2箇所から着手） <!-- id:144 done:2026-10-24T23:13 -->
 - [x] 【UI/UX/小】createPortal直書きモーダル群をFocusTrapDialogに統一 — Dashboard（BookDetailModal・MeetingInviteModal等）とChat（MeetingInviteModal・ThreadPanel）のcreatePortal直書きモーダルにEscキー・フォーカストラップ・aria-modal属性が欠けているため、既存のFocusTrapDialogコンポーネントに置換する <!-- id:145 done:2026-10-24T23:21 -->
 - [x] 【機能/小】AdminMessages送信成功後のフォーム状態リセット — 生徒向け送信後にselectedStudentIdsが、案件リマインド送信後にjobMessage・selectedJobがクリアされず再送誤操作のリスクがあるため、送信成功時に各stateを初期化する <!-- id:146 done:2026-10-24T23:17 -->
-- [x] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 -->
+- [x] 【UI/UX/中】Chat画面のメッセージ行レンダリングをChatMessageRow共通コンポーネントに抽出 — アバター・送信者名・チャットバブル・時刻・スレッドボタンの同一パターンが5箇所に重複しているため、1コンポーネントに統合して約150行を削減する <!-- id:147 done:2026-10-24T23:24 -->
 - [x] 【性能/中】Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割 — useDailySchedule・useMeetingInvitation・useTeacherStudents等のカスタムフックに状態とロジックをまとめ、不要な再レンダリングの表面積を縮小する <!-- id:148 -->
 - [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 rejected:2026-10-23T21:02 -->
 - [x] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 done:2026-10-24T23:24 -->
