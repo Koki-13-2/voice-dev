@@ -24781,3 +24781,47 @@ push は SSH 鍵がないため失敗しました。手動で `git push -u origi
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/166-icon-icon-names → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-25 00:01 — gh_portal #184 completeOnboardingのDB永続化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSHキーが設定されていないため push できませんでした。ローカルへのコミットは完了しています。
+
+---
+
+実装内容を説明します。
+
+**変更ファイル:** `src/lib/AuthContext.tsx`
+
+**修正1 — `completeOnboarding` にDB書き込みを追加 (line 270-276)**
+```tsx
+// 修正前
+const completeOnboarding = () => {
+  if (user) localStorage.setItem(onboardingKey(user.id), 'true')
+  setOnboardingDone(true)
+}
+
+// 修正後（completeTutorialと同パターン）
+const completeOnboarding = () => {
+  if (user) {
+    localStorage.setItem(onboardingKey(user.id), 'true')
+    setOnboardingDone(true)
+    ;(async () => { try { await supabase.from('profiles').update({ onboarding_done: true }).eq('id', user.id) } catch {} })()
+  }
+}
+```
+
+**修正2 — fetchProfile後の同期ロジックをリトライ対応に修正 (line 207-213)**
+- 旧: `onboardingDone` が DB/localStorage で異なれば DB値で上書き（localStorageがtrueでDBがfalseの場合にDBへの書き込み失敗を修復できなかった）
+- 新: `completeTutorial` と同パターン。DBがtrueならキャッシュも更新、DBがfalseでlocalStorageがtrueなら書き込みリトライ
+
+`git push` はSSH認証エラーで失敗しました。SSH鍵の設定後に手動で `git push -u origin task/gh_portal/184-completeonboarding-db` を実行してください。
+
+```
+
+## 2026-10-25 00:01 — gh_portal #184 completeOnboardingのDB永続化
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/184-completeonboarding-db → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
