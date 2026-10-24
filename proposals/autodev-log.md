@@ -24221,3 +24221,33 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/118-teacher-manual-ui → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:13 — gh_portal #144 全ページのSupabase非同期呼び出しにAbortControllerを導入
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSHキーがないためpushは失敗しましたが、コミットは完了しています。
+
+---
+
+実装完了です。変更内容をまとめます：
+
+**修正箇所 3か所:**
+
+1. **`Dashboard.tsx` `BookDetailModal`** (line ~1490): Google Books API への `fetch()` に `AbortController` を追加。モーダルが閉じられた際に `controller.abort()` を呼び、`AbortError` は無視して `setInfo`/`setLoading` をスキップ。
+
+2. **`Practice.tsx` `FeedbackDashboard` loadChartData** (line ~1939): `let cancelled = false` フラグを追加し、アンマウント時に `true` にする cleanup を返す。`setSubjectList` / `setRadarScores` / `setScoreHistory` / `setLoadingCharts` の呼び出しをすべて `if (!cancelled)` でガード。
+
+3. **`Practice.tsx` `FeedbackDashboard` corrections** (line ~2083): 同じく `cancelled` フラグパターンを適用。`.then()` 内の `setFeedbackItems` 呼び出し前に `if (cancelled || !data) return` を追加。
+
+git push は SSH キー未設定のため失敗しましたが、ローカルのworktreeブランチ `task/gh_portal/144-supabase-abortcontroller` にコミット済みです。
+
+```
+
+## 2026-10-24 23:13 — gh_portal #144 全ページのSupabase非同期呼び出しにAbortControllerを導入
+
+- 結果: 🔀 統合完了: task/gh_portal/144-supabase-abortcontroller → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
