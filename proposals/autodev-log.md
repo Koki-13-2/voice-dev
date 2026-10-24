@@ -24179,3 +24179,45 @@ SSH認証に失敗しました。SSHキーがこの環境に設定されてい�
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:12 — gh_portal #118 講師用テスト手動解禁（teacher_manual）UIの実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミットと push が完了しました。
+
+実装した内容をまとめます。
+
+---
+
+## 実装内容
+
+### 問題
+`test_unlock_conditions` に `trigger_type='teacher_manual'` が設定できても、講師が実際にテストを解禁する手段が存在しなかった。
+
+### 変更ファイル
+
+1. **`supabase/migrations/20261024000001_test_manual_unlocks.sql`** (新規)
+   - `test_manual_unlocks` テーブルを追加
+   - `(test_id, student_id)` のユニーク制約で重複解禁を防止
+   - RLS: 教師/管理者は全操作可、生徒は自分のレコードを参照のみ
+
+2. **`src/lib/database.types.ts`**
+   - `test_manual_unlocks` テーブルの Row/Insert/Update 型とリレーションを追加
+
+3. **`src/pages/Practice.tsx`**
+   - `teacher_manual` 条件チェックで `test_manual_unlocks` を実際にクエリし、解禁済みの場合はテストを `available` にする（従来は常に locked 固定だった）
+
+4. **`src/pages/TeacherPractice.tsx`**
+   - `ActiveTab` に `'unlock'` を追加
+   - `UnlockableTest` インターフェースを追加
+   - 「テスト解禁」タブを追加: 担当生徒 × teacher_manual 条件テストの一覧を表示
+   - 各テストに「解禁する」/「解禁取消」ボタンで `test_manual_unlocks` を INSERT/DELETE
+
+```
+
+## 2026-10-24 23:12 — gh_portal #118 講師用テスト手動解禁（teacher_manual）UIの実装
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/118-teacher-manual-ui → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
