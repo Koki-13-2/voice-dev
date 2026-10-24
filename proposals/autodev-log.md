@@ -24515,3 +24515,28 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/155-mathmarkdown-431kb-manua → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:42 — gh_portal #148 Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+タスク完了。実装内容のまとめ:
+
+**作成ファイル:**
+- `src/lib/dashboardTypes.ts` — `MeetingStatus`, `MeetingInvitation`, `HomeworkItem`, `CheckTestRef`, `GanttItemWithId`, `TeacherStudentData`, `MOCK_STUDENT_STATS` を集約
+- `src/lib/scheduleUtils.ts` — `toMin`, `minToTime`, `formatDeadline`, `autoPlaceTickets`, `fetchDailyPills`, `saveLifeSlotsToDb` を分離
+- `src/lib/hooks/useDailySchedule.ts` — 生徒の日次スケジュール・宿題・面談招待・統計を管理するカスタムフック（Dashboard から18個の useState を吸収）
+- `src/lib/hooks/useTeacherStudents.ts` — 担当生徒一覧のフェッチ・キャッシュ・Supabase Realtime購読を管理するカスタムフック（TeacherDashboard から3個の useState を吸収）
+
+**変更ファイル:**
+- `src/pages/Dashboard.tsx` — Dashboard コンポーネントは UI 状態（tab, selectedPill, feedbackScreen, showPattern系）7個のみ保持、TeacherDashboard は selected/screen の2個のみに整理
+
+TypeScript チェック・Vite ビルド共にエラーなし。コミット＆プッシュ完了。
+
+```
+
+## 2026-10-24 23:42 — gh_portal #148 Dashboard関数コンポーネントの77個のuseStateをカスタムフック群に分割
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/148-dashboard-77-usestate → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
