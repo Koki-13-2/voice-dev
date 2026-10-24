@@ -187,7 +187,7 @@ branch:
 - [ ] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
 - [ ] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
 - [ ] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
-- [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 -->
+- [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 done:2026-10-25T00:04 -->
 - [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 rejected:2026-10-23T20:43 -->
 - [x] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 done:2026-10-25T00:01 -->
 - [x] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 -->

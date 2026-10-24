@@ -24861,3 +24861,37 @@ SSH鍵の権限がないためpushは失敗しました（ローカル環境のS
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:04 — gh_portal #182 Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了。変更内容：
+
+**`src/pages/Chat.tsx` に2点追加：**
+
+1. **`mountedRef`の宣言**（既存のrefたちの直後）
+   ```ts
+   const mountedRef = useRef(true)
+   useEffect(() => () => { mountedRef.current = false }, [])
+   ```
+
+2. **`handleAiSend`内の各`await`後にマウント確認を追加**
+   - ユーザーメッセージID更新の`setAiMessages` → `inserted && mountedRef.current` でガード
+   - `@AI`ブロック開始前 → `if (!mountedRef.current) return` でスキップ
+   - `await callAiChat()`完了後 → `if (!mountedRef.current) return` でスキップ
+   - AI ID更新の`setAiMessages` → `inserted && mountedRef.current` でガード
+   - catch内の`setAiMessages` → `if (!mountedRef.current) return` でスキップ
+   - finally の`setAiTyping(false)` → `mountedRef.current &&` でガード
+
+画面遷移後（アンマウント後）に到達する非同期コールバックが状態更新とSupabase insertをスキップするようになり、不要な副作用を防止します。コミット・プッシュ済み。
+
+```
+
+## 2026-10-25 00:04 — gh_portal #182 Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/182-chat-tsx-handleaisend-se → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
