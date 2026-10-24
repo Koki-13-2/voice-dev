@@ -24664,3 +24664,34 @@ SSH鍵の権限がないためプッシュできませんでした。コミッ�
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:50 — gh_portal #163 uploadToDeliverablesの非ASCII（日本語）ファイル名保持
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+push 完了。
+
+---
+
+**変更内容:**
+
+`src/lib/storage.ts:17` の正規表現を修正しました。
+
+| 変更前 | 変更後 |
+|--------|--------|
+| `/[^\w.\-]/g` | `/[^\p{L}\p{N}.\-_]/gu` |
+
+- `\w` は `[a-zA-Z0-9_]` (ASCII のみ) → 日本語が全てアンダースコアに化けていた
+- `\p{L}\p{N}` with `u` フラグ → Unicode 文字（日本語・中国語・韓国語等）を保持しつつ、スラッシュ・スペース・特殊文字等の危険な文字のみ `_` に置換
+
+呼び出し元の `Job.tsx`・`Practice.tsx` への変更は不要で、既存機能への影響もありません。
+
+```
+
+## 2026-10-24 23:50 — gh_portal #163 uploadToDeliverablesの非ASCII（日本語）ファイル名保持
+
+- 結果: 🔀 統合完了: task/gh_portal/163-uploadtodeliverables-asc → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
