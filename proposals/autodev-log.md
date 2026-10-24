@@ -24973,3 +24973,37 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:13 — gh_portal #190 AdminJobコメント入力のIMEコンポジション対応
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSHキーの権限エラーでプッシュできませんでした。ローカルのコミットは完了しています。
+
+---
+
+実装完了です。
+
+**変更内容:** `src/pages/AdminJob.tsx` の5つのチャットコンポーネントのすべての `onKeyDown` ハンドラに `!e.nativeEvent.isComposing` チェックを追加しました。
+
+| コンポーネント | 行 |
+|---|---|
+| `SubmissionChat` | 750 |
+| `FieldCommentThread` | 833 |
+| `FieldTaskChat` | 947 |
+| `ApplicationChat` | 1285 |
+| `JobTaskThread` | 1475 |
+
+Chat.tsx と同じパターン（`!e.nativeEvent.isComposing`）で統一しており、日本語変換確定時のEnterによる誤送信を防止します。
+
+`git push` はSSHキーの権限エラーで失敗しました。手動でのプッシュが必要です。
+
+```
+
+## 2026-10-25 00:13 — gh_portal #190 AdminJobコメント入力のIMEコンポジション対応
+
+- 結果: 🔀 統合完了: task/gh_portal/190-adminjob-ime → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+

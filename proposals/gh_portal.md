@@ -195,7 +195,7 @@ branch:
 - [x] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 done:2026-10-25T00:10 -->
 - [x] 【運用/中】Dashboard・Chat間のScheduleTimeSelector等5件の重複コードをsharedモジュールに抽出 — MeetingInvitation型・MeetingStatus型・MEETING_HOURS定数・getPillForHour関数・ScheduleTimeSelectorコンポーネントが両ファイルにほぼ同一でコピペされている <!-- id:188 -->
 - [x] 【機能/小】AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行 — new Date()がモジュール読み込み時に1度だけ実行されるため、月境界を跨いでタブを開き続けると当月がドロップダウンに現れなくなる <!-- id:189 -->
-- [x] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 -->
+- [x] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 done:2026-10-25T00:13 -->
 - [ ] 【UI/UX/小】UniversityComboboxのキーボード操作・ARIA属性追加 — Onboarding.tsxの大学選択UIがonMouseDownのみで矢印キーナビゲーション不可、role="listbox"・aria-expanded・aria-activedescendant等のARIA属性も欠如している <!-- id:191 -->
 - [x] 【性能/小】utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化 — fmtDateFull・fmtDateTimeが呼び出しごとにnew Intl.DateTimeFormatを生成しておりGC圧とインスタンス化コストが無駄に発生している <!-- id:192 -->
 - [x] 【機能/小】AdminMessagesテンプレートのハードコード配列をDB取得に統一 — AdminMessages.tsxではテンプレート4件がハードコード配列だがAdminStudents.tsxではmessage_templatesテーブルから動的取得しており、管理画面間でテンプレート一覧が不一致になる <!-- id:193 -->
