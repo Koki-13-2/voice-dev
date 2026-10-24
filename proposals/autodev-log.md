@@ -24140,3 +24140,42 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/105-timeline-onchange → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:11 — gh_portal #117 AdminPayrollコマ数入力フィールドの追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH認証に失敗しました。SSHキーがこの環境に設定されていないため、プッシュは手動で行う必要があります。コミットはローカルに完了しています。
+
+---
+
+実装が完了しました。以下が変更内容のまとめです。
+
+**変更ファイル:**
+- `src/pages/admin/AdminPayroll.tsx`
+- `src/styles/globals.css`
+
+**実装内容:**
+
+1. **コマ数の読み込み優先度を改善** — `payroll_records.lesson_count` に保存済みの値があればそれを使い、なければ `meeting_records` のカウントにフォールバック
+
+2. **`lessonDrafts` 状態を追加** — 入力中の文字列を管理。月切り替え時にリセット
+
+3. **`saveLessonCount` ハンドラー** — blur / Enter キーで `payroll_records` に upsert、失敗時はロールバック
+
+4. **インライン入力UI** — 各講師行のコマ数部分を `<input type="number">` に変更。隣に単価 × 式を表示
+
+5. **CSS追加** — `.payroll-lesson-wrap`（インライン整列）、`.payroll-lesson-input`（幅64px）、`.payroll-lesson-formula`（単価式テキスト）
+
+**コミット:** `c728195`（ブランチ `task/gh_portal/117-adminpayroll`）  
+プッシュはSSHキーが設定された環境から `git push -u origin task/gh_portal/117-adminpayroll` で実行してください。
+
+```
+
+## 2026-10-24 23:11 — gh_portal #117 AdminPayrollコマ数入力フィールドの追加
+
+- 結果: 🔀 統合完了: task/gh_portal/117-adminpayroll → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
