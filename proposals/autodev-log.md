@@ -24491,3 +24491,27 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/154-authcontext-5-localstora → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:40 — gh_portal #155 MathMarkdownチャンク（431KB）のmanualChunks分割
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+タスク完了。
+
+**実装内容:**
+`vite.config.ts` に `build.rollupOptions.output.manualChunks` を追加し、431KB の MathMarkdown チャンクを分割:
+
+- `vendor-katex` (255.97 KB) — katex 本体
+- `vendor-katex` CSS (29.27 KB) — katex スタイル
+- `vendor-math-markdown` (185.05 KB) — react-markdown、rehype-katex、rehype-sanitize、remark-gfm、remark-math、および unified/hast/mdast/micromark 系
+- `MathMarkdown` コンポーネント本体は 431KB → **0.47 KB** に縮小
+
+ブランチを `origin/task/gh_portal/155-mathmarkdown-431kb-manua` にプッシュ済み。
+
+```
+
+## 2026-10-24 23:40 — gh_portal #155 MathMarkdownチャンク（431KB）のmanualChunks分割
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/155-mathmarkdown-431kb-manua → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
