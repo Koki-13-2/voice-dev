@@ -24895,3 +24895,27 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:07 — gh_portal #185 SPA画面遷移時のscroll-to-top追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限がないためpushは失敗しましたが、ローカルのコミットは完了しています。
+
+**実装完了:**
+
+- `src/App.tsx:59` の `PageTitleUpdater` の `useEffect` に `window.scrollTo(0, 0)` を1行追加
+- `pathname` が変わるたびに document.title 更新と同時にスクロール位置をトップにリセット
+- コミット済み: `f6f4730 feat: SPA画面遷移時にscroll-to-topを追加 (#185)`
+
+pushはSSH鍵の権限不足で失敗しました。SSH設定（`~/.ssh/config` or `ssh-add`）を確認してから手動で `git push -u origin task/gh_portal/185-spa-scroll-to-top` を実行してください。
+
+```
+
+## 2026-10-25 00:07 — gh_portal #185 SPA画面遷移時のscroll-to-top追加
+
+- 結果: 🔀 統合完了: task/gh_portal/185-spa-scroll-to-top → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+

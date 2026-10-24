@@ -190,7 +190,7 @@ branch:
 - [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 done:2026-10-25T00:04 -->
 - [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 rejected:2026-10-23T20:43 -->
 - [x] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 done:2026-10-25T00:01 -->
-- [x] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 -->
+- [x] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 done:2026-10-25T00:07 -->
 - [x] 【UI/UX/小】LoadingScreen文字色（#999）のWCAG AA準拠修正 — App.tsxのLoadingScreenのcolor:#999は白背景でコントラスト比約2.8:1となりAA基準4.5:1を満たしておらず、既修正の--color-mutedと同様に#717171以下へ変更が必要 <!-- id:186 -->
 - [x] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 -->
 - [x] 【運用/中】Dashboard・Chat間のScheduleTimeSelector等5件の重複コードをsharedモジュールに抽出 — MeetingInvitation型・MeetingStatus型・MEETING_HOURS定数・getPillForHour関数・ScheduleTimeSelectorコンポーネントが両ファイルにほぼ同一でコピペされている <!-- id:188 -->
