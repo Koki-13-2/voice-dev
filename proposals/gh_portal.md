@@ -140,7 +140,7 @@ branch:
 - [x] 【機能/小】AdminPayrollコマ数自動集計のmeeting_records連携 — AdminPayroll.tsx:305でコマ数が手動入力前提（lesson_count）のため、meeting_recordsの面談実施件数から自動集計する仕組みがなく運用負荷が高い <!-- id:132 done:2026-07-09T10:29 -->
 - [x] 【機能/小】PillDetailModal「教材詳細」ボタンのonClickハンドラ実装 — Dashboard.tsx:4475の「教材詳細」ボタンにonClickが未設定でクリックしても何も起こらないため、生徒が宿題実施中に教材情報を参照できない <!-- id:133 done:2026-07-09T10:07 -->
 - [x] 【運用/小】TeacherPractice handleReturn添削返却のエラーハンドリング追加 — correction_comments INSERTとcorrections UPDATE の2DB操作にtry-catchがなく、失敗時にUIフィードバックがないため添削が中途半端な状態で残りうる <!-- id:134 done:2026-07-09T23:30 -->
-- [x] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 -->
+- [x] 【機能/中】test_unlock_conditions解放条件の講師設定UI追加 — 段階突破テストの解放閾値（宿題完了率・コンテンツ視聴率）を講師がUI上で設定・変更できるフォームを追加する <!-- id:135 done:2026-10-24T23:15 -->
 - [x] 【機能/小】homework_tickets生徒側の完了報告UI実装 — 生徒が宿題完了を報告しhomework_ticketsのステータスを更新するボタンとDB処理を追加する <!-- id:136 done:2026-08-01T10:12 -->
 - [x] 【機能/中】corrections提出時の担当講師へのアプリ内通知実装 — 生徒がPDF提出でcorrectionsレコードを作成した際に担当講師のDashboardに未添削通知を表示する仕組みを追加する <!-- id:137 done:2026-07-10T00:14 -->
 - [x] 【機能/中】content_progress視聴進捗の講師側確認UI追加 — 担当生徒のコンテンツ視聴進捗率（content_progress.watch_pct）を講師がDashboard上で一覧確認できるセクションを追加する <!-- id:138 done:2026-07-10T00:17 -->

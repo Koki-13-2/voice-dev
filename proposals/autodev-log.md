@@ -24251,3 +24251,39 @@ git push は SSH キー未設定のため失敗しましたが、ローカルの
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:15 — gh_portal #135 test_unlock_conditions解放条件の講師設定UI追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+プッシュ完了です。実装内容をまとめます。
+
+---
+
+## 実装完了
+
+### 変更内容 (`src/pages/Dashboard.tsx`)
+
+1. **`DetailTab` 型に `'tests'` を追加**
+   - 生徒詳細ダッシュボードに新しいタブを追加
+
+2. **「解放条件」タブボタンを追加** (既存の「視聴進捗」タブの右隣)
+   - アイコン: `lock_open`
+
+3. **`TestUnlockConditionsPanel` コンポーネントを新規実装**
+   - `type = 'level_up'` の段階突破テストを全件取得
+   - 各テストの `test_unlock_conditions` を表示
+   - `trigger_type` に応じて「宿題完了率」「動画視聴率」「講師が手動解禁」のラベルを表示
+   - 参照教材名・コンテンツ名を解決して表示
+   - `material_progress` / `content_video` 条件は「変更」ボタンでインライン編集モードに切替
+   - `threshold_pct` を 0〜100% / 5%ステップで変更し、Supabase に保存
+   - 保存後2秒間「保存済み」フィードバックを表示
+   - 「解放閾値の変更はすべての生徒に影響します」の注意メッセージを表示
+
+```
+
+## 2026-10-24 23:15 — gh_portal #135 test_unlock_conditions解放条件の講師設定UI追加
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/135-test-unlock-conditions-u → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
