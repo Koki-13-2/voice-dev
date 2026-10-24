@@ -24562,3 +24562,31 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/159-loginwithgoogle → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-24 23:44 — gh_portal #160 VideoDetail動画読み込みエラーのフォールバックUI追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+プッシュ完了しました。
+
+---
+
+実装内容をまとめます：
+
+**変更ファイル:** `src/pages/VideoDetail.tsx`
+
+- `useState` を追加し、`videoError` 状態を管理
+- `onError={handleVideoError}` を `<video>` 要素に追加 — 403/404/非対応フォーマット等でエラー時に発火
+- エラー時は動画要素を `display: none` で隠し、「動画を読み込めませんでした」メッセージと「再試行」ボタンを表示
+- 再試行ボタン押下時は `video.src` を再セットして `video.load()` を呼び出し、強制再読み込みを実行
+- 既存の進捗保存ロジック・`onLoadedMetadata`・`onEnded` ハンドラには一切影響なし
+
+```
+
+## 2026-10-24 23:44 — gh_portal #160 VideoDetail動画読み込みエラーのフォールバックUI追加
+
+- 結果: 🔀 統合完了: task/gh_portal/160-videodetail-ui → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
