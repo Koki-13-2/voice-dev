@@ -25162,3 +25162,47 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/195-chat-tsx-4 → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-25 00:29 — gh_portal #194 AI_ROOMS の unread・preview・time ハードコード除去
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+プッシュ完了しました。実装内容をまとめます。
+
+---
+
+## 完了
+
+**変更ファイル:** `src/pages/Chat.tsx`
+
+### 実施内容
+
+1. **`AI_ROOMS` 定数のサンプル値除去（149–154行）**
+   - `preview`・`time`・`unread: 2` などのハードコード値を全削除
+   - 型を `{ id: string; subject: string; icon: string }[]` に変更
+
+2. **`formatRelativeTime` ヘルパー追加**
+   - 当日 → `HH:MM`、昨日 → `昨日`、7日未満 → `〇曜`、それ以外 → `先週`
+
+3. **`aiRoomMeta` state 追加**
+   - `Record<string, { preview: string; time: string; unread?: number }>` で動的メタデータを保持
+
+4. **AIタブ開放時にDBからメタデータを取得する `useEffect` 追加（生徒専用）**
+   - `room_members` → `chat_rooms` (type='ai') → 各ルームの最終メッセージ + `getRoomUnreadCounts` でデータ取得
+
+5. **AIルーム入室時に未読クリア**
+   - `initAiRoom` 内で `markRoomAsRead` を呼び出し、`aiRoomMeta` の `unread` もクリア
+
+6. **`filteredAiRooms` を動的生成に変更**
+   - `AI_ROOMS`（静的）と `aiRoomMeta`（動的）をマージした `AiRoom[]` を生成
+
+7. **講師側 AIルームリストから廃止プロパティの参照を削除**
+   - `room.time`・`room.preview` を参照していた JSX を修正
+
+```
+
+## 2026-10-25 00:29 — gh_portal #194 AI_ROOMS の unread・preview・time ハードコード除去
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/194-ai-rooms-unread-preview → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
