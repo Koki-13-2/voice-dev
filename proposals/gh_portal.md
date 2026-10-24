@@ -157,7 +157,7 @@ branch:
 - [ ] 【機能/小】AdminPayroll給与データのCSVエクスポートボタン追加 — 講師別の授業コマ数・金額・支払ステータスを月次CSVとしてダウンロードできるようにし、経理ワークフローを支援する <!-- id:149 rejected:2026-10-23T21:02 -->
 - [x] 【機能/小】Job画面（講師ビュー）にキーワード検索・カテゴリフィルターを追加 — active/pastタブ分割のみで案件数が増えると目的の案件を見つけにくいため、タイトル検索とカテゴリタグ絞り込みUIを実装する <!-- id:150 done:2026-10-24T23:24 -->
 - [x] 【セキュリティ/小】Practice過去問アップロードのクライアント側ファイルサイズ検証追加 — UIに「最大20MB」と表示しているがfile.sizeチェックがなく、超過ファイルはアップロード失敗時に初めてエラーになるため、選択時に即座にバリデーションする <!-- id:151 done:2026-10-24T23:27 -->
-- [x] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 -->
+- [x] 【UI/UX/小】Dashboard・Chat・TeacherPracticeのタブバーにWAI-ARIAタブパターンを適用 — role="tablist"/role="tab"/aria-selected/role="tabpanel"/aria-controls属性を付与し、スクリーンリーダーでタブとして認識可能にする <!-- id:152 done:2026-10-24T23:33 -->
 - [x] 【運用/中】AdminMessagesの送信履歴にページネーション（load more）を追加 — 現在.limit(50)で取得しており50件超の過去ログが閲覧不能なため、カーソルベースの追加読み込みを実装する <!-- id:153 done:2026-07-13T15:05 -->
 - [x] 【セキュリティ/小】AuthContext 5秒フォールバックのlocalStorageキャッシュ権限昇格防止 — プロフィール取得がタイムアウトした場合にlocalStorageのis_admin/is_ownerキャッシュがそのまま信頼されるため、フォールバック発火時はキャッシュ権限フラグをfalseに強制リセットする <!-- id:154 -->
 - [x] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 -->
