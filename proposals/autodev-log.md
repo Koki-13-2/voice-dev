@@ -24590,3 +24590,31 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:46 — gh_portal #161 saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了しました。
+
+## 変更内容
+
+**問題**: `saveStudentSubjects` は `delete` → `insert` を2つの独立したDB呼び出しで行っていたため、`insert` 失敗時に生徒の受験科目が全消失するリスクがあった。
+
+**対応**:
+
+1. **`supabase/migrations/20261024000001_save_student_subjects_rpc.sql`** — PL/pgSQL関数 `save_student_subjects` を新規作成。`SECURITY DEFINER` で実行し、関数内で「本人または管理者」かを確認してから DELETE + INSERT を単一トランザクション内で実行。
+
+2. **`src/lib/studentSubjects.ts`** — `saveStudentSubjects` を `supabase.rpc('save_student_subjects', ...)` の1呼び出しに置き換え。エラー時は例外をスローするよう変更。
+
+3. **`src/lib/database.types.ts`** — RPC関数の型定義を追加。
+
+PostgreSQLのPL/pgSQL関数内の複数ステートメントは暗黙的に同一トランザクションで実行されるため、INSERT失敗時はDELETEも自動的にロールバックされ、科目の全消失が防止されます。
+
+```
+
+## 2026-10-24 23:46 — gh_portal #161 saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/161-savestudentsubjects-dele → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
