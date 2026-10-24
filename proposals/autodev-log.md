@@ -25076,3 +25076,21 @@ TypeScriptエラー: 0件（`tsc --noEmit`でクリーン確認済み）
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:18 — gh_portal #192 utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容:** `src/lib/utils.ts` で `fmtDateFull` と `fmtDateTime` が呼び出しごとに生成していた `Intl.DateTimeFormat` インスタンスを、モジュールスコープの定数 `_dateFmt` / `_dateTimeFmt` として抽出。これにより関数呼び出しのたびに発生していたインスタンス化コストと GC 圧が解消されました。コミット・プッシュ済みです。
+
+```
+
+## 2026-10-25 00:18 — gh_portal #192 utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化
+
+- 結果: 🔀 統合完了: task/gh_portal/192-utils-ts-intl-datetimefo → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
