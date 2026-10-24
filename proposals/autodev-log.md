@@ -24825,3 +24825,39 @@ const completeOnboarding = () => {
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/184-completeonboarding-db → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-25 00:01 — gh_portal #169 Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限がないためpushは失敗しました（ローカル環境のSSH設定の問題）。コミット自体は正常に完了しています。
+
+---
+
+実装完了です。
+
+**変更内容:**
+
+1. **`index.html`** — CSP meta タグを追加:
+   ```html
+   <meta http-equiv="Content-Security-Policy" content="font-src 'self' https://fonts.gstatic.com;" />
+   ```
+
+2. **`vercel.json`** — CSP HTTPヘッダーを追加:
+   ```json
+   "font-src 'self' https://fonts.gstatic.com;"
+   ```
+
+**なぜSRIではなくCSPか**: Google Fonts の CSS はブラウザのUA毎に動的生成されるため、SRIハッシュを事前に計算して固定することができません。CSP の `font-src` ディレクティブで「フォントファイルは `fonts.gstatic.com` からのみ許可」と制限する方が確実かつ実用的です。
+
+**効果**: 攻撃者がDNSスプーフィングやMITMで別ドメインからフォントを差し替えようとしても、ブラウザがCSPでブロックします。既存の `fonts.gstatic.com` からの読み込みは引き続き正常に動作します。
+
+```
+
+## 2026-10-25 00:01 — gh_portal #169 Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定
+
+- 結果: 🔀 統合完了: task/gh_portal/169-google-fonts-cdn-sri-sub → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
