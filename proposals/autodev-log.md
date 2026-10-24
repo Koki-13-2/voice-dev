@@ -24105,3 +24105,38 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:05 — gh_portal #105 Timelineバナーファイル入力にonChangeハンドラを実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了。変更内容をまとめます。
+
+---
+
+**実装内容:**
+
+1. **マイグレーション** (`supabase/migrations/20261024000001_add_banner_image_url.sql`)
+   - `announcements.banner_image_url TEXT` カラム追加
+   - `banners` Storageバケット（public, 5MB）作成
+   - 管理者専用のRLSポリシー設定
+
+2. **`src/lib/database.types.ts`**
+   - `announcements`の`Row/Insert/Update`に`banner_image_url: string | null`を追加
+
+3. **`src/pages/Timeline.tsx`**
+   - `BannerSlide`インターフェースに`imageUrl?: string`を追加
+   - バナーフェッチクエリに`banner_image_url`を追加
+   - `handleBannerImageChange`を実装：選択ファイルを`banners`バケットにアップロード→`announcements`レコード更新→ローカルstate反映
+   - バナースライドのレンダリング：`imageUrl`がある場合は`background-image`で表示（テキストは非表示）
+   - 隠しfile inputに`onChange={handleBannerImageChange}`を追加
+
+これにより「管理者がバナーをタップ→ファイル選択→画像が上書きアップロードされバナーに反映」の動作が完成しました。
+
+```
+
+## 2026-10-24 23:05 — gh_portal #105 Timelineバナーファイル入力にonChangeハンドラを実装
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/105-timeline-onchange → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+

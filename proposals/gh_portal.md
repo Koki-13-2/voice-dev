@@ -110,7 +110,7 @@ branch:
 - [x] 【セキュリティ/小】AdminPayroll unitPrice/bonusFlatの数値バリデーション追加 — HTML min={0}はブラウザヒントのみで負の値を防止できず給与計算に不正な金額が入りうるため、onChange時にMath.max(0,v)でクランプする <!-- id:102 done:2026-07-08T17:03 -->
 - [ ] 【UI/UX/小】globals.css user-select — none グローバル無効化の緩和 — 全要素でテキスト選択が無効化されておりユーザーが情報をコピーできないアクセシビリティ問題を、インタラクティブ要素のみに限定して修正する <!-- id:103 rejected:2026-10-18T22:50 -->
 - [ ] 【セキュリティ/小】MathMarkdownにrehype-sanitizeを追加 — ReactMarkdown+rehypeKatexパイプラインにHTML無害化プラグインがなく、AIチャット応答やクイズ問題文経由でXSSが可能 <!-- id:104 done:2026-10-18T22:55 -->
-- [x] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 -->
+- [x] 【機能/小】Timelineバナーファイル入力にonChangeハンドラを実装 — 管理者がバナー画像をクリック→ファイル選択しても何も起きない（onChangeが未設定） <!-- id:105 done:2026-10-24T23:05 -->
 - [x] 【性能/小】Timelineバナー自動スライドのuseEffect依存配列にbannerSlides.lengthを追加 — マウント時のuseEffect[]で空配列のlengthを閉じ込めるため、スライドが常にindex 0に戻る <!-- id:106 done:2026-10-24T23:01 -->
 - [x] 【UX/小】Timeline投稿・質問送信失敗時にcloseComposerを呼ばない — エラー発生時もcloseComposer()が実行されユーザーの入力テキストと画像が消失する <!-- id:107 done:2026-07-09T07:54 -->
 - [x] 【信頼性/小】Dashboard面談承諾・拒否ボタンのSupabase呼び出しにエラーハンドリングを追加 — awaitの結果を検証せず楽観的にUIを更新するため、失敗時にUI/DB不整合が永続化する <!-- id:108 done:2026-07-09T08:02 -->
