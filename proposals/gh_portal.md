@@ -192,7 +192,7 @@ branch:
 - [x] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 done:2026-10-25T00:01 -->
 - [x] 【UI/UX/小】SPA画面遷移時のscroll-to-top追加 — App.tsxのPageTitleUpdaterでdocument.titleは更新しているがwindow.scrollTo(0,0)がないため、ページ遷移後にスクロール位置がリセットされずユーザーがページ中間から閲覧を開始してしまう <!-- id:185 done:2026-10-25T00:07 -->
 - [x] 【UI/UX/小】LoadingScreen文字色（#999）のWCAG AA準拠修正 — App.tsxのLoadingScreenのcolor:#999は白背景でコントラスト比約2.8:1となりAA基準4.5:1を満たしておらず、既修正の--color-mutedと同様に#717171以下へ変更が必要 <!-- id:186 done:2026-10-25T00:07 -->
-- [x] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 -->
+- [x] 【機能/小】Timeline共有ボタン・質問カードの死UIハンドラ実装 — Timeline.tsxのshareボタン（line 814）にonClickが未設定で押しても無反応、質問カード（lines 901-916）もクリック遷移不可で表示だけのUI要素になっている <!-- id:187 done:2026-10-25T00:10 -->
 - [x] 【運用/中】Dashboard・Chat間のScheduleTimeSelector等5件の重複コードをsharedモジュールに抽出 — MeetingInvitation型・MeetingStatus型・MEETING_HOURS定数・getPillForHour関数・ScheduleTimeSelectorコンポーネントが両ファイルにほぼ同一でコピペされている <!-- id:188 -->
 - [x] 【機能/小】AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行 — new Date()がモジュール読み込み時に1度だけ実行されるため、月境界を跨いでタブを開き続けると当月がドロップダウンに現れなくなる <!-- id:189 -->
 - [x] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 -->

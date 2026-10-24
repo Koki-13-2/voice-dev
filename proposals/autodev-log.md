@@ -24943,3 +24943,33 @@ SSH キーが設定されていないため `git push` は失敗しましたが�
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:10 — gh_portal #187 Timeline共有ボタン・質問カードの死UIハンドラ実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。実装内容を以下にまとめます：
+
+**変更内容（`src/pages/Timeline.tsx`）:**
+
+1. **shareボタン（元 line 814）**: `sharePost(post)` 関数を追加し `onClick` に紐付け。`navigator.share()` が使えるブラウザではネイティブ共有シートを表示、非対応環境ではクリップボードにコピー。
+
+2. **質問カード（元 lines 901-916）**: 未解決・解決済み両方に `onClick={() => openQuestionDetail(q)}` を追加。
+
+3. **質問詳細ボトムシート（新規）**: クリックで開くシートに以下を実装：
+   - 質問本文・投稿者・日時・バッジを表示
+   - 既存の回答一覧（Supabase `post_comments` から取得）を表示
+   - 未解決質問には回答入力欄（Enter送信 / 送信ボタン対応）
+   - 回答送信後に回答件数をオプティミスティック更新
+
+型チェック（`tsc --noEmit`）エラーなし、リモートへの push も完了しています。
+
+```
+
+## 2026-10-25 00:10 — gh_portal #187 Timeline共有ボタン・質問カードの死UIハンドラ実装
+
+- 結果: 🔀 統合完了: task/gh_portal/187-timeline-ui → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
