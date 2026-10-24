@@ -24313,3 +24313,29 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-24 23:21 — gh_portal #145 createPortal直書きモーダル群をFocusTrapDialogに統一
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。実施内容のまとめ：
+
+**変更ファイル: `src/pages/Dashboard.tsx` と `src/pages/Chat.tsx`**
+
+置換した4つのモーダル：
+1. **Dashboard.tsx - `BookDetailModal`**: `createPortal` → `FocusTrapDialog`（center レイアウト、デフォルト `modal-overlay`/`modal` クラス）
+2. **Dashboard.tsx - `MeetingInviteModal`**: `createPortal` → `FocusTrapDialog`（ボトムシート用に `overlayStyle` で `flex + alignItems: flex-end` を指定）
+3. **Chat.tsx - `MeetingInviteModal`**: `createPortal` → `FocusTrapDialog`（同上）+ `FocusTrapDialog` import 追加
+4. **Chat.tsx - `ThreadPanel`**: `createPortal` → `FocusTrapDialog`（zIndex: 300 のボトムシート）
+
+これにより4つのモーダル全てに **Esc キーで閉じる**・**フォーカストラップ（Tab 循環）**・**`aria-modal="true"` / `role="dialog"`** が付与されました。コミット＆プッシュ済みです。
+
+```
+
+## 2026-10-24 23:21 — gh_portal #145 createPortal直書きモーダル群をFocusTrapDialogに統一
+
+- 結果: 🔀 統合完了: task/gh_portal/145-createportal-focustrapdi → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
