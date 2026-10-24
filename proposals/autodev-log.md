@@ -25094,3 +25094,35 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 To push the current branch and set the remote as upstream, use
 ）
 
+## 2026-10-25 00:19 — gh_portal #193 AdminMessagesテンプレートのハードコード配列をDB取得に統一
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH キーの権限エラーで push できませんでした。ローカルの SSH エージェントに鍵が登録されていないようです。ローカル環境で `ssh-add` を実行するか、GitHub のデプロイキーを設定する必要があります。
+
+---
+
+実装完了の内容をまとめます：
+
+**変更内容 (`src/pages/admin/AdminMessages.tsx`)**
+
+1. `MessageTemplate` インターフェース (`{ id: string; name: string }`) を追加
+2. `templates` state を追加
+3. `useAsyncLoad` の初期フェッチに `message_templates` テーブルへのクエリを追加（`sort_order` → `created_at` 順、`AdminStudents.tsx` の `MessageComposer` と同じ順序）
+4. ハードコードの `['宿題リマインド', 'ログイン促進', '模試申込のご案内', '面談のご連絡']` を `templates.map(t => ...)` に置き換え
+5. テンプレートが0件のとき「テンプレートが登録されていません」と表示するフォールバックを追加
+
+これで `AdminMessages` と `AdminStudents` の `MessageComposer` が同じ `message_templates` テーブルを参照するようになり、管理画面間でテンプレート一覧が一致します。
+
+git push は SSH 鍵の設定が必要なため実行できませんでした。ローカルで `ssh-add` してから push してください。
+
+```
+
+## 2026-10-25 00:19 — gh_portal #193 AdminMessagesテンプレートのハードコード配列をDB取得に統一
+
+- 結果: 🔀 統合完了: task/gh_portal/193-adminmessages-db → stu-ui（push-failed: fatal: The current branch stu-ui has no upstream branch.
+To push the current branch and set the remote as upstream, use
+）
+
