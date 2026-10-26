@@ -180,13 +180,13 @@ branch:
 - [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 rejected:2026-10-26T14:34 -->
 - [x] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->
 - [x] 【UI/UX/小】Material Symbolsフォントのdisplay=blockをdisplay=swapに変更 — index.html line 15のアイコンフォント読み込みパラメータがblockのためフォントロード完了まで全アイコンが非表示になり、AIチャットやContentsタブ等で表示が壊れて見える問題を解消する <!-- id:174 -->
-- [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 -->
+- [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 done:2026-10-26T14:40 -->
 - [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
 - [x] 【運用/小】.env.exampleファイルを作成し必要な環境変数をドキュメント化 — VITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYの存在が supabase.tsのrequireEnv()を読まないと判明しない <!-- id:177 -->
 - [x] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 -->
 - [x] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
-- [ ] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
-- [ ] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
+- [x] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
+- [x] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
 - [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 done:2026-10-25T00:04 -->
 - [ ] 【テスト/中】Vitestの初期セットアップ（vitest.config.ts・セットアップファイル・サンプルテスト）を追加 — package.jsonにテストフレームワークが一切なくユニットテスト実行基盤が存在しない <!-- id:183 rejected:2026-10-23T20:43 -->
 - [x] 【セキュリティ/小】completeOnboardingのDB永続化 — AuthContext.tsxのcompleteOnboardingがlocalStorageにのみ書き込みprofilesテーブルのonboarding_doneを更新しないため、ブラウザ変更やlocalStorageクリア時にオンボーディングがリセットされる（completeTutorialはDB書き込み済みなのに対し未対応） <!-- id:184 done:2026-10-25T00:01 -->
@@ -196,7 +196,7 @@ branch:
 - [x] 【運用/中】Dashboard・Chat間のScheduleTimeSelector等5件の重複コードをsharedモジュールに抽出 — MeetingInvitation型・MeetingStatus型・MEETING_HOURS定数・getPillForHour関数・ScheduleTimeSelectorコンポーネントが両ファイルにほぼ同一でコピペされている <!-- id:188 done:2026-10-25T00:18 -->
 - [x] 【機能/小】AdminPayroll MONTHSモジュールスコープ計算のuseMemo移行 — new Date()がモジュール読み込み時に1度だけ実行されるため、月境界を跨いでタブを開き続けると当月がドロップダウンに現れなくなる <!-- id:189 done:2026-10-25T00:14 -->
 - [x] 【UI/UX/小】AdminJobコメント入力のIMEコンポジション対応 — Chat.tsxでは対応済みだがAdminJobのSubmissionCommentThread・FieldCommentThread・FieldTaskChatではisComposingチェックがなく日本語変換確定時のEnterで誤送信される <!-- id:190 done:2026-10-25T00:13 -->
-- [ ] 【UI/UX/小】UniversityComboboxのキーボード操作・ARIA属性追加 — Onboarding.tsxの大学選択UIがonMouseDownのみで矢印キーナビゲーション不可、role="listbox"・aria-expanded・aria-activedescendant等のARIA属性も欠如している <!-- id:191 -->
+- [x] 【UI/UX/小】UniversityComboboxのキーボード操作・ARIA属性追加 — Onboarding.tsxの大学選択UIがonMouseDownのみで矢印キーナビゲーション不可、role="listbox"・aria-expanded・aria-activedescendant等のARIA属性も欠如している <!-- id:191 -->
 - [x] 【性能/小】utils.ts Intl.DateTimeFormatインスタンスのモジュールスコープ定数化 — fmtDateFull・fmtDateTimeが呼び出しごとにnew Intl.DateTimeFormatを生成しておりGC圧とインスタンス化コストが無駄に発生している <!-- id:192 done:2026-10-25T00:18 -->
 - [x] 【機能/小】AdminMessagesテンプレートのハードコード配列をDB取得に統一 — AdminMessages.tsxではテンプレート4件がハードコード配列だがAdminStudents.tsxではmessage_templatesテーブルから動的取得しており、管理画面間でテンプレート一覧が不一致になる <!-- id:193 done:2026-10-25T00:19 -->
 - [x] 【機能/小】AI_ROOMS の unread・preview・time ハードコード除去 — Chat.tsx の `AI_ROOMS` 定数（149–154行）から `unread: 2` などのサンプル値を削除し、未読数は `getRoomUnreadCounts` の実DB結果、preview/time はメッセージ最終行から動的に生成するよう修正する <!-- id:194 done:2026-10-25T00:29 -->

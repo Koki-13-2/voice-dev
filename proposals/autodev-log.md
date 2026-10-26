@@ -25233,3 +25233,27 @@ Please commit your changes or stash them before you merge.
 Aborting
 Merge with strategy ort failed.
 
+## 2026-10-26 14:40 — gh_portal #175 Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵のアクセス権がないためpushは失敗しましたが、コミットは完了しています。
+
+---
+
+実装完了です。
+
+**変更内容** (`src/pages/Contents.tsx` lines 162-174):
+- `<div className="tab-bar">` に `role="tablist"` と `aria-label="コンテンツ"` を追加
+- 各 `<button>` に `role="tab"`、`id="contents-tab-{id}"`、`aria-selected={tab === t.id}`、`aria-controls="contents-panel-{id}"` を追加
+
+Chat.tsxの既存実装と同じWAI-ARIAタブパターンで統一しました。`git push`はSSH鍵の権限不足で失敗しましたが、コミット自体は`345d210`として正常に作成されています。
+
+```
+
+## 2026-10-26 14:40 — gh_portal #175 Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/175-contents-tsx-role-tablis → stu-ui（pushed）
+
