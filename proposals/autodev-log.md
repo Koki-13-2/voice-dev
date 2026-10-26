@@ -25279,3 +25279,37 @@ SSH鍵の権限でpushが失敗しました。プッシュ以外は完了して�
 
 - 結果: 🔀 統合完了: task/gh_portal/174-material-symbols-display → stu-ui（pushed）
 
+## 2026-10-26 14:42 — gh_portal #191 UniversityComboboxのキーボード操作・ARIA属性追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限エラーでプッシュできませんでした（Windows側からWSLのSSH鍵へのアクセス権限問題）。コミット自体は正常に作成されています。
+
+実装内容をまとめます：
+
+## 完了した変更
+
+**`src/components/SchoolCombobox.tsx`**:
+- `activeIndex` ステートを追加してキーボードカーソル位置を管理
+- `handleKeyDown` ハンドラーを追加:
+  - `ArrowDown` / `ArrowUp`: リスト項目間を循環移動
+  - `Enter`: アクティブな項目を選択
+  - `Escape`: ドロップダウンを閉じる
+- ARIA属性を追加:
+  - input: `role="combobox"`, `aria-expanded`, `aria-haspopup="listbox"`, `aria-autocomplete="list"`, `aria-controls`, `aria-activedescendant`
+  - ul: `role="listbox"`, `id`
+  - li: `role="option"`, `aria-selected`, `id`
+
+**`src/styles/globals.css`**:
+- `.onboarding-combobox__item.is-active` にホバーと同じハイライトスタイルを追加
+
+プッシュはWindows側からWSLのSSH鍵にアクセスできないため失敗しましたが、コミット(`47ea1e6`)はローカルブランチに正常に記録されています。
+
+```
+
+## 2026-10-26 14:42 — gh_portal #191 UniversityComboboxのキーボード操作・ARIA属性追加
+
+- 結果: 🔀 統合完了: task/gh_portal/191-universitycombobox-aria → stu-ui（pushed）
+
