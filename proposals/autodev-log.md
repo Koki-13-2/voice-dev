@@ -25257,3 +25257,25 @@ Chat.tsxの既存実装と同じWAI-ARIAタブパターンで統一しました�
 
 - 結果: 🔀 統合完了: task/gh_portal/175-contents-tsx-role-tablis → stu-ui（pushed）
 
+## 2026-10-26 14:41 — gh_portal #174 Material Symbolsフォントのdisplay=blockをdisplay=swapに変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限でpushが失敗しました。プッシュ以外は完了しています。
+
+**結果まとめ：**
+
+タスクの目的である `display=block` → `display=swap` の変更は、**既にmainブランチに適用済み**でした。
+
+- git履歴を確認すると、`ded2a03`（perf: Material Symbolsサブセット化）で`display=block`が設定され、その後のicon-names関連タスクで`display=swap`に修正済み
+- 現在の `index.html` line 15-23 のMaterial Symbols URLは両方とも `&display=swap` を使用しており、問題は解消されている
+- SSH鍵の権限がないためリモートへのpushは失敗（ローカルコミットは作成済み）
+
+```
+
+## 2026-10-26 14:41 — gh_portal #174 Material Symbolsフォントのdisplay=blockをdisplay=swapに変更
+
+- 結果: 🔀 統合完了: task/gh_portal/174-material-symbols-display → stu-ui（pushed）
+
