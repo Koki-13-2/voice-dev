@@ -25336,3 +25336,30 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/173-icon-tsx-size-prop → stu-ui（pushed）
 
+## 2026-10-26 14:44 — gh_portal #177 .env.exampleファイルを作成し必要な環境変数をドキュメント化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の認証が通らないためプッシュできませんでしたが、コミット自体は完了しています。
+
+---
+
+完了しました。
+
+**実施内容:**
+- `.env.example` を新規作成し、以下の環境変数をドキュメント化しました:
+  - `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` — アプリ本体（`src/lib/supabase.ts`）が必要とする変数
+  - `SUPABASE_SERVICE_ROLE_KEY` — `scripts/` 配下のスクリプト実行時のみ必要な変数（公開厳禁の旨も注記）
+
+**コミット:** `e3cad74` `feat: .env.exampleを作成し必要な環境変数をドキュメント化`
+
+**プッシュ:** SSH鍵が設定されていないためリモートへのプッシュは失敗しました。SSH鍵を設定後に `git push -u origin task/gh_portal/177-env-example` を実行してください。
+
+```
+
+## 2026-10-26 14:44 — gh_portal #177 .env.exampleファイルを作成し必要な環境変数をドキュメント化
+
+- 結果: 🔀 統合完了: task/gh_portal/177-env-example → stu-ui（pushed）
+
