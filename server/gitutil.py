@@ -147,7 +147,9 @@ def list_worktrees(repo_path: str) -> list[dict]:
 
 def merge_branch(repo_path: str, branch: str, into: str = "") -> str:
     """タスクブランチを統合先ブランチへマージする。
-    戻り値: "merged" / "conflict" / "error: ..."。コンフリクト時は自動abortし作業ツリーを汚さない。
+    戻り値: "merged" / "conflict" / "dirty: ..." / "error: ..."。
+    conflict時は自動abortし作業ツリーを汚さない。dirtyは統合先ワークツリーの
+    未コミット変更がマージ対象と重なりgitが拒否したケース（マージ自体は未開始）。
     """
     try:
         into = into or get_current_branch(repo_path)
@@ -161,8 +163,15 @@ def merge_branch(repo_path: str, branch: str, into: str = "") -> str:
         r = _run_git(["merge", "--no-ff", "--no-edit", branch], repo_path, timeout=60)
         if r.returncode == 0:
             return "merged"
-        _run_git(["merge", "--abort"], repo_path)
-        return "conflict"
+        # MERGE_HEADがあれば本物のコンフリクト（マージ開始済み）。なければ未開始の拒否
+        in_merge = _run_git(["rev-parse", "-q", "--verify", "MERGE_HEAD"], repo_path)
+        if in_merge.returncode == 0:
+            _run_git(["merge", "--abort"], repo_path)
+            return "conflict"
+        msg = (r.stderr.strip() or r.stdout.strip())[:300]
+        if "commit your changes or stash" in msg or "would be overwritten" in msg:
+            return f"dirty: {msg}"
+        return f"error: {msg}"
     except Exception as e:
         return f"error: {e}"
 

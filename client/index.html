@@ -3463,10 +3463,9 @@ async function mergeWorktree(branch, taskId) {
     if (body.ok) {
       showToast(`マージしました（${body.push || ''}）`, 'success');
       showProposalScreen(projectPath, projectName);
-    } else if (res.status === 409) {
-      showToast('コンフリクトのため自動マージできません。手動で解決してください', 'error');
     } else {
-      showToast(body.error || 'マージに失敗しました', 'error');
+      const msg = body.error || 'マージに失敗しました';
+      showToast(body.detail ? `${msg}：${body.detail}` : msg, 'error');
     }
   } catch(e) { showToast('マージに失敗しました', 'error'); }
 }

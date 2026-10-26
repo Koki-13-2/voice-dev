@@ -982,7 +982,17 @@ async def autodev_merge(data: dict):
             await asyncio.to_thread(gitutil.remove_worktree, app_path, task_id)
         push_result = await asyncio.to_thread(gitutil.push, app_path)
         return JSONResponse({"ok": True, "result": "merged", "push": push_result})
-    return JSONResponse({"error": result}, status_code=409 if result == "conflict" else 400)
+    if result == "conflict":
+        return JSONResponse(
+            {"error": "コンフリクトのため自動マージできません。手動で解決してください"},
+            status_code=409)
+    if result.startswith("dirty:"):
+        return JSONResponse(
+            {"error": "統合先の作業ツリーに未コミットの変更があるためマージできません。"
+                      "先にコミットまたはstashしてください",
+             "detail": result[6:].strip()},
+            status_code=409)
+    return JSONResponse({"error": result}, status_code=400)
 
 
 # ── セッションストア ─────────────────────────────────
