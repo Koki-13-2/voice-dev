@@ -25363,3 +25363,26 @@ SSH鍵の認証が通らないためプッシュできませんでしたが、�
 
 - 結果: 🔀 統合完了: task/gh_portal/177-env-example → stu-ui（pushed）
 
+## 2026-10-26 14:45 — gh_portal #178 Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵の権限エラーでプッシュできませんでした（ローカル環境のSSH設定の問題）。
+
+**実装完了のサマリー:**
+
+- **変更箇所:** `src/pages/Chat.tsx:754-761` の `getRoomUnreadCounts` 関数
+- **変更内容:** Supabaseクエリに `.order('created_at', { ascending: false }).limit(500)` を追加
+- **効果:** 全ルームの全メッセージを無制限にフェッチする問題を解消。最新500件に限定することでクライアント帯域・メモリ消費を抑制
+- **設計根拠:** 未読カウントはバッジ表示目的（通常 99+ 上限）のため、最新500件で十分なカバレッジ。メッセージ蓄積が増えても性能劣化しない
+
+プッシュはSSH鍵の権限エラーにより失敗しました（リモートへのアクセス権設定が必要です）。
+
+```
+
+## 2026-10-26 14:45 — gh_portal #178 Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/178-chat-tsx-getroomunreadco → stu-ui（pushed）
+

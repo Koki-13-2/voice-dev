@@ -183,7 +183,7 @@ branch:
 - [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 done:2026-10-26T14:40 -->
 - [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
 - [x] 【運用/小】.env.exampleファイルを作成し必要な環境変数をドキュメント化 — VITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYの存在が supabase.tsのrequireEnv()を読まないと判明しない <!-- id:177 done:2026-10-26T14:44 -->
-- [x] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 -->
+- [x] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 done:2026-10-26T14:45 -->
 - [x] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
 - [x] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
 - [x] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
