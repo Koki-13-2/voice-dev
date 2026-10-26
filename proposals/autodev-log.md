@@ -25206,3 +25206,30 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/194-ai-rooms-unread-preview → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-10-26 14:37 — gh_portal #158 Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実施内容:**
+
+`src/App.tsx` の `ProtectedRoute()` 関数に `LifePatternProvider`、`MeetingRecordProvider`、`MeetingFeedbackProvider`、`TutorialProvider` を移動しました。
+
+- **変更前**: 4つの Provider が `App()` のトップレベル（`AuthProvider` 直下）でアプリ全体を囲んでいた → ログイン・登録画面でも不要な DB フェッチが発火
+- **変更後**: `ProtectedRoute` が認証・オンボーディング完了を確認した後にのみ Provider をマウント → 未認証ユーザーへのフェッチを排除
+
+コミット `eafffcd` を作成し、`origin` へのプッシュも完了しました。
+
+```
+
+## 2026-10-26 14:37 — gh_portal #158 Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動
+
+- 結果: ⚠ マージ失敗: task/gh_portal/158-context-provider-lifepat → stu-ui: dirty: error: Your local changes to the following files would be overwritten by merge:
+	src/App.tsx
+Please commit your changes or stash them before you merge.
+Aborting
+Merge with strategy ort failed.
+

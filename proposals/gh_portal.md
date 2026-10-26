@@ -163,7 +163,7 @@ branch:
 - [x] 【性能/小】MathMarkdownチャンク（431KB）のmanualChunks分割 — vite.config.tsにbuild.rollupOptions.output.manualChunksを追加し、katex・react-markdown・rehype系を独立ベンダーチャンクに分離してキャッシュ効率を改善する <!-- id:155 done:2026-10-24T23:40 -->
 - [x] 【機能/小】Toast共通コンポーネントにsuccess/infoバリアント追加 — 現在error固定のclassNameにtype propを追加し、成功通知（保存完了など）を緑系スタイルとrole="status"で表示可能にする <!-- id:156 done:2026-07-18T21:13 -->
 - [x] 【UI/UX/小】--color-muted（#888888）のWCAG AAコントラスト比修正 — 白背景に対し3.54:1で基準未達のため、#717171程度に変更して4.5:1を確保する <!-- id:157 done:2026-07-18T21:18 -->
-- [ ] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 -->
+- [x] 【性能/小】Context Provider群（LifePattern/MeetingRecord/MeetingFeedback/Tutorial）をProtectedRoute内に移動 — 現在ログイン・登録画面を含む全ルートを囲んでおり、未認証ユーザーでも不要なDBフェッチが発火するため、認証済みルート内でのみマウントする <!-- id:158 done:2026-10-26T14:37 -->
 - [x] 【セキュリティ/小】loginWithGoogleの連打防止ガード追加 — 現在signInWithOAuthに二重クリック防止がなく、複数のOAuthリダイレクトが同時発行される可能性があるため、pending状態フラグでボタンをdisableにする <!-- id:159 done:2026-10-24T23:44 -->
 - [x] 【機能/小】VideoDetail動画読み込みエラーのフォールバックUI追加 — video要素にonErrorハンドラがなく、403/404や非対応フォーマット時に黒い矩形が表示されるだけなので、エラーメッセージとリトライボタンを表示する <!-- id:160 done:2026-10-24T23:44 -->
 - [x] 【セキュリティ/中】saveStudentSubjectsのdelete→insertをSupabase RPCトランザクションに変更 — 現在delete後にinsertが失敗すると生徒の受験科目が全消失するため、DB側でBEGIN/COMMITを持つRPC関数に置き換えて原子性を確保する <!-- id:161 done:2026-10-24T23:46 -->
@@ -177,14 +177,14 @@ branch:
 - [x] 【セキュリティ/小】Google Fonts CDN読み込みにSRI（Subresource Integrity）またはCSP font-srcを設定 — 外部CDNからのフォント読み込みに対する改竄検知・制限がなく、悪意あるフォント差し替えリスクがある <!-- id:169 done:2026-10-25T00:01 -->
 - [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 rejected:2026-10-23T21:01 -->
 - [x] 【機能/小】Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示 — icon_names漏れやタイポ時にも空白や文字化けではなくデフォルトアイコン(help_outline等)を表示させる <!-- id:171 done:2026-07-18T21:09 -->
-- [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 -->
-- [ ] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->
-- [ ] 【UI/UX/小】Material Symbolsフォントのdisplay=blockをdisplay=swapに変更 — index.html line 15のアイコンフォント読み込みパラメータがblockのためフォントロード完了まで全アイコンが非表示になり、AIチャットやContentsタブ等で表示が壊れて見える問題を解消する <!-- id:174 -->
-- [ ] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 -->
-- [ ] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
-- [ ] 【運用/小】.env.exampleファイルを作成し必要な環境変数をドキュメント化 — VITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYの存在が supabase.tsのrequireEnv()を読まないと判明しない <!-- id:177 -->
-- [ ] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 -->
-- [ ] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
+- [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 rejected:2026-10-26T14:34 -->
+- [x] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->
+- [x] 【UI/UX/小】Material Symbolsフォントのdisplay=blockをdisplay=swapに変更 — index.html line 15のアイコンフォント読み込みパラメータがblockのためフォントロード完了まで全アイコンが非表示になり、AIチャットやContentsタブ等で表示が壊れて見える問題を解消する <!-- id:174 -->
+- [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 -->
+- [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
+- [x] 【運用/小】.env.exampleファイルを作成し必要な環境変数をドキュメント化 — VITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYの存在が supabase.tsのrequireEnv()を読まないと判明しない <!-- id:177 -->
+- [x] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 -->
+- [x] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
 - [ ] 【運用/小】examGuard.tsのモジュールスコープlet変数をReact useRefに移行 — 複数コンポーネントから同時にガードを設定した場合に後勝ちで上書きされ先の設定が消える競合を防止する <!-- id:180 -->
 - [ ] 【セキュリティ/小】AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加 — profiles更新・upsert失敗が完全にサイレント無視されており本番障害の検知が不可能になっている <!-- id:181 -->
 - [x] 【性能/小】Chat.tsx handleAiSendのsetTimeout（line 1599）にコンポーネントアンマウント時のクリーンアップを追加 — 画面遷移後に不要なsetAiMessagesとSupabase insertが実行される問題を防止する <!-- id:182 done:2026-10-25T00:04 -->
