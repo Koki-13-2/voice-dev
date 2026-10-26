@@ -25445,3 +25445,43 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/181-authcontext-tsx-catch-li → stu-ui（pushed）
 
+## 2026-10-26 14:54 — gh_portal #180 examGuard.tsのモジュールスコープlet変数をReact useRefに移行
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。変更内容をまとめます。
+
+---
+
+**実装内容**
+
+モジュールスコープの `let guard: GuardCallback | null` を React Context + `useRef<Map<symbol, GuardCallback>>` に移行しました。
+
+**変更ファイル (5件)**
+
+| ファイル | 変更内容 |
+|---|---|
+| `src/lib/examGuard.ts` → `examGuard.tsx` | モジュール変数を廃止。`ExamGuardProvider`・`useExamGuardSet()`・`useExamGuardCheck()` を実装 |
+| `src/App.tsx` | `<ExamGuardProvider>` で Suspense をラップ |
+| `src/components/TabBar.tsx` | `examGuard.check` → `useExamGuardCheck()` フックに変更 |
+| `src/pages/Practice.tsx` | `examGuard.set` → `useExamGuardSet()` フックに変更 |
+
+**競合防止の仕組み**
+
+- 各コンポーネントが `useExamGuardSet()` を呼ぶと、`Symbol()` で一意なキーが割り当てられ `Map` に登録される
+- 複数コンポーネントが同時にガードを設定しても、それぞれ別キーで共存（後勝ち上書きなし）
+- `useExamGuardCheck()` はマップ内の全ガードをチェーン実行する
+- コンポーネントのアンマウント時にキーを自動削除
+
+```
+
+## 2026-10-26 14:54 — gh_portal #180 examGuard.tsのモジュールスコープlet変数をReact useRefに移行
+
+- 結果: ⚠ マージ失敗: task/gh_portal/180-examguard-ts-let-react-u → stu-ui: dirty: error: Your local changes to the following files would be overwritten by merge:
+	src/App.tsx
+Please commit your changes or stash them before you merge.
+Aborting
+Merge with strategy ort failed.
+
