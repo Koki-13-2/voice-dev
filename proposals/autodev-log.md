@@ -25313,3 +25313,26 @@ SSH鍵の権限エラーでプッシュできませんでした（Windows側か�
 
 - 結果: 🔀 統合完了: task/gh_portal/191-universitycombobox-aria → stu-ui（pushed）
 
+## 2026-10-26 14:43 — gh_portal #173 Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了しました。
+
+**変更内容（`src/components/Icon.tsx`）:**
+
+- `ICON_SIZES = { sm: 16, md: 20, lg: 36 }` 定数をエクスポート
+- `size` prop が数値だけでなく `'sm' | 'md' | 'lg'` のトークンも受け付けるよう型を拡張
+- デフォルトサイズを `24` → `'md'`（20px）に変更（全呼び出し元は明示的に数値を渡しているため既存コードへの影響なし）
+- 既存の数値指定は完全に後方互換
+
+今後は `<Icon name="arrow_back" size="md" />` や `<Icon name="history" size={ICON_SIZES.lg} />` のように用途別定数で統一できます。
+
+```
+
+## 2026-10-26 14:43 — gh_portal #173 Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保
+
+- 結果: 🔀 統合完了: task/gh_portal/173-icon-tsx-size-prop → stu-ui（pushed）
+

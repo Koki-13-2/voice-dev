@@ -178,7 +178,7 @@ branch:
 - [ ] 【テスト/中】全画面のアイコン表示をスクリーンショット比較で検証するビジュアルリグレッションテストを追加 — Playwrightでアイコンを含む主要画面をキャプチャし文字化けの再発を自動検出する <!-- id:170 rejected:2026-10-23T21:01 -->
 - [x] 【機能/小】Icon.tsxにフォールバックpropsを追加し未定義グリフ時に代替アイコンを表示 — icon_names漏れやタイポ時にも空白や文字化けではなくデフォルトアイコン(help_outline等)を表示させる <!-- id:171 done:2026-07-18T21:09 -->
 - [ ] 【性能/小】Material Symbols Roundedフォントのサブセットをセルフホスティングに切り替え — CDN依存を排除しオフライン環境やCDN障害時にもアイコンが表示されるようにする <!-- id:172 rejected:2026-10-26T14:34 -->
-- [x] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 -->
+- [x] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 done:2026-10-26T14:43 -->
 - [x] 【UI/UX/小】Material Symbolsフォントのdisplay=blockをdisplay=swapに変更 — index.html line 15のアイコンフォント読み込みパラメータがblockのためフォントロード完了まで全アイコンが非表示になり、AIチャットやContentsタブ等で表示が壊れて見える問題を解消する <!-- id:174 done:2026-10-26T14:41 -->
 - [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 done:2026-10-26T14:40 -->
 - [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
