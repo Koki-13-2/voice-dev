@@ -25386,3 +25386,21 @@ SSH鍵の権限エラーでプッシュできませんでした（ローカル�
 
 - 結果: 🔀 統合完了: task/gh_portal/178-chat-tsx-getroomunreadco → stu-ui（pushed）
 
+## 2026-10-26 14:45 — gh_portal #176 Supabaseクライアント初期化にauth flowType
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容:** `src/lib/supabase.ts:15` の `createClient` 呼び出しに `auth: { flowType: 'pkce' }` オプションを追加しました。
+
+PKCEフロー（Proof Key for Code Exchange）を明示的に指定することで、Google OAuthの認可コードがURLフラグメント（`#`以降）に含まれなくなり、ブラウザ履歴やリファラーヘッダー経由でのトークン漏洩リスクを排除します。コミット・プッシュ済みです。
+
+```
+
+## 2026-10-26 14:45 — gh_portal #176 Supabaseクライアント初期化にauth flowType
+
+- 結果: 🔀 統合完了: task/gh_portal/176-supabase-auth-flowtype → stu-ui（pushed）
+

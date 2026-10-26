@@ -181,7 +181,7 @@ branch:
 - [x] 【UI/UX/小】Icon.tsxのsize propにデフォルト値を統一しアイコンサイズの一貫性を確保 — 各画面でfontSizeを個別指定しており14px〜48pxまでばらつきがあるため、用途別の定数(sm/md/lg)を定義する <!-- id:173 done:2026-10-26T14:43 -->
 - [x] 【UI/UX/小】Material Symbolsフォントのdisplay=blockをdisplay=swapに変更 — index.html line 15のアイコンフォント読み込みパラメータがblockのためフォントロード完了まで全アイコンが非表示になり、AIチャットやContentsタブ等で表示が壊れて見える問題を解消する <!-- id:174 done:2026-10-26T14:41 -->
 - [x] 【UI/UX/小】Contents.tsxタブバーにrole="tablist"・aria-selected属性を追加 — Chat.tsxには実装済みのWAI-ARIAタブパターンがContents.tsx（line 162-174）には欠落しておりスクリーンリーダーがタブを認識できない <!-- id:175 done:2026-10-26T14:40 -->
-- [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 -->
+- [x] 【セキュリティ/小】Supabaseクライアント初期化にauth flowType — 'pkce'を明示設定 — supabase.tsのcreateClientがデフォルトのimplicitフローを使用しておりGoogle OAuth認可コードがURLフラグメント経由で漏洩するリスクがある <!-- id:176 done:2026-10-26T14:45 -->
 - [x] 【運用/小】.env.exampleファイルを作成し必要な環境変数をドキュメント化 — VITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYの存在が supabase.tsのrequireEnv()を読まないと判明しない <!-- id:177 done:2026-10-26T14:44 -->
 - [x] 【性能/中】Chat.tsx getRoomUnreadCountsクエリに.limit()句を追加 — 全ルームの全メッセージを無制限にfetchしておりメッセージ蓄積に伴いクライアント帯域・メモリ消費が際限なく増大する（line 672-693） <!-- id:178 done:2026-10-26T14:45 -->
 - [x] 【機能/小】Chat.tsxのDate.now()メッセージID生成をcrypto.randomUUID()に置換 — 同一ミリ秒に複数メッセージ送信時にReactキーが衝突しUI表示が壊れるバグを防止する（line 1373等8箇所） <!-- id:179 -->
