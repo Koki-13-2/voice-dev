@@ -25420,3 +25420,28 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/179-chat-tsx-date-now-id-cry → stu-ui（pushed）
 
+## 2026-10-26 14:51 — gh_portal #181 AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容:**
+
+`src/lib/AuthContext.tsx` に `reportError` のインポートを追加し、profiles更新の4つの空catchブロックすべてに呼び出しを追加しました：
+
+1. **onboarding_done リトライ**（~238行目）: `reportError('[AuthContext] profiles onboarding_done retry failed:', e)`
+2. **tutorial_done リトライ**（~245行目）: `reportError('[AuthContext] profiles tutorial_done retry failed:', e)`
+3. **completeTutorial**（~304行目）: `reportError('[AuthContext] profiles tutorial_done update failed:', e)`
+4. **completeOnboarding**（~312行目）: `reportError('[AuthContext] profiles onboarding_done update failed:', e)`
+
+いずれもフローは止めず（try/catch構造は維持）、失敗時に `console.error`（将来はSentry等）でエラーを記録するようになりました。コミット・プッシュ済みです。
+
+```
+
+## 2026-10-26 14:51 — gh_portal #181 AuthContext.tsxの空catchブロック（line 192, 238）にreportError呼び出しを追加
+
+- 結果: 🔀 統合完了: task/gh_portal/181-authcontext-tsx-catch-li → stu-ui（pushed）
+
