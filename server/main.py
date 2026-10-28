@@ -1137,10 +1137,16 @@ async def create_session(data: dict):
 
 @app.get("/api/sessions/{session_id}/log")
 async def get_session_log(session_id: str, limit: int = 500):
-    """セッションのチャットログ（履歴復元用）。runningで進行中タスクの有無も返す"""
+    """セッションのチャットログ（履歴復元用）。runningで進行中タスクの有無、
+    project_path等で過去セッション再開時のプロジェクト復元を可能にする"""
+    meta = sessions.get(session_id)
     return JSONResponse({
         "entries": chatlog_store.read(session_id, limit=limit),
         "running": task_manager.is_running(session_id),
+        "name": meta.name if meta else None,
+        "project_path": meta.project_path if meta else "",
+        "project_name": (Path(meta.project_path).name
+                         if meta and meta.project_path else ""),
     })
 
 

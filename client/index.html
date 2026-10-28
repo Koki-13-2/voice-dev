@@ -712,6 +712,76 @@
     vertical-align: middle;
   }
 
+  /* ============ ピッカー内 過去チャット一覧 ============ */
+  .picker-sessions { margin-top: 28px; }
+  .picker-sessions-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: .02em;
+  }
+  .sess-empty {
+    color: var(--muted-2, var(--muted));
+    font-size: 12px;
+    padding: 10px 2px;
+  }
+  .sess-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .sess-actions {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    display: flex;
+  }
+  .sess-act-btn {
+    width: 68px;
+    border: none;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .sess-act-btn.stop { background: #a66f00; }
+  .sess-act-btn.del { background: #b03030; }
+  .sess-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 11px 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), var(--surface);
+    cursor: pointer;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform;
+  }
+  .sess-row-info { min-width: 0; flex: 1; }
+  .sess-row-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sess-row-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sess-row-hint { color: var(--muted); font-size: 14px; flex-shrink: 0; opacity: .5; }
+
   .picker-back {
     background: none;
     border: none;
@@ -2398,10 +2468,162 @@ async function showWorkspacePicker() {
       ${icons[i]}${ws.workspace}
     </button>`
   ).join('');
+  // 開発モードのみ: 最上位フォルダ表示時に別枠で過去チャット一覧を表示
+  const sessionsSection = currentMode === 'dev'
+    ? `<div class="picker-sessions">
+        <div class="picker-sessions-title">💬 過去のチャット <span style="font-weight:400">（タップで再開 / 左スワイプで停止・削除）</span></div>
+        <div id="picker-sessions-list"><div class="sess-empty">読み込み中...</div></div>
+      </div>`
+    : '';
   setPicker(`
     <div class="picker-title">ワークスペースを選択</div>
-    <div class="workspace-grid">${btns}</div>`);
+    <div class="workspace-grid">${btns}</div>
+    ${sessionsSection}`);
   setInputEnabled(false);
+  if (currentMode === 'dev') renderPickerSessions();
+}
+
+// ---- ピッカー内 過去チャット一覧 ----
+async function renderPickerSessions() {
+  const wrap = document.getElementById('picker-sessions-list');
+  if (!wrap) return;
+  let items;
+  try {
+    items = await fetch('/api/sessions').then(r => r.json());
+  } catch (e) {
+    wrap.innerHTML = '<div class="sess-empty">読み込みに失敗しました</div>';
+    return;
+  }
+  // チャットログがあるか実行中のセッションのみ表示（空セッションは除外）
+  items = (Array.isArray(items) ? items : []).filter(s => s.has_log || s.running);
+  if (!document.getElementById('picker-sessions-list')) return; // 画面遷移済み
+  if (!items.length) {
+    wrap.innerHTML = '<div class="sess-empty">過去のチャットはありません</div>';
+    return;
+  }
+  wrap.innerHTML = items.map(s => {
+    const isCurrent = s.id === SESSION_ID;
+    const label = s.name || s.project_name || ('セッション ' + s.id.slice(0, 8));
+    return `<div class="sess-item" data-id="${escAttr(s.id)}">
+      <div class="sess-actions">
+        ${s.running ? `<button class="sess-act-btn stop" onclick="stopPickerSession('${escAttr(s.id)}')">⏸ 停止</button>` : ''}
+        <button class="sess-act-btn del" onclick="deletePickerSession('${escAttr(s.id)}')">🗑 削除</button>
+      </div>
+      <div class="sess-row">
+        <div class="sess-row-info">
+          <div class="sess-row-name">${s.running ? '🟢 ' : '⚪ '}${escHtml(label)}${isCurrent ? ' <span style="color:var(--muted);font-weight:400">（このタブ）</span>' : ''}</div>
+          <div class="sess-row-sub">${escHtml(s.project_name || 'プロジェクト未選択')} ・ ${fmtRelTime(s.last_active)}</div>
+        </div>
+        <span class="sess-row-hint">‹</span>
+      </div>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.sess-item').forEach(attachSessSwipe);
+}
+
+let _openSessItem = null; // スワイプで開いている行（同時に1つのみ）
+
+function closeSessItem(item) {
+  const row = item?.querySelector('.sess-row');
+  if (row) {
+    row.style.transition = 'transform .18s ease';
+    row.style.transform = 'translateX(0)';
+  }
+  if (_openSessItem === item) _openSessItem = null;
+}
+
+function attachSessSwipe(item) {
+  const row = item.querySelector('.sess-row');
+  const id = item.dataset.id;
+  let startX = 0, startY = 0, baseX = 0, dir = null, dragging = false;
+
+  row.addEventListener('pointerdown', (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    baseX = _openSessItem === item ? -item.querySelector('.sess-actions').offsetWidth : 0;
+    dir = null;
+    dragging = false;
+  });
+
+  row.addEventListener('pointermove', (e) => {
+    if (e.buttons === 0 && e.pointerType === 'mouse') return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (dir === null) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+      if (dir === 'h') {
+        dragging = true;
+        try { row.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+    }
+    if (dir !== 'h') return;
+    const w = item.querySelector('.sess-actions').offsetWidth;
+    const x = Math.min(0, Math.max(-w, baseX + dx));
+    row.style.transition = 'none';
+    row.style.transform = `translateX(${x}px)`;
+  });
+
+  row.addEventListener('pointerup', (e) => {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (!dragging && Math.abs(dx) < 6 && Math.abs(dy) < 6) {
+      // タップ: 他の行が開いていれば閉じるだけ。そうでなければセッションを開く
+      if (_openSessItem && _openSessItem !== item) { closeSessItem(_openSessItem); return; }
+      if (_openSessItem === item) { closeSessItem(item); return; }
+      openPickerSession(id);
+      return;
+    }
+    if (!dragging) return;
+    const w = item.querySelector('.sess-actions').offsetWidth;
+    const x = Math.min(0, Math.max(-w, baseX + dx));
+    row.style.transition = 'transform .18s ease';
+    if (x < -w / 2) {
+      row.style.transform = `translateX(${-w}px)`;
+      if (_openSessItem && _openSessItem !== item) closeSessItem(_openSessItem);
+      _openSessItem = item;
+    } else {
+      row.style.transform = 'translateX(0)';
+      if (_openSessItem === item) _openSessItem = null;
+    }
+  });
+
+  row.addEventListener('pointercancel', () => {
+    if (dragging) closeSessItem(item);
+  });
+}
+
+function openPickerSession(id) {
+  // 既存のセッション切替機構（?session_id=）でログ復元・会話継続・実行中タスク再接続を行う
+  location.href = location.origin + '/?session_id=' + encodeURIComponent(id);
+}
+
+async function stopPickerSession(id) {
+  try {
+    await fetch(`/api/sessions/${encodeURIComponent(id)}/cancel`, { method: 'POST' });
+    showToast('セッションを停止しました', 'success');
+  } catch (e) {
+    showToast('停止に失敗しました', 'error');
+  }
+  _openSessItem = null;
+  renderPickerSessions();
+}
+
+async function deletePickerSession(id) {
+  const isCurrent = id === SESSION_ID;
+  const msg = isCurrent
+    ? 'このタブで使用中のセッションです。削除すると会話がリセットされます。削除しますか？'
+    : 'このセッションを削除しますか？';
+  if (!confirm(msg)) return;
+  try {
+    await fetch(`/api/sessions/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    showToast('セッションを削除しました', 'success');
+    if (isCurrent && wsReady) ws.send(JSON.stringify({ type: 'reset' }));
+  } catch (e) {
+    showToast('削除に失敗しました', 'error');
+  }
+  _openSessItem = null;
+  renderPickerSessions();
 }
 
 // Step2: プロジェクト選択
@@ -4014,6 +4236,20 @@ async function restoreHistory() {
   } catch(e) { return; }
   const entries = res.entries || [];
   if (!entries.length) return;
+
+  // ?session_id= で過去セッションを明示的に開いた場合（開発モード）:
+  // プロジェクト選択状態を復元し、ピッカーの代わりにチャット画面で続きの会話を可能にする
+  const explicitOpen = new URLSearchParams(location.search).has('session_id');
+  const resumeProject = explicitOpen && currentMode === 'dev' && res.project_path;
+  if (resumeProject) {
+    projectPath = res.project_path;
+    projectName = res.project_name || res.project_path.split('/').pop();
+    localStorage.setItem('projectPath', projectPath);
+    localStorage.setItem('projectName', projectName);
+    document.getElementById('messages').innerHTML = ''; // ピッカーを除去
+    document.getElementById('quick-actions').style.display = 'flex';
+  }
+
   const divider = document.createElement('div');
   divider.style.cssText = 'text-align:center;color:var(--muted);font-size:11px;margin:10px 0;opacity:.7';
   divider.textContent = '── 以前の会話ログ ──';
@@ -4024,6 +4260,13 @@ async function restoreHistory() {
   divider2.style.cssText = divider.style.cssText;
   divider2.textContent = '── ここから新しい会話 ──';
   document.getElementById('messages').appendChild(divider2);
+
+  if (resumeProject) {
+    const icon = PROJ_ICONS[projectName] || '📁';
+    addMessage('ai', `${icon} **${projectName}** のセッションを再開しました。続きの会話ができます。`);
+    // 実行中タスクがある場合はWS再接続時のバッファ配信（thinking）に任せて入力は無効のまま
+    if (!res.running) setInputEnabled(true);
+  }
   scrollBottom();
 }
 
