@@ -1,7 +1,11 @@
 ---
 app: gh_portal
 app_path: /home/kokinagano/hennyujuku/gh_portal
-branch: 
+branch: stu-ui
+# 実装済み (2026-10-29): Supabase の improvement_proposals / user_feedbacks テーブルから
+#   ユーザー投稿提案を voice-dev の提案リストに取り込む機能を追加。
+#   server/main.py POST /api/proposals/import-user-feedback
+#   client/index.html 「👤 意見取り込む」ボタン + importUserFeedback()
 ---
 
 # gh_portal 改善提案

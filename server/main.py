@@ -921,6 +921,70 @@ async def set_proposal_branch(data: dict):
     return JSONResponse({"ok": True, "result": "branch-cleared" if not branch else "saved"})
 
 
+@app.post("/api/proposals/import-user-feedback")
+async def import_user_feedback(data: dict):
+    import httpx
+    app_path = data.get("app_path", "")
+    env = secrets_store.load_env("gh_portal")
+    supabase_url = env.get("SUPABASE_URL", "https://drmoefhhovpzmuzdqhax.supabase.co")
+    service_role_key = env.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    if not service_role_key:
+        return JSONResponse(
+            {"error": "gh_portal のシークレットに SUPABASE_SERVICE_ROLE_KEY が未設定です。シークレットタブから登録してください。"},
+            status_code=400,
+        )
+    headers = {
+        "apikey": service_role_key,
+        "Authorization": f"Bearer {service_role_key}",
+        "Content-Type": "application/json",
+    }
+    new_tasks = []
+    async with httpx.AsyncClient(timeout=20) as client:
+        r1 = await client.post(
+            f"{supabase_url}/rest/v1/rpc/get_improvement_proposals_admin",
+            headers=headers, json={},
+        )
+        if r1.status_code == 200:
+            for row in r1.json():
+                content = (row.get("content") or "").strip()
+                if not content:
+                    continue
+                tab = row.get("tab") or "other"
+                first_line = content.split("\n")[0]
+                title = (first_line[:57] + "…") if len(first_line) > 57 else first_line
+                desc = content
+                image_url = row.get("image_url")
+                if image_url:
+                    desc += f" | 📷 {image_url}"
+                new_tasks.append({"angle": f"ユーザー提案/{tab}/小", "title": title, "desc": desc})
+        r2 = await client.post(
+            f"{supabase_url}/rest/v1/rpc/get_user_feedbacks_admin",
+            headers=headers, json={},
+        )
+        if r2.status_code == 200:
+            for row in r2.json():
+                content = (row.get("content") or "").strip()
+                if not content:
+                    continue
+                first_line = content.split("\n")[0]
+                title = (first_line[:57] + "…") if len(first_line) > 57 else first_line
+                desc = content
+                image_url = row.get("image_url")
+                if image_url:
+                    desc += f" | 📷 {image_url}"
+                new_tasks.append({"angle": "ユーザーご意見/小", "title": title, "desc": desc})
+    total = len(new_tasks)
+    if total == 0:
+        return JSONResponse({"added": 0, "skipped": 0, "total": 0})
+    app_name = Path(app_path).name
+    added = proposal_store.add_tasks(app_path, new_tasks)
+    if added > 0:
+        await gitutil.commit_and_push(
+            [str(proposal_store._file_for(app_name))],
+            f"proposals: {app_name} にユーザーフィードバック {added}件を取り込み")
+    return JSONResponse({"added": added, "skipped": total - added, "total": total})
+
+
 @app.get("/api/autodev")
 async def get_autodev():
     return JSONResponse(autodev.status())
