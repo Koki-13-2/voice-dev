@@ -3481,7 +3481,7 @@ async function showProposalScreen(projPath, projName) {
     </select>
     <button class="btn-new-file" onclick="generateProposals()">🤖 提案を生成</button>
     <button class="btn-new-file" onclick="runCheckedProposals()" title="チェック済みタスクをworktree分離で即時並列実行">▶ 並列実行</button>
-    <button class="btn-new-file" onclick="importUserFeedback()" title="Supabase からユーザー投稿の改善提案・フィードバックを取り込む">👤 意見取り込む</button>
+    <button class="btn-new-file" onclick="importUserFeedback()" title="Supabase からユーザー投稿の改善提案・フィードバックを取り込む">👤 意見取込</button>
   </div>
   ${branchBarHtml}
   <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
@@ -3522,7 +3522,7 @@ function proposalRowHtml(t, variant) {
 async function importUserFeedback() {
   if (!projectPath) return;
   const btn = document.querySelector('#proposal-screen .btn-new-file[onclick="importUserFeedback()"]');
-  if (btn) { btn.disabled = true; btn.textContent = '👤 取り込み中…'; }
+  if (btn) { btn.disabled = true; btn.textContent = '👤 取込中…'; }
   try {
     const res = await fetch('/api/proposals/import-user-feedback', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3538,7 +3538,7 @@ async function importUserFeedback() {
     }
   } catch(e) { showToast('取り込みに失敗しました', 'error'); }
   finally {
-    if (btn) { btn.disabled = false; btn.textContent = '👤 意見取り込む'; }
+    if (btn) { btn.disabled = false; btn.textContent = '👤 意見取込'; }
   }
 }
 

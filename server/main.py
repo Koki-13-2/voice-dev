@@ -924,22 +924,45 @@ async def set_proposal_branch(data: dict):
 @app.post("/api/proposals/import-user-feedback")
 async def import_user_feedback(data: dict):
     import httpx
+    from dotenv import dotenv_values
     app_path = data.get("app_path", "")
-    env = secrets_store.load_env("gh_portal")
-    supabase_url = env.get("SUPABASE_URL", "https://drmoefhhovpzmuzdqhax.supabase.co")
-    service_role_key = env.get("SUPABASE_SERVICE_ROLE_KEY", "")
-    if not service_role_key:
+    app_name_for_secrets = Path(app_path).name if app_path else "gh_portal"
+
+    # 1. voice-dev シークレットから取得
+    env = secrets_store.load_env(app_name_for_secrets)
+    supabase_url = env.get("SUPABASE_URL", "") or env.get("VITE_SUPABASE_URL", "")
+    api_key = (env.get("SUPABASE_SERVICE_ROLE_KEY", "")
+               or env.get("SUPABASE_ANON_KEY", "")
+               or env.get("VITE_SUPABASE_ANON_KEY", ""))
+
+    # 2. プロジェクトの .env.local / .env からフォールバック
+    if not api_key and app_path:
+        for fname in (".env.local", ".env"):
+            env_file = Path(app_path) / fname
+            if env_file.exists():
+                proj = dotenv_values(str(env_file))
+                supabase_url = supabase_url or proj.get("VITE_SUPABASE_URL", "") or proj.get("SUPABASE_URL", "")
+                api_key = (proj.get("SUPABASE_SERVICE_ROLE_KEY", "")
+                           or proj.get("SUPABASE_ANON_KEY", "")
+                           or proj.get("VITE_SUPABASE_ANON_KEY", ""))
+                if api_key:
+                    break
+
+    supabase_url = supabase_url or "https://drmoefhhovpzmuzdqhax.supabase.co"
+
+    if not api_key:
         return JSONResponse(
-            {"error": "gh_portal のシークレットに SUPABASE_SERVICE_ROLE_KEY が未設定です。シークレットタブから登録してください。"},
+            {"error": "Supabase キーが見つかりません。プロジェクトの .env.local に VITE_SUPABASE_ANON_KEY を設定するか、シークレットタブから SUPABASE_ANON_KEY を登録してください。"},
             status_code=400,
         )
     headers = {
-        "apikey": service_role_key,
-        "Authorization": f"Bearer {service_role_key}",
+        "apikey": api_key,
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
     new_tasks = []
-    async with httpx.AsyncClient(timeout=20) as client:
+    try:
+      async with httpx.AsyncClient(timeout=20) as client:
         r1 = await client.post(
             f"{supabase_url}/rest/v1/rpc/get_improvement_proposals_admin",
             headers=headers, json={},
@@ -973,6 +996,11 @@ async def import_user_feedback(data: dict):
                 if image_url:
                     desc += f" | 📷 {image_url}"
                 new_tasks.append({"angle": "ユーザーご意見/小", "title": title, "desc": desc})
+    except httpx.HTTPError as e:
+        return JSONResponse(
+            {"error": f"Supabase への接続に失敗しました: {e}"},
+            status_code=502,
+        )
     total = len(new_tasks)
     if total == 0:
         return JSONResponse({"added": 0, "skipped": 0, "total": 0})
