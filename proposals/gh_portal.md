@@ -206,4 +206,3 @@ branch: stu-ui
 - [x] 【機能/小】AI_ROOMS の unread・preview・time ハードコード除去 — Chat.tsx の `AI_ROOMS` 定数（149–154行）から `unread: 2` などのサンプル値を削除し、未読数は `getRoomUnreadCounts` の実DB結果、preview/time はメッセージ最終行から動的に生成するよう修正する <!-- id:194 done:2026-10-25T00:29 -->
 - [x] 【機能/小】Chat.tsx モックデータ死コード4変数の削除 — `CHANNEL_MESSAGES`・`STUDENTS`・`TEACHER_MESSAGES`・`INIT_STUDENT_MESSAGES`（107–139行）はいずれも UI に到達しない未参照変数のため一括削除する <!-- id:195 done:2026-10-25T00:26 -->
 - [x] 【UI/UX/小】Timeline.tsx 「もっと読み込む」ボタンの永続disabled バグ修正 — `loadOlderPosts`/`loadNewerPosts` でSupabaseエラー発生時に`setLoadingOlder(false)`が`finally`でなく`if`ブランチ内にあるため、ネットワーク失敗後にローディング状態が解除されずボタンが永久に押せなくなる。 <!-- id:196 done:2026-10-25T00:25 -->
-- [ ] 【ユーザー提案/timeline/小】質問タブの解決済み/未解決の分類表示がくっきりしておらず見づらいため、UIを改善いただきたい — 質問タブの解決済み/未解決の分類表示がくっきりしておらず見づらいため、UIを改善いただきたい <!-- id:197 -->
