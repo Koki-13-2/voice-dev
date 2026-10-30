@@ -25615,3 +25615,26 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/201-authcontext-token-refres → stu-ui（pushed）
 
+## 2026-10-30 16:17 — gh_portal #204 質問タブ・解決済みセクションの色をグレーに変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+タスクが完了しました。
+
+**調査結果と実施内容のサマリー：**
+
+このタスクは既に `task/gh_portal/202` にて実装済みでした（コミット `b47c81c`）。具体的な変更内容は：
+
+1. **`src/styles/globals.css`** — `.section-label--resolved` の color を `var(--color-success)` (緑) から `var(--color-muted)` (グレー) に、border-bottom-color を `#B2DFBB` (緑) から `var(--color-border)` (グレー) に変更
+2. **`src/pages/Timeline.tsx`** — 解決済みバッジを `badge-success` (緑) から `badge-muted` (グレー) に変更（3箇所）
+
+`task/gh_portal/204` ブランチは stu-ui ブランチのその修正を含む地点から作成されていたため、コードは既に正しい状態でした。検証コミットを作成してリモートにプッシュしました。
+
+```
+
+## 2026-10-30 16:17 — gh_portal #204 質問タブ・解決済みセクションの色をグレーに変更
+
+- 結果: 🔀 統合完了: task/gh_portal/204 → stu-ui（pushed）
+
