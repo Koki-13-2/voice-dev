@@ -25572,3 +25572,28 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/199-chat-rls → stu-ui（pushed）
 
+## 2026-10-30 15:08 — gh_portal #200 Practice.tsx 過去問アップロードエラーの`alert()`をインライン表示に置換
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH キーの権限エラーのため push は失敗しましたが、コミット自体は完了しています。
+
+---
+
+実装完了です。変更内容：
+
+- **`uploadError` ステート追加**（1314行目）: `fileSizeError` と同じ `useState<string | null>(null)` パターン
+- **送信開始時にリセット**（1320行目）: `setSubmitting(true)` 直後に `setUploadError(null)` を呼び出し
+- **`alert()` を置換**（1348行目）: ブロッキングな `alert()` を `setUploadError(...)` に変更
+- **インライン表示**（1491〜1495行目）: 送信ボタンの下に `fileSizeError` と同一スタイルでエラーを表示
+
+git push は SSH 認証の問題で失敗しましたが、コミット（`d0af27c`）はローカルに作成済みです。
+
+```
+
+## 2026-10-30 15:08 — gh_portal #200 Practice.tsx 過去問アップロードエラーの`alert()`をインライン表示に置換
+
+- 結果: 🔀 統合完了: task/gh_portal/200-practice-tsx-alert → stu-ui（pushed）
+
