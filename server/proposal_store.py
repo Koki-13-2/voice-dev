@@ -1,9 +1,11 @@
 """改善提案ストア — proposals/<アプリ名>.md のチェックリストを管理する"""
+import json
 import re
 from datetime import datetime
 from pathlib import Path
 
 PROPOSALS_DIR = Path(__file__).parent.parent / "proposals"
+_IMPORTED_TRACK = PROPOSALS_DIR / ".imported_ids.json"
 
 # 出力契約マーカー（プロンプトで義務付け、抽出はこれを最優先）
 PROPOSALS_START = "<<<PROPOSALS_START>>>"
@@ -44,6 +46,28 @@ _GEN_RE = re.compile(
 
 def _file_for(app_name: str) -> Path:
     return PROPOSALS_DIR / f"{app_name}.md"
+
+
+def _load_imported_ids() -> set[str]:
+    if not _IMPORTED_TRACK.exists():
+        return set()
+    try:
+        return set(json.loads(_IMPORTED_TRACK.read_text(encoding="utf-8")))
+    except Exception:
+        return set()
+
+
+def mark_imported_ids(ids: list[str]) -> None:
+    """取り込み済み行IDをマークする（リバート後の二重取り込み防止）"""
+    ids = [i for i in ids if i]
+    if not ids:
+        return
+    imported = _load_imported_ids()
+    imported.update(ids)
+    PROPOSALS_DIR.mkdir(parents=True, exist_ok=True)
+    _IMPORTED_TRACK.write_text(
+        json.dumps(sorted(imported), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 def _parse_file(f: Path) -> tuple[dict, list[dict], list[str]]:

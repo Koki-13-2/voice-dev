@@ -921,21 +921,15 @@ async def set_proposal_branch(data: dict):
     return JSONResponse({"ok": True, "result": "branch-cleared" if not branch else "saved"})
 
 
-@app.post("/api/proposals/import-user-feedback")
-async def import_user_feedback(data: dict):
-    import httpx
+async def _load_supabase_creds(app_path: str) -> tuple[str, str]:
+    """(supabase_url, api_key) を返す。api_key が空なら credentials が見つからない。"""
     from dotenv import dotenv_values
-    app_path = data.get("app_path", "")
     app_name_for_secrets = Path(app_path).name if app_path else "gh_portal"
-
-    # 1. voice-dev シークレットから取得
     env = secrets_store.load_env(app_name_for_secrets)
     supabase_url = env.get("SUPABASE_URL", "") or env.get("VITE_SUPABASE_URL", "")
     api_key = (env.get("SUPABASE_SERVICE_ROLE_KEY", "")
                or env.get("SUPABASE_ANON_KEY", "")
                or env.get("VITE_SUPABASE_ANON_KEY", ""))
-
-    # 2. プロジェクトの .env.local / .env からフォールバック
     if not api_key and app_path:
         for fname in (".env.local", ".env"):
             env_file = Path(app_path) / fname
@@ -947,8 +941,48 @@ async def import_user_feedback(data: dict):
                            or proj.get("VITE_SUPABASE_ANON_KEY", ""))
                 if api_key:
                     break
-
     supabase_url = supabase_url or "https://drmoefhhovpzmuzdqhax.supabase.co"
+    return supabase_url, api_key
+
+
+async def _rewrite_feedback_for_engineer(content: str, tab: str | None = None) -> tuple[str, str]:
+    """フィードバックをエンジニア視点で書き直す。(title, desc) を返す。"""
+    context = f"（対象タブ: {tab}）" if tab else ""
+    prompt = (
+        f"以下のアプリへのユーザーフィードバック{context}を、エンジニアの実装タスクとして技術的に整理し直してください。\n\n"
+        f"【ユーザー原文】\n{content}\n\n"
+        "以下の形式で厳密に出力してください:\n"
+        "タイトル: <実装タスクとしての短いタイトル（30文字以内）>\n"
+        "説明: <技術的観点での説明（実装方針・影響範囲・優先度の根拠を含む。2〜4文）>"
+    )
+    text_parts: list[str] = []
+    async for chunk in run_oneshot(
+        prompt,
+        system_prompt="あなたはシニアソフトウェアエンジニアです。ユーザーフィードバックを技術的な実装タスクとして整理してください。",
+    ):
+        if chunk.get("type") in ("text", "result_text"):
+            text_parts.append(chunk["content"])
+    full = "".join(text_parts).strip()
+    title = desc = ""
+    for line in full.split("\n"):
+        s = line.strip()
+        if re.match(r"^タイトル[：:]", s):
+            title = re.sub(r"^タイトル[：:]\s*", "", s).strip()
+        elif re.match(r"^説明[：:]", s):
+            desc = re.sub(r"^説明[：:]\s*", "", s).strip()
+    if not title:
+        first = content.split("\n")[0]
+        title = (first[:57] + "…") if len(first) > 57 else first
+    if not desc:
+        desc = content
+    return title, desc
+
+
+@app.post("/api/proposals/import-user-feedback")
+async def import_user_feedback(data: dict):
+    import httpx
+    app_path = data.get("app_path", "")
+    supabase_url, api_key = await _load_supabase_creds(app_path)
 
     if not api_key:
         return JSONResponse(
@@ -1011,6 +1045,139 @@ async def import_user_feedback(data: dict):
             [str(proposal_store._file_for(app_name))],
             f"proposals: {app_name} にユーザーフィードバック {added}件を取り込み")
     return JSONResponse({"added": added, "skipped": total - added, "total": total})
+
+
+@app.get("/api/proposals/pending-feedbacks")
+async def get_pending_feedbacks(app_path: str = ""):
+    """Supabase から未処理（import_status IS NULL）のフィードバックを返す"""
+    import httpx
+    supabase_url, api_key = await _load_supabase_creds(app_path)
+    if not api_key:
+        return JSONResponse(
+            {"error": "Supabase キーが見つかりません。シークレットタブから SUPABASE_ANON_KEY を登録してください。"},
+            status_code=400,
+        )
+    headers = {
+        "apikey": api_key,
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    items = []
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            r1 = await client.post(
+                f"{supabase_url}/rest/v1/rpc/get_improvement_proposals_admin",
+                headers=headers, json={},
+            )
+            if r1.status_code == 200:
+                for row in r1.json():
+                    if row.get("import_status") is not None:
+                        continue
+                    content = (row.get("content") or "").strip()
+                    if not content:
+                        continue
+                    items.append({
+                        "id": row["id"],
+                        "type": "proposal",
+                        "tab": row.get("tab") or "other",
+                        "content": content,
+                        "image_url": row.get("image_url"),
+                        "created_at": row.get("created_at", ""),
+                    })
+            r2 = await client.post(
+                f"{supabase_url}/rest/v1/rpc/get_user_feedbacks_admin",
+                headers=headers, json={},
+            )
+            if r2.status_code == 200:
+                for row in r2.json():
+                    if row.get("import_status") is not None:
+                        continue
+                    content = (row.get("content") or "").strip()
+                    if not content:
+                        continue
+                    items.append({
+                        "id": row["id"],
+                        "type": "opinion",
+                        "tab": None,
+                        "content": content,
+                        "image_url": row.get("image_url"),
+                        "created_at": row.get("created_at", ""),
+                    })
+    except httpx.HTTPError as e:
+        return JSONResponse({"error": f"Supabase への接続に失敗しました: {e}"}, status_code=502)
+    return JSONResponse({"items": items})
+
+
+@app.post("/api/proposals/process-feedbacks")
+async def process_feedbacks(data: dict):
+    """選択フィードバックを取込/棄却処理し、Supabase の import_status を更新する"""
+    import httpx
+    app_path = data.get("app_path", "")
+    action = data.get("action", "")
+    items = data.get("items", [])
+
+    if action not in ("import", "reject"):
+        return JSONResponse({"error": "action は import または reject を指定してください"}, status_code=400)
+    if not items:
+        return JSONResponse({"error": "items が空です"}, status_code=400)
+
+    supabase_url, api_key = await _load_supabase_creds(app_path)
+    if not api_key:
+        return JSONResponse(
+            {"error": "Supabase キーが見つかりません。シークレットタブから SUPABASE_ANON_KEY を登録してください。"},
+            status_code=400,
+        )
+    headers = {
+        "apikey": api_key,
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    status_value = "imported" if action == "import" else "rejected"
+    new_tasks = []
+    errors = []
+
+    async with httpx.AsyncClient(timeout=60) as client:
+        for item in items:
+            item_id = item.get("id", "")
+            item_type = item.get("type", "")
+            content = (item.get("content") or "").strip()
+            if not content or not item_id or item_type not in ("proposal", "opinion"):
+                continue
+
+            if action == "import":
+                tab = item.get("tab") if item_type == "proposal" else None
+                title, desc = await _rewrite_feedback_for_engineer(content, tab)
+                image_url = item.get("image_url")
+                if image_url:
+                    desc += f" | 📷 {image_url}"
+                angle = (f"ユーザー提案/{item.get('tab') or 'other'}/小"
+                         if item_type == "proposal" else "ユーザーご意見/小")
+                new_tasks.append({"angle": angle, "title": title, "desc": desc})
+
+            r = await client.post(
+                f"{supabase_url}/rest/v1/rpc/set_feedback_import_status",
+                headers=headers,
+                json={"p_type": item_type, "p_id": item_id, "p_status": status_value},
+            )
+            if r.status_code not in (200, 204):
+                errors.append(f"{item_id[:8]}: HTTP {r.status_code}")
+
+    imported = 0
+    if action == "import" and new_tasks and app_path:
+        added = proposal_store.add_tasks(app_path, new_tasks)
+        imported = added
+        app_name = Path(app_path).name
+        if added > 0:
+            await gitutil.commit_and_push(
+                [str(proposal_store._file_for(app_name))],
+                f"proposals: {app_name} にユーザーフィードバック {added}件を取り込み")
+
+    return JSONResponse({
+        "imported": imported,
+        "rejected": len(items) if action == "reject" else 0,
+        "errors": errors,
+    })
 
 
 @app.get("/api/autodev")
