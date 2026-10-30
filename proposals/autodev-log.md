@@ -25638,3 +25638,33 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/204 → stu-ui（pushed）
 
+## 2026-10-30 16:18 — gh_portal #203 管理画面の意見箱一覧にステータス列を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装・コミット・プッシュが完了しました。
+
+**実施内容:**
+
+`src/pages/admin/AdminFeedback.tsx` に2箇所の変更を追加しました：
+
+- **ProposalCard（改善提案）**: `import_status` が null のとき、黄色の「未対応」バッジを表示
+- **OpinionList（ご意見）**: 同様に「未対応」バッジを追加
+
+これで全3状態のステータスが可視化されます：
+| 状態 | 表示 | 色 |
+|------|------|-----|
+| null（未処理） | 未対応 | 黄 |
+| imported | 📥 取込済 | 青 |
+| rejected | 🚫 棄却済 | グレー |
+
+DB側の `import_status` カラム追加（migration `20261030000001`）と RPC の更新も既にブランチに含まれており、バックエンドとの接続も整合しています。コミット `8c84664` としてブランチ `task/gh_portal/203` にプッシュ済みです。
+
+```
+
+## 2026-10-30 16:18 — gh_portal #203 管理画面の意見箱一覧にステータス列を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/203 → stu-ui（pushed）
+
