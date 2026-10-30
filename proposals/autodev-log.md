@@ -25528,3 +25528,20 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/197-ui → stu-ui（pushed）
 
+## 2026-10-30 15:06 — gh_portal #202 質問タブの解決済みセクションの表示は緑ではなくグレーに
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。変更内容：
+
+- `src/styles/globals.css`: `.section-label--resolved` の色を `var(--color-success)`（緑）→ `var(--color-muted)`（グレー）、ボーダー色を `#B2DFBB`（緑） → `var(--color-border)`（グレー）に変更
+- `src/pages/Timeline.tsx`: 解決済み質問カードおよび質問詳細シート・投稿フィード内の「解決済」バッジを `badge-success` → `badge-muted` に変更（他画面の合格・完了バッジには影響なし）
+
+```
+
+## 2026-10-30 15:06 — gh_portal #202 質問タブの解決済みセクションの表示は緑ではなくグレーに
+
+- 結果: 🔀 統合完了: task/gh_portal/202 → stu-ui（pushed）
+
