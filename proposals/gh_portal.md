@@ -211,3 +211,4 @@ branch: stu-ui
 - [ ] 【セキュリティ/中】Chat グループチャンネル一覧のRLS漏洩修正 — `chat_rooms`を直接全件取得しておりユーザーが未参加のチャンネル名も`channels`ステートに混入するため、`room_members`経由のJOINクエリに変更してメンバーのみが所属ルームを見られるようにする（Chat.tsx:1441） <!-- id:199 -->
 - [ ] 【UI/UX/小】Practice.tsx 過去問アップロードエラーの`alert()`をインライン表示に置換 — `handleRequestCorrection`のcatch節でブロッキングな`alert()`を使っており他のエラー表示（`fileSizeError`等）と不統一なため、`uploadError`ステート変数を追加してフォーム内にインライン表示する（Practice.tsx:1346） <!-- id:200 -->
 - [ ] 【性能/小】AuthContext TOKEN_REFRESHEDイベントで`resolved`フラグが立たず最大5秒ローディングが続くバグ修正 — `TOKEN_REFRESHED`ハンドラが`return`する前に`resolved = true`を設定していないため、アクセストークン期限切れ状態での初回起動時に5秒フォールバックが必ず発火してローディングが長引く問題を修正する（AuthContext.tsx:189） <!-- id:201 -->
+- [ ] 【ユーザー提案/timeline/小】質問タブの解決済みセクションの表示は緑ではなくグレーに — 質問タブの解決済みセクションの表示は緑ではなくグレーに <!-- id:202 -->
