@@ -25508,3 +25508,23 @@ CSS クラス `.reply-thread` の `padding-top: var(--space-3)` がインライ�
 
 - 結果: 🔀 統合完了: task/gh_portal/198 → stu-ui（pushed）
 
+## 2026-10-30 10:12 — gh_portal #197 質問タブの解決済み/未解決の分類表示がくっきりしておらず見づらいため、UIを改善いただきたい
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミット・プッシュ完了です。
+
+**実装内容:**
+
+- **セクションヘッダーの色分け**: `section-label--unresolved`（オレンジ＋オレンジ下線）と `section-label--resolved`（グリーン＋グリーン下線）のCSS修飾クラスを追加し、両セクションを一目で区別できるようにした
+- **解決済みカードのスタイル変更**: `pinned-card--resolved` クラスを追加し、背景をオレンジグラデーションからニュートラルな薄グレー（`#FAFAFA`）に変更。未解決カード（オレンジ暖色）と解決済みカード（グレー中性）で視覚的な対比を明確化
+- **インライン `opacity:0.75` を CSS クラスに移動**: `opacity:0.85` をCSSクラスで管理し、コードもすっきりさせた
+
+```
+
+## 2026-10-30 10:12 — gh_portal #197 質問タブの解決済み/未解決の分類表示がくっきりしておらず見づらいため、UIを改善いただきたい
+
+- 結果: 🔀 統合完了: task/gh_portal/197-ui → stu-ui（pushed）
+
