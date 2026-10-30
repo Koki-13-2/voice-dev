@@ -25545,3 +25545,30 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/202 → stu-ui（pushed）
 
+## 2026-10-30 15:07 — gh_portal #199 Chat グループチャンネル一覧のRLS漏洩修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+## 変更内容まとめ
+
+**問題**: `Chat.tsx:1440` で `chat_rooms` テーブルを全件取得（`type='group'` のみフィルタ）していたため、ユーザーが未参加のチャンネル名が `channels` ステートに混入していた。
+
+**修正**: クエリを `room_members` 起点に変更し、`chat_rooms!inner(...)` で JOIN する方式に変更。
+
+- `room_members.user_id = userId` でまず現在のユーザーの参加行のみ取得
+- `!inner` JOIN により `chat_rooms` の情報を一度のクエリで取得
+- `.eq('chat_rooms.type', 'group')` でグループチャンネルのみに絞り込み
+- 以前は2回のクエリだったが、1回のクエリに統合されて効率も改善
+
+**コミット**: `f5bf365` → `origin/task/gh_portal/199-chat-rls` にプッシュ済み
+
+```
+
+## 2026-10-30 15:07 — gh_portal #199 Chat グループチャンネル一覧のRLS漏洩修正
+
+- 結果: 🔀 統合完了: task/gh_portal/199-chat-rls → stu-ui（pushed）
+
