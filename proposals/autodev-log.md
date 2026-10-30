@@ -25597,3 +25597,21 @@ git push は SSH 認証の問題で失敗しましたが、コミット（`d0af2
 
 - 結果: 🔀 統合完了: task/gh_portal/200-practice-tsx-alert → stu-ui（pushed）
 
+## 2026-10-30 15:15 — gh_portal #201 AuthContext TOKEN_REFRESHEDイベントで`resolved`フラグが立たず最大5秒ローディングが続くバグ修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容**: `src/lib/AuthContext.tsx:186-189`の`TOKEN_REFRESHED`ハンドラに`resolved = true`と`clearTimeout(fallback)`を2行追加しました。
+
+**修正の理由**: アクセストークン期限切れ状態での初回起動時、Supabaseは`TOKEN_REFRESHED`を最初のイベントとして発火することがあります。修正前はこのハンドラが`return`する前に`resolved = true`を設定していなかったため、5秒後のフォールバックタイマーが必ず発火してしまっていました。修正後は`TOKEN_REFRESHED`発火時点でフォールバックをキャンセルし、続いて発火する`INITIAL_SESSION`が正常にプロフィール取得とローディング解除を行います。
+
+```
+
+## 2026-10-30 15:15 — gh_portal #201 AuthContext TOKEN_REFRESHEDイベントで`resolved`フラグが立たず最大5秒ローディングが続くバグ修正
+
+- 結果: 🔀 統合完了: task/gh_portal/201-authcontext-token-refres → stu-ui（pushed）
+
