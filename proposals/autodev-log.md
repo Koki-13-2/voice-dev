@@ -25813,3 +25813,31 @@ SSHキーがWindows側にないためpushできませんが、コミット自体
 
 - 結果: 🔀 統合完了: task/gh_portal/212 → stu-ui（pushed）
 
+## 2026-11-05 09:17 — gh_portal #215 質問タブ解決/未解決の視認性改善
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。実装内容のまとめ：
+
+**変更ファイル:** `src/pages/Timeline.tsx`, `src/styles/globals.css`
+
+**CSS追加 (`globals.css`):**
+- `.badge-unresolved`: オレンジ背景(`#FFF3E8`)・ダークオレンジ文字(`#C2410C`)・オレンジボーダー
+- `.badge-resolved`: グリーン背景(`#DCFCE7`)・ダークグリーン文字(`#15803D`)・グリーンボーダー
+- `section-label--resolved`: 色をグレーからグリーン(`var(--color-success)`)に変更
+- `pinned-card--resolved`: 背景・ボーダーをグリーン系のトーンに変更
+
+**TSX変更 (`Timeline.tsx`):**
+- 未解決質問カードのメタ行に `badge-unresolved` の「募集中」バッジを追加
+- 解決済みカードと質問詳細シートの `badge-muted`（グレー）を `badge-resolved`（グリーン）に変更
+
+これにより、未解決（オレンジ）と解決済み（グリーン）が色・コントラストの両面で明確に区別されます。
+
+```
+
+## 2026-11-05 09:17 — gh_portal #215 質問タブ解決/未解決の視認性改善
+
+- 結果: 🔀 統合完了: task/gh_portal/215 → stu-ui（pushed）
+
