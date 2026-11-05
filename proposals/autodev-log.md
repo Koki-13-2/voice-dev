@@ -25668,3 +25668,31 @@ DB側の `import_status` カラム追加（migration `20261030000001`）と RPC 
 
 - 結果: 🔀 統合完了: task/gh_portal/203 → stu-ui（pushed）
 
+## 2026-11-05 09:00 — gh_portal #210 お知らせバナー非表示時の余白除去
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH キーがこの環境からはアクセスできないためプッシュは失敗しましたが、コミットは完了しています。
+
+実装内容をまとめます：
+
+**変更ファイル:** `src/pages/Timeline.tsx`
+
+**修正内容:**
+1. `bannerLoaded` 状態（`boolean`、初期値 `false`）を追加
+2. バナーフェッチの `.then()` 完了時に `setBannerLoaded(true)` を呼び出し
+3. JSX のバナーカルーセルを `{bannerLoaded && bannerSlides.length > 0 && (...)}` の条件付きレンダリングに変更
+
+**動作:**
+- ローディング中: コンテナ非表示（余白なし）
+- 取得完了・0件: コンテナ非表示（余白なし）→ **今回の修正ポイント**
+- 取得完了・1件以上: 従来通りカルーセル表示
+
+```
+
+## 2026-11-05 09:00 — gh_portal #210 お知らせバナー非表示時の余白除去
+
+- 結果: 🔀 統合完了: task/gh_portal/210 → stu-ui（pushed）
+
