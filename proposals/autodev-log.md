@@ -25782,3 +25782,34 @@ SSH鍵が設定されていないためプッシュに失敗しました（ロ�
 
 - 結果: 🔀 統合完了: task/gh_portal/211-google → stu-ui（pushed）
 
+## 2026-11-05 09:12 — gh_portal #212 管理画面「ご意見箱」一覧にステータス列を追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSHキーがWindows側にないためpushできませんが、コミット自体は完了しています。WSL側のSSHエージェントが必要です。
+
+---
+
+実装完了です。変更内容：
+
+**`src/pages/admin/AdminFeedback.tsx`**
+- 改善提案タブ・ご意見タブを**カードレイアウト → テーブルレイアウト**に変換
+- 各テーブルに**「ステータス」専用列**を追加（未対応/取込済/棄却済のバッジを独立した列で表示）
+- `ImportStatusBadge`コンポーネントで両タブのステータス表示を統一
+- バックエンド変更不要（`import_status`フィールドはRPCレスポンスに既存）
+
+| テーブル | 列構成 |
+|----------|--------|
+| 改善提案 | 画面タブ / 日時 / 内容 / **ステータス** / 画像 |
+| ご意見 | 日時 / 内容 / **ステータス** / 画像 |
+
+コミット: `9586a16` — `git push`はSSH鍵の権限エラーで失敗しました。WSL環境でSSHエージェントを設定後、`git push -u origin task/gh_portal/212`を実行してください。
+
+```
+
+## 2026-11-05 09:12 — gh_portal #212 管理画面「ご意見箱」一覧にステータス列を追加
+
+- 結果: 🔀 統合完了: task/gh_portal/212 → stu-ui（pushed）
+
