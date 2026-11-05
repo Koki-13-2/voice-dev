@@ -2302,11 +2302,11 @@
     <span id="mic-label">タップして話す</span>
   </button>
   <div id="quick-actions" class="quick-actions" style="display:none">
-    <button class="qa-btn" onclick="quickSend('変更をgit add -A して適切なメッセージでgit commitして')">📝 commit</button>
-    <button class="qa-btn" onclick="quickSend('git pushしてリモートに反映して。リモートが未設定なら状況を教えて')">⬆ push</button>
-    <button class="qa-btn" onclick="quickSend('このプロジェクトをVercelに本番デプロイして（vercel --prod）。プロジェクトが未リンクならセットアップから進めて')">🚀 deploy</button>
-    <button class="qa-btn" onclick="quickSend('リリースを一括実行して: テストがあれば実行し、問題なければ git add -A → commit → push → Vercel本番デプロイまで順に実行。途中で失敗したらそこで止めて原因を報告して')">⚡ すべて</button>
-    <button class="qa-btn" onclick="openSecretsModal()">🔐 環境変数</button>
+    <button class="qa-btn" onclick="quickSend('git status でブランチを確認して。mainへの直接コミットは禁止（task/ブランチで作業すること）。問題なければ git add . して適切なメッセージでgit commitして')">📝 commit</button>
+    <button class="qa-btn" onclick="quickSend('git status でブランチを確認して。mainへの直接pushは禁止。task/ブランチならそのままpushして。stu-uiへのマージが必要な場合は手順を示して（マージ後はローカル・リモートともブランチを削除）')">⬆ push</button>
+    <button class="qa-btn" onclick="quickSend('gh_portalをVercelにデプロイして。手順: /home/kokinagano/hennyujuku/gh_portal/ で bash deploy.sh を実行（Vercelアカウントは Gokakuhennnyu スコープ）。vercel --prod の直接実行は禁止。deploy.sh が存在しなければ内容を確認してから報告して')">🚀 deploy</button>
+    <button class="qa-btn" onclick="quickSend('gh_portal のリリースを一括実行して。手順: ①git status でブランチ確認（mainへの直接コミット・push禁止） ②git add . → 適切なメッセージでcommit ③task/ブランチならpush → stu-uiへマージ → マージ済みブランチを削除（ローカル・リモート） ④/home/kokinagano/hennyujuku/gh_portal/ で bash deploy.sh でVercelデプロイ。途中で失敗したらそこで止めて原因を報告して')">⚡ すべて</button>
+    <button class="qa-btn" onclick="quickSend('gh_portalの環境変数設定を確認して。.env.local の内容を確認し、不足している変数があれば教えて。Supabase のサービスロールキーは bash supabase.sh projects api-keys --project-ref drmoefhhovpzmuzdqhax で動的取得すること（.env.local に書かない設計）')">🔐 環境変数</button>
   </div>
   <div id="ctx-chips-bar" class="ctx-chips-bar" style="display:none"></div>
   <div class="text-row">
