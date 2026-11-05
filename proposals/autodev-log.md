@@ -25945,3 +25945,22 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/216 → stu-ui（pushed）
 
+## 2026-11-05 10:04 — gh_portal #214 質問タブ返信の上部マージン欠落を修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容:**
+- `src/pages/Timeline.tsx` 1266行目: 質問詳細シートの `reply-thread` ラッパーの `padding-top` を `var(--space-3)` (12px) から `var(--space-4)` (16px) に変更
+
+**理由:** 通常の投稿コンポーネント (`post-card`) が `padding: var(--space-4)` (16px) を使用しているのに対し、質問タブの返信スレッドは `var(--space-3)` (12px) で表示されており、視覚的な一貫性が欠けていた。影響範囲は質問詳細シートのリプライ表示のみで、通常の投稿タブのリプライスレッドは変更なし。
+
+```
+
+## 2026-11-05 10:05 — gh_portal #214 質問タブ返信の上部マージン欠落を修正
+
+- 結果: 🔀 統合完了: task/gh_portal/214 → stu-ui（pushed）
+
