@@ -25890,3 +25890,32 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/207 → stu-ui（pushed）
 
+## 2026-11-05 09:19 — gh_portal #213 質問タブの解決済みセクションの色をグレーに変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH キーのアクセス権がないため push は失敗しましたが、コミット自体は完了しています。
+
+---
+
+**実装内容のまとめ：**
+
+調査の結果、解決済みセクションのグレー対応は `task#204`（コミット `928c00a`）で既に基本実装済みでした。今回のタスク #213 では、その実装をさらに強化しました：
+
+**変更ファイル：** `src/styles/globals.css`
+
+| 要素 | 変更前 | 変更後 |
+|------|--------|--------|
+| `.section-label--resolved` | 色・ボーダーのみグレー | + `font-weight: 500` + `opacity: 0.85` 追加 |
+| `.pinned-card--resolved` | 背景 `#FAFAFA`、opacity `0.85` | 背景 `#F5F5F5`（より濃いグレー）、opacity `0.82` |
+
+**効果：** 未解決セクション（`font-weight: 700`、フル輝度）と解決済みセクション（`font-weight: 500`、opacity 低下）の視覚的コントラストが明確になり、「完了・非アクティブ」状態をより直感的に伝えられます。リモートへの push は SSH キー権限がないため失敗しましたが、コミットはローカルブランチに記録済みです。
+
+```
+
+## 2026-11-05 09:19 — gh_portal #213 質問タブの解決済みセクションの色をグレーに変更
+
+- 結果: ⚠ コンフリクト（要確認）: task/gh_portal/213 → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
+
