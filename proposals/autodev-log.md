@@ -26025,3 +26025,28 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/222 → stu-ui（pushed）
 
+## 2026-11-05 15:37 — gh_portal #223 講師画面からテスト解禁UIを削除
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実施内容**:
+- `ActiveTab` 型から `'unlock'` を削除
+- `UnlockableTest` インターフェースを削除
+- `UnlockList` コンポーネント（約190行）を削除
+- 関連 state（`unlockableTests`, `togglingKeys`, `unlockRefreshKey`）を削除
+- `loadUnlockables` useEffect と `handleToggleUnlock` 関数を削除
+- タブバーの「テスト解禁」ボタンを削除
+- タブコンテンツの条件分岐を整理（`retest` を else に統合）
+
+「再受験申請」タブ・`RetestList` コンポーネント・承認/却下フローはすべてそのまま維持しています。コミット `232cfe7` として `origin/task/gh_portal/223-ui` にプッシュ済みです。
+
+```
+
+## 2026-11-05 15:37 — gh_portal #223 講師画面からテスト解禁UIを削除
+
+- 結果: 🔀 統合完了: task/gh_portal/223-ui → stu-ui（pushed）
+
