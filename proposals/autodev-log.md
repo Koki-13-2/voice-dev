@@ -25759,3 +25759,26 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/208 → stu-ui（pushed）
 
+## 2026-11-05 09:11 — gh_portal #211 Googleログイン画面から講師登録ボタンを削除
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+SSH鍵が設定されていないためプッシュに失敗しました（ローカルのSSH鍵がWSLパス経由で利用できない状態）。コミット自体は正常に完了しています。
+
+---
+
+**完了内容:**
+
+- `src/pages/Login.tsx` の「招待制登録（講師・スタッフ）」リンク（4行）を削除
+- 残存する「塾生登録はこちら」リンクとレイアウトに影響なし
+- コミット完了: `936547b feat: Googleログイン画面から講師登録ボタンを削除`
+- プッシュ: SSH鍵未設定のため失敗（ローカルコミットは完了済み）
+
+```
+
+## 2026-11-05 09:11 — gh_portal #211 Googleログイン画面から講師登録ボタンを削除
+
+- 結果: 🔀 統合完了: task/gh_portal/211-google → stu-ui（pushed）
+
