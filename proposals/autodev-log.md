@@ -25696,3 +25696,39 @@ SSH キーがこの環境からはアクセスできないためプッシュは�
 
 - 結果: 🔀 統合完了: task/gh_portal/210 → stu-ui（pushed）
 
+## 2026-11-05 09:08 — gh_portal #209 チャット画面コンテナの高さ固定対応
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実装内容**
+
+根本原因は、`.chat-page`（flex column コンテナ）と `.chat-thread`（flex: 1）の間にある `div[role="tabpanel"]` が flex styling を持っておらず、flex チェーンが断絶していた点です。
+
+**修正箇所**: `src/styles/globals.css` に1ルール追加
+
+```css
+.chat-page > [role="tabpanel"] {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+```
+
+これにより:
+- タブパネルが `.chat-page` の残余スペースを取得（`flex: 1`）
+- 自身も flex コンテナになり、子要素の `.chat-thread` / `.chat-shell` が正しく `flex: 1` で高さを継承できる
+- メッセージ0件・新規ルームでも白い余白なくビューポートを満たす
+
+ロジック変更なし。コミット＆プッシュ済み（`task/gh_portal/209`）。
+
+```
+
+## 2026-11-05 09:08 — gh_portal #209 チャット画面コンテナの高さ固定対応
+
+- 結果: 🔀 統合完了: task/gh_portal/209 → stu-ui（pushed）
+
