@@ -25964,3 +25964,7 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/214 → stu-ui（pushed）
 
+## 2026-11-05 10:22 — gh_portal #217 デモ用サンプルデータ挿入マイグレーション実装
+
+- 結果: ⏱ タイムアウト（25分）
+
