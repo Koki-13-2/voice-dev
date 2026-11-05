@@ -25841,3 +25841,52 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/215 → stu-ui（pushed）
 
+## 2026-11-05 09:18 — gh_portal #207 再テスト申請・承認フローの実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。変更内容をまとめます。
+
+---
+
+## 実装完了：再テスト申請・承認フロー
+
+### 追加したファイル
+
+**`supabase/migrations/20261105000001_retest_requests.sql`**
+- `retest_requests` テーブルを新規作成
+  - カラム：`student_id`, `test_id`, `status`（pending/approved/rejected）, `note`, `reviewed_by`, `reviewed_at`, `requested_at`
+  - RLSポリシー：生徒は自分の申請を参照・作成・削除可、講師/管理者は全操作可
+
+### 変更したファイル
+
+**`src/pages/Practice.tsx`（生徒側）**
+- `retestMap` 状態を追加（test_id → {id, status} のマップ）
+- `retest_requests` テーブルからpending/approved申請を取得するuseEffectを追加
+- `requestRetest()` 関数を追加（重複チェック付きINSERT）
+- `completeTest()` に再受験完了時の承認申請消費ロジックを追加
+- `CheckTestList` / `StageTestList` に `retestMap`・`onRequestRetest` props追加
+  - 完了済みテストに「再受験を申請」ボタン表示
+  - 申請中は「申請中...」表示
+  - 承認済みはカードがクリック可能になり再受験できる
+
+**`src/pages/TeacherPractice.tsx`（講師側）**
+- `RetestRequestItem` インターフェースを追加
+- `RetestList` コンポーネントを追加（承認/却下ボタン付き申請一覧）
+- 「再受験申請」タブを追加（件数バッジ付き）
+- 担当生徒の pending な申請を取得するuseEffectを追加
+- `handleApproveRetest()` / `handleRejectRetest()` を追加
+
+### 設計ポイント
+- 段階突破テストの自動解放ロジック（`test_unlock_conditions`）は**一切変更なし**
+- 再受験の経路は `retest_requests` テーブルのみで管理（既存フローと完全分離）
+- 承認済み申請は生徒が再受験を完了した時点で自動削除（消費）
+
+```
+
+## 2026-11-05 09:18 — gh_portal #207 再テスト申請・承認フローの実装
+
+- 結果: 🔀 統合完了: task/gh_portal/207 → stu-ui（pushed）
+
