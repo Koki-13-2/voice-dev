@@ -25919,3 +25919,29 @@ SSH キーのアクセス権がないため push は失敗しましたが、コ�
 
 - 結果: ⚠ コンフリクト（要確認）: task/gh_portal/213 → stu-ui。worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください
 
+## 2026-11-05 10:03 — gh_portal #216 バナー非表示時のタブ上部余白が消える問題を修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実施した変更** (`src/styles/globals.css` 3箇所):
+
+1. **`.app-main:has(.tl-tabs)` を追加** — タイムライン画面では `.tl-tabs` が常に存在するため、バナーの有無によらず `padding-top: 0` が適用される
+2. **`.tl-tabs` に `margin-top: var(--space-4)` を追加** — タブ自身が上余白を持ち、外部コンテナやバナーに依存しない
+3. **`.tl-carousel` の `margin-bottom: var(--space-4)` を削除** — カルーセルとタブの間の間隔はタブの `margin-top` で一元管理
+
+**結果**:
+- バナーあり: app-main padding-top=0 → カルーセル → `margin-top: var(--space-4)` → タブ
+- バナーなし: app-main padding-top=0 → `margin-top: var(--space-4)` → タブ
+
+どちらの場合も `var(--space-4)` の一定余白が確保されます。
+
+```
+
+## 2026-11-05 10:03 — gh_portal #216 バナー非表示時のタブ上部余白が消える問題を修正
+
+- 結果: 🔀 統合完了: task/gh_portal/216 → stu-ui（pushed）
+
