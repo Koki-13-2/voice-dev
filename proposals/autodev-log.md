@@ -26004,3 +26004,24 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⏱ タイムアウト（25分）
 
+## 2026-11-05 15:35 — gh_portal #222 意見箱一覧テーブルの列幅・横スクロール対応
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容：** `src/pages/admin/AdminFeedback.tsx`
+
+- `ProposalList` テーブル: `minWidth: 620` を追加、各列に個別の `minWidth`（画面タブ:90, 日時:130, 内容:220, ステータス:110, 画像:60）を設定
+- `OpinionList` テーブル: `minWidth: 520` を追加、各列に `minWidth`（日時:130, 内容:240, ステータス:90, 画像:60）を設定
+
+テーブルラッパーの `overflowX: 'auto'` は既に実装済みだったため変更不要。これで狭い画面でも各列が適切な幅を保ち、コンテンツが溢れると横スクロールで対応できます。
+
+```
+
+## 2026-11-05 15:35 — gh_portal #222 意見箱一覧テーブルの列幅・横スクロール対応
+
+- 結果: 🔀 統合完了: task/gh_portal/222 → stu-ui（pushed）
+
