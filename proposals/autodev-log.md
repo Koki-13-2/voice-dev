@@ -26290,3 +26290,21 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/230 → stu-ui（pushed）
 
+## 2026-11-06 18:34 — gh_portal #232 ヘッダーの「今週の連続学習」→「連続学習」に修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+- `src/pages/Practice.tsx:1042` の `今週の連続学習` → `連続学習` に変更
+- コミット: `fix: ヘッダーの「今週の連続学習」→「連続学習」に修正 (#232)`
+- `origin/task/gh_portal/232` へプッシュ済み
+
+```
+
+## 2026-11-06 18:34 — gh_portal #232 ヘッダーの「今週の連続学習」→「連続学習」に修正
+
+- 結果: 🔀 統合完了: task/gh_portal/232 → stu-ui（pushed）
+
