@@ -26251,3 +26251,42 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/229-ui → stu-ui（pushed）
 
+## 2026-11-06 17:50 — gh_portal #230 宿題の空き時間自動スケジューリング機能
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了しました。
+
+## 実装内容
+
+### 変更ファイル3本
+
+**`src/lib/scheduleUtils.ts`**
+- `RescheduledItem` 型を追加
+- `findNextAvailableSlotFrom(studentId, estimatedMinutes, fromDate, fromHour=6)` を新規追加 — 指定日の早朝(6:00)から空き枠を検索し、なければ翌日以降(最大14日)を探す
+- `saveLifeSlotsToDb()` を `Promise<void>` → `Promise<{ rescheduled: RescheduledItem[] }>` に変更し、以下のロジックを追加:
+  1. 衝突するタスクスロットを削除前にチケット情報ごと収集
+  2. 旧タスクスロットを削除
+  3. **新しい生活スロットを先行挿入**（再配置検索時に正確な衝突判定ができるよう）
+  4. 衝突チケットを順次 `findNextAvailableSlotFrom()` で空き枠に再配置
+  5. 日付が変わる場合は `homework_tickets.due_date` と `is_delayed` を更新
+
+**`src/lib/hooks/useDailySchedule.ts`**
+- `rescheduleNotice` state を追加
+- `applyPattern()` — `saveLifeSlotsToDb()` の戻り値を受け取り、再スケジュール件数をセット
+- `saveBulkPatterns(dayMap)` を新規追加 — 14日分の一括保存と再スケジュールを統合
+- `clearRescheduleNotice` を追加、すべてをフックの戻り値に含める
+
+**`src/pages/Dashboard.tsx`**
+- `rescheduleNotice` / `clearRescheduleNotice` / `saveBulkPatterns` を destructure
+- 再スケジュール通知バナーを追加（緑系のインフォバナー、×ボタンで閉じられる）
+- `PatternSetupSheet` の onApply を `saveBulkPatterns()` に統合（直接 `saveLifeSlotsToDb` を呼ぶコードを削除）
+
+```
+
+## 2026-11-06 17:50 — gh_portal #230 宿題の空き時間自動スケジューリング機能
+
+- 結果: 🔀 統合完了: task/gh_portal/230 → stu-ui（pushed）
+
