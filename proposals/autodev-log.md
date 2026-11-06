@@ -26136,3 +26136,41 @@ RLSポリシー（`own_update: auth.uid() = author_id`）はすでに投稿者�
 
 - 結果: 🔀 統合完了: task/gh_portal/227 → stu-ui（pushed）
 
+## 2026-11-06 17:05 — gh_portal #226 チャンネル管理の権限制御と初期データ整備
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。実装内容をまとめます。
+
+---
+
+## 実装内容
+
+### マイグレーション: `supabase/migrations/20261106000001_channel_access_control.sql`
+
+1. **chat_rooms INSERT 権限制限**: 既存の全認証ユーザー許可ポリシー(`authenticated_insert`)を削除し、`is_admin = true` または `is_owner = true` のユーザーのみ作成できる `admin_insert` ポリシーに差し替え
+2. **全グループチャンネル参照**: `type = 'group'` のルームは全認証ユーザーが参照可能な `group_all_select` ポリシーを追加（チャンネル一覧ブラウズ用）
+3. **退室ポリシー**: `room_members` に自己削除を許可する `own_delete` ポリシーを追加
+4. **デフォルトチャンネルシード**: 数学・英語・物理・小論文の4チャンネルを投入（重複しない場合のみ）
+
+### Chat.tsx
+
+- **`Channel` 型**: `joined: boolean` フィールドを追加
+- **`fetchChannels`**: 自分がメンバーのチャンネルのみ → 全グループチャンネルを取得し、参加状態を `joined` にマッピング
+- **`handleJoinChannel` / `handleLeaveChannel`**: 入室(room_members INSERT)・退室(room_members DELETE)ハンドラを追加
+- **チャンネル一覧UI**: `<button>` 行を `<div>` に変更し、各行に「入室」/「退室」ボタンを追加。参加済みチャンネルのみ行クリックでチャット画面を開く
+- **チャンネル作成ボタン**: `user?.isAdmin` の場合のみ表示（一般ユーザー・生徒は非表示）
+- **バグ修正**: `CreateChannelModal` を誤配置(teacherタブ内)から正しい channelタブ内に移動
+
+```
+
+## 2026-11-06 17:05 — gh_portal #226 チャンネル管理の権限制御と初期データ整備
+
+- 結果: ⚠ マージ失敗: task/gh_portal/226 → stu-ui: dirty: error: Your local changes to the following files would be overwritten by merge:
+	src/pages/Chat.tsx
+Please commit your changes or stash them before you merge.
+Aborting
+Merge with strategy ort failed.
+
