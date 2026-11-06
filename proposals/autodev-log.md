@@ -26174,3 +26174,41 @@ Please commit your changes or stash them before you merge.
 Aborting
 Merge with strategy ort failed.
 
+## 2026-11-06 17:48 — gh_portal #228 生活パターン設定の保存処理が永続化されない不具合修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+## 修正内容まとめ
+
+**根本原因：** 2つのバグが重なっていました
+
+1. **デフォルトパターン（平日・週末）の編集が DB に保存されない**  
+   `DEFAULT_IDS.has(p.id)` のチェックで DB 書き込みを完全スキップしていた。リロード時にハードコードされたデフォルト値で上書きされるため設定が消える。
+
+2. **新規パターン追加の `day_type: 'custom'` が CHECK 制約違反の可能性**  
+   元のスキーマは `CHECK (day_type IN ('weekday', 'holiday'))` で `'custom'` を許可していなかった。
+
+**修正内容：**
+
+| ファイル | 変更内容 |
+|---|---|
+| `supabase/migrations/20261106000002_life_patterns_add_default_key.sql` | `default_key TEXT` カラムと一意インデックス追加、`day_type` 制約を緩和 |
+| `src/lib/LifePatternContext.tsx` | デフォルトパターンを `default_key` で upsert、ロード時にオーバーライドを統合、エラーハンドリング追加 |
+| `src/lib/database.types.ts` | `default_key` カラムを型定義に追加 |
+
+**動作：** デフォルトパターンを編集すると `default_key: 'weekday'` などで DB に upsert → リロード後も編集済み状態が復元。「削除」ボタン押下でオーバーライドレコードが消え、元のデフォルトに戻る。
+
+```
+
+## 2026-11-06 17:48 — gh_portal #228 生活パターン設定の保存処理が永続化されない不具合修正
+
+- 結果: ⚠ マージ失敗: task/gh_portal/228 → stu-ui: dirty: error: The following untracked working tree files would be overwritten by merge:
+	supabase/migrations/20261106000002_life_patterns_add_default_key.sql
+Please move or remove them before you merge.
+Aborting
+Merge with strategy ort failed.
+
