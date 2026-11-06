@@ -26078,3 +26078,32 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/224 → stu-ui（pushed）
 
+## 2026-11-06 16:56 — gh_portal #225 講師の担当生徒チャット表示の絞り込み修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**変更内容の要約：**
+
+`src/pages/Chat.tsx` の `fetchStudents` 関数（講師向けチャット一覧取得）で、未読カウント計算時のデータ取得を担当生徒のみに絞り込みました。
+
+**修正箇所（約1265行）：**
+
+- **変更前**: `.neq('user_id', teacherId)` — 講師以外の全ユーザー（担当外生徒を含む）のルームデータを取得
+- **変更後**: `.in('user_id', studentIds)` — `teacher_student_assignments` から取得した担当生徒IDのみでフィルタ
+
+さらに取得したルームIDを `assignedDmRoomIds` として絞り込み、`getRoomUnreadCounts` も担当生徒ルームのみを対象にすることで、担当外生徒の個人情報（メッセージ存在有無・タイムスタンプ）がフロントエンドで参照されないようにしました。
+
+```
+
+## 2026-11-06 16:56 — gh_portal #225 講師の担当生徒チャット表示の絞り込み修正
+
+- 結果: ⚠ マージ失敗: task/gh_portal/225 → stu-ui: dirty: error: Your local changes to the following files would be overwritten by merge:
+	src/pages/Chat.tsx
+Please commit your changes or stash them before you merge.
+Aborting
+Merge with strategy ort failed.
+
