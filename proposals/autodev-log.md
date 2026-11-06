@@ -26308,3 +26308,24 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/232 → stu-ui（pushed）
 
+## 2026-11-06 18:43 — gh_portal #233 段階突破テスト開放条件のDB静的管理化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了。変更内容：
+
+- **migration**: `test_unlock_conditions` に `ref_material_ticket_id` カラム追加、`ticket_completion` を CHECK 制約に追加、teacher 書き込み権限を admin のみに限定、`homework_tickets` 完了時の自動解禁トリガー実装
+- **Dashboard.tsx**: `TestUnlockConditionsPanel` を読み取り専用表示に変更
+- **Practice.tsx**: `ticket_completion` 型を `test_manual_unlocks` 経由で処理
+- **database.types.ts**: `ref_material_ticket_id` フィールドと FK を追加
+
+ブランチ `task/gh_portal/233-db` をリモートへプッシュ済み。
+
+```
+
+## 2026-11-06 18:43 — gh_portal #233 段階突破テスト開放条件のDB静的管理化
+
+- 結果: 🔀 統合完了: task/gh_portal/233-db → stu-ui（pushed）
+
