@@ -26050,3 +26050,31 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/223-ui → stu-ui（pushed）
 
+## 2026-11-06 16:56 — gh_portal #224 生活パターン設定が予定生成に反映されないバグ修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。
+
+## 修正内容
+
+**原因**: 生活パターンを保存・適用する際、既存タスクスロット（homework_tickets紐づき）が生活パターンのブロックと時間的に重複していても削除されなかったため、次回ロード時に両方のスロットが表示され競合が発生していた。
+
+**修正ファイル**:
+
+1. **`src/lib/scheduleUtils.ts`** — `saveLifeSlotsToDb` にDB側の競合削除ロジックを追加
+   - 生活スロット保存前に、各日付の生活パターンブロックと時間が重複する未ロックのタスクスロットを削除
+   - 削除されたタスクは次回ロード時に `autoPlaceTickets` により空き時間へ自動再配置される
+
+2. **`src/lib/hooks/useDailySchedule.ts`** — `applyPattern` の state 更新に競合フィルタを追加
+   - 新しい生活パターンブロックと重複する時間帯のタスクピルをstateからも即座に除外
+   - UIとDBの状態が一致し、`triggerRefresh` 完了まで競合表示が出ない
+
+```
+
+## 2026-11-06 16:56 — gh_portal #224 生活パターン設定が予定生成に反映されないバグ修正
+
+- 結果: 🔀 統合完了: task/gh_portal/224 → stu-ui（pushed）
+
