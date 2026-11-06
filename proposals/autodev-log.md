@@ -26107,3 +26107,32 @@ Please commit your changes or stash them before you merge.
 Aborting
 Merge with strategy ort failed.
 
+## 2026-11-06 17:00 — gh_portal #227 タイムラインの質問ステータス変更機能を修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。
+
+## 修正内容
+
+**問題の根本原因:** `Question` インターフェースに `authorId` がなかったため、質問者と現在ログイン中のユーザーを比較できず、「解決済みにする」ボタンが実装されていなかった。
+
+**修正した箇所（`src/pages/Timeline.tsx`）:**
+
+1. **`Question` インターフェース** に `authorId: string` を追加
+2. **`POST_SELECT`** に `author_id` を追加（DBから取得）
+3. **`rowToQuestion`** で `author_id` → `authorId` にマップ
+4. **`submitQuestion`** の楽観的更新に `authorId: user.id` を追加
+5. **`resolveQuestion` 関数**を新規実装 — `posts.is_resolved = true` をDBに書き込み、ローカル状態を更新
+6. **質問詳細シートに「解決済みにする」ボタン**を追加 — 質問者本人かつ未解決の場合のみ表示
+
+RLSポリシー（`own_update: auth.uid() = author_id`）はすでに投稿者自身の更新を許可していたため、DB側の変更は不要でした。
+
+```
+
+## 2026-11-06 17:00 — gh_portal #227 タイムラインの質問ステータス変更機能を修正
+
+- 結果: 🔀 統合完了: task/gh_portal/227 → stu-ui（pushed）
+
