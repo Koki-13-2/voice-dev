@@ -26329,3 +26329,43 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/233-db → stu-ui（pushed）
 
+## 2026-11-06 18:44 — gh_portal #231 大学・学部選択の階層型ポップアップUI実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミット・プッシュ完了。実装内容をまとめます。
+
+---
+
+## 実装完了
+
+**変更ファイル:**
+
+| ファイル | 変更内容 |
+|---|---|
+| `src/components/UniversitySelectModal.tsx` | 新規作成 — 5ステップモーダル |
+| `src/lib/eduDataApi.ts` | `minLength`オプション追加（1文字検索許可） |
+| `src/pages/Onboarding.tsx` | 大学/学部フィールドを統合ボタンに置換 |
+| `src/styles/globals.css` | ボタン・モーダル用スタイル追加 |
+
+**モーダルフロー:**
+1. **都道府県** — 48都道府県グリッド（「全国」でスキップ可）
+2. **設立形態** — 国立/公立/私立/すべて
+3. **あかさたな行** — ア行〜ワ行の10選択肢
+4. **大学選択** — edu-data.jp APIで動的フェッチ、テキスト検索で絞り込み、都道府県・設立形態でクライアント側フィルタリング
+5. **学部入力** — 自由記述（第一志望は必須）
+
+**Onboardingの変更点:**
+- Step2「過去の志望校+学部」→ 統合ボタン1つ
+- Step3「第一〜第三志望×大学+学部」→ 各統合ボタン3つ
+- 在籍校（F1,G1対応）はSchoolComboboxのまま維持
+- 既存のドラフト保存・バリデーション・DB送信ロジックは無変更
+
+```
+
+## 2026-11-06 18:44 — gh_portal #231 大学・学部選択の階層型ポップアップUI実装
+
+- 結果: 🔀 統合完了: task/gh_portal/231-ui → stu-ui（pushed）
+
