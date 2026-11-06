@@ -26212,3 +26212,42 @@ Please move or remove them before you merge.
 Aborting
 Merge with strategy ort failed.
 
+## 2026-11-06 17:49 — gh_portal #229 ダッシュボード予定ブロックのインライン編集UI実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了しました。以下が変更内容のまとめです：
+
+**実装内容（`src/pages/Dashboard.tsx`）**
+
+`DailyPanel` 関数に以下を追加：
+
+1. **長押し検出**（400ms）
+   - `onPointerDown` / `onTouchStart` でタイマー開始
+   - 8px 以上のポインター移動でキャンセル（スクロール対応）
+   - 長押し成立時にバイブレーション（`navigator.vibrate(60)`）
+
+2. **編集モード UI**
+   - `outline` ハイライト + 「編集中」バッジ
+   - ピル上下端に 36×5px のドラッグハンドルを表示
+   - 「完了」ボタンで明示的に終了
+
+3. **D&D ハンドラー**
+   - `setPointerCapture` でポインターを要素にキャプチャし、ピル外へのドラッグも追跡
+   - `touchmove` に `{ passive: false }` を document レベルで登録してスクロール抑止
+   - 30 分グリッドスナップ：`Math.round(dMin / 30) * 30`
+   - 上端：開始時刻変更（最小 30 分の間隔を保持）
+   - 下端：終了時刻変更（タイムライン範囲内に制限）
+
+4. **保存ロジック**
+   - `daily_schedule_slots` の該当レコードを `UPDATE`（`hour`/`minute`/`duration_minutes`）
+   - 生活パターンのマスター定義（`life_patterns`）には一切触れない
+
+```
+
+## 2026-11-06 17:49 — gh_portal #229 ダッシュボード予定ブロックのインライン編集UI実装
+
+- 結果: 🔀 統合完了: task/gh_portal/229-ui → stu-ui（pushed）
+
