@@ -26430,3 +26430,26 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/237 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-08 21:41 — gh_portal #248 ダッシュボードのピル長押し判定ロジック修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了。変更内容まとめ：
+
+**`src/pages/Dashboard.tsx`（`DailyPanel` 内）**
+
+| 変更点 | 変更前 | 変更後 |
+|--------|--------|--------|
+| `startLongPress` タイムアウト | `400` ms | `1000` ms |
+| `onTouchMove` キャンセル条件 | `dx²+dy² > 64`（8px 全方向） | `\|dy\| > 10`（縦10px超）または `dx²+dy² > 144`（12px 全方向） |
+
+タイムアウトを1000msにすることでスクロール中に誤って編集モードへ入るリスクが大幅に低下します。また `onTouchMove` では縦方向（スクロール方向）10px超を最優先のキャンセル条件として判定するため、意図しないドラッグ開始をより確実に防げます。
+
+```
+
+## 2026-11-08 21:41 — gh_portal #248 ダッシュボードのピル長押し判定ロジック修正
+
+- 結果: ⚠ マージ失敗: task/gh_portal/248 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
