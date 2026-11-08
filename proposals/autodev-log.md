@@ -26395,3 +26395,38 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/236 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-08 17:29 — gh_portal #237 チュートリアル完了状態の永続化と再表示抑制
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミット・プッシュ完了しました。
+
+---
+
+## 実施内容
+
+### 根本原因
+`logout()` 時に `localStorage.removeItem(tutorialKey(uid))` でキャッシュを削除していたため、再ログイン時に DB フェッチ完了前の一瞬 `tutorialDone = false` になり、`TutorialContext` の `useEffect` が起動してしまっていた。
+
+### 修正内容（2ファイル）
+
+**`src/lib/AuthContext.tsx`**  
+- `logout()` から `localStorage.removeItem(tutorialKey(uid))` を削除
+- キーは `gh_portal_tutorial_${uid}` と UID で分離されているため異なるユーザー間の汚染なし
+
+**`src/lib/TutorialContext.tsx`**  
+- `useEffect` の依存配列に `tutorialDone` を追加（`[user?.id]` → `[user?.id, tutorialDone]`）
+- `tutorialDone` が `true` に変わったタイミングで `setIsActive(false)` を呼ぶ節を追加（別デバイスや初回キャッシュなし時の二重保護）
+
+### 動作保証
+- 設定画面からの手動再起動（`startTutorial()`）は deps を変えないため引き続き動作する
+- 初回ユーザー（localStorage なし・DB も false）はこれまで通りチュートリアルが起動する
+
+```
+
+## 2026-11-08 17:29 — gh_portal #237 チュートリアル完了状態の永続化と再表示抑制
+
+- 結果: ⚠ マージ失敗: task/gh_portal/237 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
