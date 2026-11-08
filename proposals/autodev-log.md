@@ -26369,3 +26369,29 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/231-ui → stu-ui（pushed）
 
+## 2026-11-08 17:28 — gh_portal #236 面談開始ボタンをスクロール追従固定表示に変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**実装内容:**
+
+`src/pages/Dashboard.tsx` の `StudentDetailDashboard` コンポーネントで、ヘッダーと面談アクションバーを単一の `position: sticky / top: 0` ラッパーに統合しました。
+
+**変更前:** ヘッダーのみが sticky で、面談開始ボタン（緑）・面談設定ボタン・拒否バーは通常フローに存在し、スクロールで視界外に消えていた。
+
+**変更後:** 3種類の面談アクションバーすべてをヘッダーと同じ sticky ラッパー内に移動。スクロール位置に関わらず画面上部に常時固定表示される。
+
+- ビルド確認: `vite build` 成功
+- コミット: `c64e928`
+- プッシュ: `origin/task/gh_portal/236`
+
+```
+
+## 2026-11-08 17:28 — gh_portal #236 面談開始ボタンをスクロール追従固定表示に変更
+
+- 結果: ⚠ マージ失敗: task/gh_portal/236 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
