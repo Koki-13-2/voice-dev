@@ -26453,3 +26453,38 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/248 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:09 — gh_portal #251 ロングプレス閾値を1000msから600msに短縮
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+---
+
+**タスク実行不要と判断した理由を報告します。**
+
+タスク説明：「現在の 1000ms から 600ms に変更」
+
+実際のコード（`Dashboard.tsx:664`）：
+```typescript
+}, 400)  // 現在の値は 400ms（1000ms ではない）
+```
+
+**現状**：ロングプレス閾値はすでに **400ms** で、タスクの目標値 600ms よりも速い（より良いUX）。
+
+考えられる経緯：
+- このタスクが作られた時点での値が 1000ms だったが、その後誰かが 400ms に変更済み
+- または、タスクの説明が誤った前提（1000ms）に基づいて書かれた
+
+**結論**：600ms に変更すると逆にロングプレスが遅くなりUXが悪化します。タスクの目的（操作性改善）はすでに達成されている状態のため、コード変更は行いません。
+
+---
+
+変更なしのため、コミット・プッシュも不要です。タスクの実装状況（すでに目標以上に改善済み）をご確認いただき、必要であれば正確な目標値を再指定してください。
+
+```
+
+## 2026-11-12 16:09 — gh_portal #251 ロングプレス閾値を1000msから600msに短縮
+
+- 結果: ⚠ マージ失敗: task/gh_portal/251-1000ms-600ms → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
