@@ -26488,3 +26488,42 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/251-1000ms-600ms → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:11 — gh_portal #249 チケット進捗：4ステータスのビジュアル可視化
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミット・プッシュ完了しました。
+
+## 実装内容まとめ
+
+### 追加したロジック（`Dashboard.tsx`）
+
+**`getTicketStatus4` 関数**
+| 条件 | ステータス |
+|---|---|
+| `hwStatus === null` | `'unassigned'`（未割当） |
+| `done` かつ `completedAt < dueDate` | `'early'`（前倒完了） |
+| `done` | `'done'`（完了済） |
+| `pending` かつ `today >= dueDate` | `'overdue'`（遅延） |
+| `pending` | `'pending'`（期日未到来） |
+
+**`TicketStatus4Badge` コンポーネント**
+- 遅延: 赤バッジ + `warning` アイコン + 期日表示
+- 前倒完了: 青バッジ + `rocket_launch` アイコン + 完了日表示
+- 完了済: 緑バッジ + `check_circle` アイコン + 完了日表示
+- 期日未到来（3日以内）: 黄バッジ + `schedule` アイコン
+- 期日未到来（余裕あり）: グレーバッジ + `calendar_today` アイコン
+
+### 更新箇所
+- **`MaterialTicketProgressModal`**: DBクエリに `due_date`/`completed_at` を追加、各チケット行を4ステータスで色分け・バッジ表示
+- **`hwDueBadge`**: 宿題カードのバッジも同一ロジックで統一
+- **`globals.css`**: `ticket-progress-item--overdue`/`ticket-progress-item--early` スタイルを追加
+
+```
+
+## 2026-11-12 16:11 — gh_portal #249 チケット進捗：4ステータスのビジュアル可視化
+
+- 結果: ⚠ マージ失敗: task/gh_portal/249-4 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
