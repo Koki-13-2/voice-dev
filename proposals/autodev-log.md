@@ -26587,3 +26587,38 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/253 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:19 — gh_portal #254 講師ヘッダーへの面談通知アイコン追加
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+## 実装内容
+
+**新規ファイル: `src/components/MeetingNotificationIcon.tsx`**
+- ロール `'teacher'` のみ表示（生徒・管理者には非表示）
+- マウント時に Supabase から以下を取得：
+  - `teacher_student_assignments WHERE status = 'accepted'` → 担当生徒ID一覧
+  - `meetings WHERE teacher_id = ...` → 最新面談レコード一覧
+- 生徒ごとに面談ステータスを判定：
+  - 面談レコードなし or `status = 'rejected'` → **要設定**（黄色バッジ）
+  - `status = 'invited'` → **調整中**（青バッジ）
+  - `accepted` / `completed` → 通知なし
+- ベルアイコン＋赤色カウントバッジを表示
+- クリックでドロップダウンポップアップを開き、対象生徒一覧とステータスを表示
+- ポップアップ内の生徒をクリックすると `/dashboard` へ遷移
+
+**更新: `src/components/Header.tsx`**
+- ADMINバッジとアバターの間に `<MeetingNotificationIcon />` を挿入
+
+**更新: `src/styles/globals.css`**
+- `.mtg-notif*` クラス群を追加（ベルボタン・バッジ・ポップアップ）
+
+```
+
+## 2026-11-12 16:19 — gh_portal #254 講師ヘッダーへの面談通知アイコン追加
+
+- 結果: ⚠ マージ失敗: task/gh_portal/254 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
