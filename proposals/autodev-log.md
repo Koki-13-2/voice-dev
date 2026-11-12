@@ -26622,3 +26622,33 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/254 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:21 — gh_portal #255 面談記録モーダルの生徒プラン取得バグ修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+修正完了・プッシュ済みです。
+
+## 修正内容
+
+**根本原因:** `useTeacherStudents` フックが `profiles` テーブルから `membership_plan` を取得しておらず、`TeacherStudentData` にプラン情報フィールドが存在しなかったため、面談設定モーダル・面談記録パネルで生徒のプラン情報が表示できない状態でした。
+
+**変更ファイル（3件）:**
+
+1. **`src/lib/dashboardTypes.ts`** — `TeacherStudentData` インターフェースに `membershipPlan?: string` を追加
+
+2. **`src/lib/hooks/useTeacherStudents.ts`** — プロファイルクエリを `'id, name, membership_plan'` に変更し、取得した値を `membershipPlan` にマップ
+
+3. **`src/pages/Dashboard.tsx`**
+   - `planLabel` のインポートを追加
+   - `MeetingInviteModal` のプロップスに `membershipPlan` を追加し、ヘッダーの生徒名横にプランバッジを表示
+   - `MeetingRecordsPanel` のプロップスに `membershipPlan` を追加し、記録一覧の上部にプランバッジを表示
+   - 両コンポーネントの呼び出し元で `student.membershipPlan` を渡すよう修正
+
+```
+
+## 2026-11-12 16:21 — gh_portal #255 面談記録モーダルの生徒プラン取得バグ修正
+
+- 結果: ⚠ マージ失敗: task/gh_portal/255 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
