@@ -26527,3 +26527,27 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/249-4 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:11 — gh_portal #250 面談シート提出後のボタン表示ロジック修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。変更内容のまとめ：
+
+**修正したバグ**: 面談シート提出後も「面談を開始する」ボタンが残存していた問題
+
+**修正箇所** (`src/pages/Dashboard.tsx`):
+
+1. **`TeacherDashboard` の `onComplete` コールバック** (line ~2839): 面談ワークフロー完了時に `selected.nextMeeting.status` を `'completed'` に更新するよう追加。これにより、ローカルstateが即座に反映される。
+
+2. **`StudentDetailDashboard`** (line ~3091): `isCompleted` フラグを追加し、`status === 'completed'` の場合に「面談インビテーション」ボタンを表示する分岐を追加。
+
+**ステータス遷移**: `accepted` → ワークフロー完了 → `completed` → ボタンが「面談インビテーション」に切り替わり、次回面談の設定が可能になる。
+
+```
+
+## 2026-11-12 16:11 — gh_portal #250 面談シート提出後のボタン表示ロジック修正
+
+- 結果: ⚠ マージ失敗: task/gh_portal/250 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
