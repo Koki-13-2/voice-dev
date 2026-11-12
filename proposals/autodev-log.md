@@ -26652,3 +26652,32 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/255 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:23 — gh_portal #252 生徒向け面談・メッセージ履歴一覧画面の実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了・push 完了です。
+
+---
+
+## 実装内容まとめ
+
+**新規ファイル**: `src/pages/StudentHistory.tsx`
+- **面談記録タブ**: `meeting_records` テーブルから `student_id` でフィルタし、担当講師名（profiles JOIN）・日時・3ステップメモを時系列表示。カードタップで展開/折りたたみ。
+- **メッセージタブ**: 生徒が参加する `chat_rooms(type='dm')` の中から講師送信メッセージを取得・表示。送信者アバター付き。
+
+**既存ファイル変更**:
+- `TabBar.tsx`: 生徒ナビに「履歴」タブ（`/history`, `history` アイコン）を追加（6番目）
+- `App.tsx`: `/history` ルート追加、`StudentHistoryRoute`（生徒以外は `/timeline` にリダイレクト）
+- `globals.css`: `history-card` / `history-msg-card` のスタイル追加（既存デザイントークン使用）
+
+TypeScript チェック・Vite ビルドともにエラーなし確認済み。
+
+```
+
+## 2026-11-12 16:23 — gh_portal #252 生徒向け面談・メッセージ履歴一覧画面の実装
+
+- 結果: ⚠ マージ失敗: task/gh_portal/252 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
