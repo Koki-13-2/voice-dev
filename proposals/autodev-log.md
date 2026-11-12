@@ -26551,3 +26551,39 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: ⚠ マージ失敗: task/gh_portal/250 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-12 16:17 — gh_portal #253 面談後フォームをモーダル強制表示に変更
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+実装完了です。変更内容をまとめます。
+
+## 完了した変更
+
+**ファイル**: `src/pages/Dashboard.tsx`
+
+### 変更内容
+
+1. **自動強制表示** — `useEffect` を追加し、`dbPendingRecords` に未回答面談があれば即座に `feedbackScreen = 'form'` にセット。ダッシュボード表示時に自動でモーダルが開く。
+
+2. **ESCキー無効化** — `feedbackScreen !== 'hidden'` のとき `keydown` イベントを capture フェーズでリッスンし、`Escape` キーを `preventDefault()` でブロック。
+
+3. **フルスクリーンオーバーレイモーダル** — `createPortal` で `document.body` に直接マウント。
+   - `position: fixed; inset: 0; z-index: 1000` → 全画面カバー
+   - `rgba(0,0,0,0.65)` の暗いバックドロップ
+   - 中央に `maxWidth: 480 / maxHeight: 90dvh` のダイアログパネル
+   - バックドロップにクリックハンドラ不在 → クリックしても何も起きない
+
+4. **早期returnを削除** — 以前は `feedbackScreen === 'form'` でページ全体を差し替えていた処理を撤廃し、ダッシュボードを背景に残したままモーダルを重ねる方式に。
+
+5. **埋め込み通知カードを削除** — モーダルが自動表示されるため不要になった通知カードを除去。
+
+6. **コンポーネントスタイル修正** — `MtgFeedbackScreen` / `MtgFeedbackDoneScreen` の `minHeight: '100dvh'` を `flex: '1 1 0'; minHeight: 0` に変更し、モーダルコンテナ内でスクロール可能になるよう対応。
+
+```
+
+## 2026-11-12 16:17 — gh_portal #253 面談後フォームをモーダル強制表示に変更
+
+- 結果: ⚠ マージ失敗: task/gh_portal/253 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
+
