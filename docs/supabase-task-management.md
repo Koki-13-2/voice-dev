@@ -101,7 +101,9 @@ anon キーで RLS をバイパスして読み書きするため（既存 `set_f
 ## 実装ステータス（2026-11-13 実装）
 
 - [x] gh_portal migration（列追加 + RPC）: `supabase/migrations/20261113000001_dev_task_columns.sql`
-      ※ **Supabase への適用が未実施**。適用するまで voice-dev 側の提案画面は空になる。
+      → **Supabase に適用済み（2026-11-13, `supabase db push`）**。本番で読取検証済み
+      （dev_* 列7種を確認、`load()` で既存の取込済み提案 34件がタスクとして取得できることを確認）。
+- [x] gh_portal の開発ブランチ `stu-ui` を `~/.voice-dev/app_config.json` に移行（旧MD frontmatterから）。
 - [x] server/supabase_task_store.py（Supabase バックエンドのタスクストア）
 - [x] server/main.py 差し替え（proposals 系 API + import + propose を Supabase 化）
 - [x] server/autodev.py 差し替え（next_tasks / mark_done / set_checked / get_branch / run_now）
