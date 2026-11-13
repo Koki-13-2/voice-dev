@@ -3505,17 +3505,17 @@ function proposalRowHtml(t, variant) {
   const isDone = !!t.done;
   return `<div class="proposal-row${isDone ? ' done' : ''}${isRejected ? ' rejected' : ''}">
     <input type="checkbox" ${t.checked ? 'checked' : ''} ${isDone || isRejected ? 'disabled' : ''}
-      onchange="toggleProposal(${t.id}, this.checked)" />
+      onchange="toggleProposal('${t.id}', this.checked, '${t.type || 'proposal'}')" />
     <div style="flex:1;min-width:0">
-      <div class="proposal-angle">【${escHtml(t.angle)}】#${t.id}</div>
+      <div class="proposal-angle">【${escHtml(t.angle)}】${t.dev_source === 'ai' ? '🤖' : '👤'} #${escHtml(String(t.id).slice(0,8))}</div>
       <div class="proposal-title">${escHtml(t.title)}</div>
       ${t.desc ? `<div class="proposal-desc">${escHtml(t.desc)}</div>` : ''}
-      ${isDone ? `<div class="proposal-done-at">✅ ${escHtml(t.done)} 実装済み</div>` : ''}
-      ${isRejected ? `<div class="proposal-done-at" style="color:var(--muted)">🚫 ${escHtml(t.rejected)} 不採用</div>` : ''}
+      ${isDone ? `<div class="proposal-done-at">✅ ${escHtml(String(t.done))} 実装済み</div>` : ''}
+      ${isRejected ? `<div class="proposal-done-at" style="color:var(--muted)">🚫 ${escHtml(String(t.rejected))} 不採用</div>` : ''}
     </div>
     ${isRejected
-      ? `<button class="proposal-action-btn restore" onclick="restoreProposal(${t.id})" title="復元">↩ 復元</button>`
-      : (!isDone ? `<button class="proposal-action-btn" onclick="runProposalNow(${t.id})" title="今すぐworktreeで実行">▶</button><button class="proposal-action-btn reject" onclick="rejectProposal(${t.id})" title="不採用">🚫</button>` : '')}
+      ? `<button class="proposal-action-btn restore" onclick="restoreProposal('${t.id}', '${t.type || 'proposal'}')" title="復元">↩ 復元</button>`
+      : (!isDone ? `<button class="proposal-action-btn" onclick="runProposalNow('${t.id}')" title="今すぐworktreeで実行">▶</button><button class="proposal-action-btn reject" onclick="rejectProposal('${t.id}', '${t.type || 'proposal'}')" title="不採用">🚫</button>` : '')}
   </div>`;
 }
 
@@ -3598,22 +3598,22 @@ function clearProposalGenerating() {
   if (proposalGenTimer) { clearInterval(proposalGenTimer); proposalGenTimer = null; }
 }
 
-async function toggleProposal(id, checked) {
+async function toggleProposal(id, checked, type) {
   try {
     const res = await fetch('/api/proposals/toggle', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ app_path: projectPath, id, checked }),
+      body: JSON.stringify({ app_path: projectPath, id, checked, type: type || 'proposal' }),
     });
     if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     refreshAutodevBar();
   } catch(e) { showToast('更新に失敗しました', 'error'); }
 }
 
-async function rejectProposal(id) {
+async function rejectProposal(id, type) {
   try {
     const res = await fetch('/api/proposals/reject', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ app_path: projectPath, id }),
+      body: JSON.stringify({ app_path: projectPath, id, type: type || 'proposal' }),
     });
     if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     showToast('不採用にしました', 'success');
@@ -3621,11 +3621,11 @@ async function rejectProposal(id) {
   } catch(e) { showToast('更新に失敗しました', 'error'); }
 }
 
-async function restoreProposal(id) {
+async function restoreProposal(id, type) {
   try {
     const res = await fetch('/api/proposals/restore', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ app_path: projectPath, id }),
+      body: JSON.stringify({ app_path: projectPath, id, type: type || 'proposal' }),
     });
     if (!res.ok) { showToast('更新に失敗しました', 'error'); return; }
     showToast('提案を復元しました', 'success');
@@ -3702,12 +3702,12 @@ function autodevBarHtml(ad) {
   const tasks = ad.running_tasks || (ad.running ? [ad.running] : []);
   let statusLine;
   if (tasks.length > 1) {
-    statusLine = `⚙ ${tasks.length}件 並行実行中: ` + tasks.map(t => `${escHtml(t.app)} #${t.id}（${escHtml(t.started)}〜）`).join('、');
+    statusLine = `⚙ ${tasks.length}件 並行実行中: ` + tasks.map(t => `${escHtml(t.app)} #${escHtml(String(t.id).slice(0,8))}（${escHtml(t.started)}〜）`).join('、');
   } else if (tasks.length === 1) {
     const t = tasks[0];
-    statusLine = `⚙ 実行中: ${escHtml(t.app)} #${t.id} ${escHtml(t.title)}（${escHtml(t.started)}〜）`;
+    statusLine = `⚙ 実行中: ${escHtml(t.app)} #${escHtml(String(t.id).slice(0,8))} ${escHtml(t.title)}（${escHtml(t.started)}〜）`;
   } else if (ad.next_task) {
-    statusLine = `次のタスク: ${escHtml(ad.next_task.app)} #${ad.next_task.id} ${escHtml(ad.next_task.title)}`;
+    statusLine = `次のタスク: ${escHtml(ad.next_task.app)} #${escHtml(String(ad.next_task.id).slice(0,8))} ${escHtml(ad.next_task.title)}`;
   } else {
     statusLine = 'キューは空です（実装したい提案にチェックを入れてください）';
   }

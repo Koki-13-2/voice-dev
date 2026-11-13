@@ -20,7 +20,8 @@ import autodev
 import chatlog_store
 import gitutil
 import idea_store
-import proposal_store
+import proposal_store  # パース関数（extract_block / parse_generated）用
+import supabase_task_store as task_store  # タスク台帳の正（Supabase）
 import secrets_store
 import session_store
 from claude_client import ClaudeClient, run_oneshot
@@ -883,30 +884,39 @@ async def checkout_branch(data: dict):
 # ── 追加提案蓄積モード ───────────────────────────────
 @app.get("/api/proposals")
 async def get_proposals(app_path: str):
-    return JSONResponse(proposal_store.load(app_path))
+    return JSONResponse(await asyncio.to_thread(task_store.load, app_path))
 
 
 @app.post("/api/proposals/toggle")
 async def toggle_proposal(data: dict):
-    ok = proposal_store.set_checked(data["app_path"], int(data["id"]), bool(data["checked"]))
-    if not ok:
-        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    try:
+        await asyncio.to_thread(
+            task_store.set_checked, data["app_path"], str(data["id"]),
+            bool(data["checked"]), data.get("type", "proposal"))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=502)
     return JSONResponse({"ok": True})
 
 
 @app.post("/api/proposals/reject")
 async def reject_proposal(data: dict):
-    ok = proposal_store.reject_task(data["app_path"], int(data["id"]))
-    if not ok:
-        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    try:
+        await asyncio.to_thread(
+            task_store.reject_task, data["app_path"], str(data["id"]),
+            data.get("type", "proposal"))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=502)
     return JSONResponse({"ok": True})
 
 
 @app.post("/api/proposals/restore")
 async def restore_proposal(data: dict):
-    ok = proposal_store.restore_task(data["app_path"], int(data["id"]))
-    if not ok:
-        return JSONResponse({"error": "タスクが見つかりません"}, status_code=404)
+    try:
+        await asyncio.to_thread(
+            task_store.restore_task, data["app_path"], str(data["id"]),
+            data.get("type", "proposal"))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=502)
     return JSONResponse({"ok": True})
 
 
@@ -914,7 +924,7 @@ async def restore_proposal(data: dict):
 async def set_proposal_branch(data: dict):
     app_path = data["app_path"]
     branch = data.get("branch", "").strip()
-    proposal_store.set_branch(app_path, branch)
+    task_store.set_branch(app_path, branch)
     if branch and gitutil.is_git_repo(app_path):
         result = gitutil.checkout_or_create(app_path, branch)
         return JSONResponse({"ok": True, "result": result})
@@ -994,7 +1004,19 @@ async def import_user_feedback(data: dict):
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
-    new_tasks = []
+    # 未処理（import_status IS NULL）の提案・ご意見を書き直しなしで一括タスク化する。
+    # タスク台帳は Supabase が正: import_feedback_as_task で同じ行に dev_task_* を設定。
+    def _raw_title_desc(row: dict) -> tuple[str, str]:
+        content = (row.get("content") or "").strip()
+        first_line = content.split("\n")[0]
+        title = (first_line[:57] + "…") if len(first_line) > 57 else first_line
+        desc = content
+        image_url = row.get("image_url")
+        if image_url:
+            desc += f" | 📷 {image_url}"
+        return title, desc
+
+    pending: list[tuple[str, str, str, str, str]] = []  # (type, id, angle, title, desc)
     try:
       async with httpx.AsyncClient(timeout=20) as client:
         r1 = await client.post(
@@ -1003,47 +1025,40 @@ async def import_user_feedback(data: dict):
         )
         if r1.status_code == 200:
             for row in r1.json():
-                content = (row.get("content") or "").strip()
-                if not content:
+                if row.get("import_status") is not None or not (row.get("content") or "").strip():
                     continue
                 tab = row.get("tab") or "other"
-                first_line = content.split("\n")[0]
-                title = (first_line[:57] + "…") if len(first_line) > 57 else first_line
-                desc = content
-                image_url = row.get("image_url")
-                if image_url:
-                    desc += f" | 📷 {image_url}"
-                new_tasks.append({"angle": f"ユーザー提案/{tab}/小", "title": title, "desc": desc})
+                title, desc = _raw_title_desc(row)
+                pending.append(("proposal", row["id"], f"ユーザー提案/{tab}/小", title, desc))
         r2 = await client.post(
             f"{supabase_url}/rest/v1/rpc/get_user_feedbacks_admin",
             headers=headers, json={},
         )
         if r2.status_code == 200:
             for row in r2.json():
-                content = (row.get("content") or "").strip()
-                if not content:
+                if row.get("import_status") is not None or not (row.get("content") or "").strip():
                     continue
-                first_line = content.split("\n")[0]
-                title = (first_line[:57] + "…") if len(first_line) > 57 else first_line
-                desc = content
-                image_url = row.get("image_url")
-                if image_url:
-                    desc += f" | 📷 {image_url}"
-                new_tasks.append({"angle": "ユーザーご意見/小", "title": title, "desc": desc})
+                title, desc = _raw_title_desc(row)
+                pending.append(("opinion", row["id"], "ユーザーご意見/小", title, desc))
+
+        total = len(pending)
+        if total == 0:
+            return JSONResponse({"added": 0, "skipped": 0, "total": 0})
+        added = 0
+        for item_type, item_id, angle, title, desc in pending:
+            r = await client.post(
+                f"{supabase_url}/rest/v1/rpc/import_feedback_as_task",
+                headers=headers,
+                json={"p_type": item_type, "p_id": item_id,
+                      "p_angle": angle, "p_title": title, "p_desc": desc},
+            )
+            if r.status_code in (200, 204):
+                added += 1
     except httpx.HTTPError as e:
         return JSONResponse(
             {"error": f"Supabase への接続に失敗しました: {e}"},
             status_code=502,
         )
-    total = len(new_tasks)
-    if total == 0:
-        return JSONResponse({"added": 0, "skipped": 0, "total": 0})
-    app_name = Path(app_path).name
-    added = proposal_store.add_tasks(app_path, new_tasks)
-    if added > 0:
-        await gitutil.commit_and_push(
-            [str(proposal_store._file_for(app_name))],
-            f"proposals: {app_name} にユーザーフィードバック {added}件を取り込み")
     return JSONResponse({"added": added, "skipped": total - added, "total": total})
 
 
@@ -1133,8 +1148,7 @@ async def process_feedbacks(data: dict):
         "Content-Type": "application/json",
     }
 
-    status_value = "imported" if action == "import" else "rejected"
-    new_tasks = []
+    imported = 0
     errors = []
 
     async with httpx.AsyncClient(timeout=60) as client:
@@ -1146,6 +1160,7 @@ async def process_feedbacks(data: dict):
                 continue
 
             if action == "import":
+                # エンジニア向けに書き直し、同じ行を dev_task_* でタスク化（Supabaseが正）
                 tab = item.get("tab") if item_type == "proposal" else None
                 title, desc = await _rewrite_feedback_for_engineer(content, tab)
                 image_url = item.get("image_url")
@@ -1153,25 +1168,24 @@ async def process_feedbacks(data: dict):
                     desc += f" | 📷 {image_url}"
                 angle = (f"ユーザー提案/{item.get('tab') or 'other'}/小"
                          if item_type == "proposal" else "ユーザーご意見/小")
-                new_tasks.append({"angle": angle, "title": title, "desc": desc})
-
-            r = await client.post(
-                f"{supabase_url}/rest/v1/rpc/set_feedback_import_status",
-                headers=headers,
-                json={"p_type": item_type, "p_id": item_id, "p_status": status_value},
-            )
-            if r.status_code not in (200, 204):
-                errors.append(f"{item_id[:8]}: HTTP {r.status_code}")
-
-    imported = 0
-    if action == "import" and new_tasks and app_path:
-        added = proposal_store.add_tasks(app_path, new_tasks)
-        imported = added
-        app_name = Path(app_path).name
-        if added > 0:
-            await gitutil.commit_and_push(
-                [str(proposal_store._file_for(app_name))],
-                f"proposals: {app_name} にユーザーフィードバック {added}件を取り込み")
+                r = await client.post(
+                    f"{supabase_url}/rest/v1/rpc/import_feedback_as_task",
+                    headers=headers,
+                    json={"p_type": item_type, "p_id": item_id,
+                          "p_angle": angle, "p_title": title, "p_desc": desc},
+                )
+                if r.status_code in (200, 204):
+                    imported += 1
+                else:
+                    errors.append(f"{item_id[:8]}: HTTP {r.status_code}")
+            else:  # reject: 取込棄却（タスク化せず import_status='rejected'）
+                r = await client.post(
+                    f"{supabase_url}/rest/v1/rpc/set_feedback_import_status",
+                    headers=headers,
+                    json={"p_type": item_type, "p_id": item_id, "p_status": "rejected"},
+                )
+                if r.status_code not in (200, 204):
+                    errors.append(f"{item_id[:8]}: HTTP {r.status_code}")
 
     return JSONResponse({
         "imported": imported,
@@ -1212,10 +1226,7 @@ async def autodev_log():
 async def autodev_run_now(data: dict):
     """指定タスクをworktree分離で即時並列起動する（方針E）"""
     app_path = data["app_path"]
-    try:
-        ids = [int(i) for i in data.get("ids", [])]
-    except (TypeError, ValueError):
-        return JSONResponse({"error": "タスクIDの形式が不正です"}, status_code=400)
+    ids = [str(i) for i in data.get("ids", []) if str(i).strip()]
     if not ids:
         return JSONResponse({"error": "タスクIDを指定してください"}, status_code=400)
     return JSONResponse(autodev.run_now(app_path, ids, model=data.get("model")))
@@ -1234,7 +1245,7 @@ async def autodev_merge(data: dict):
     """統合待ちブランチを統合先へマージする。成功時はworktreeを削除する（方針D）"""
     app_path = data["app_path"]
     branch = data["branch"]
-    into = proposal_store.get_branch(app_path)
+    into = task_store.get_branch(app_path)
     result = await asyncio.to_thread(gitutil.merge_branch, app_path, branch, into)
     if result == "merged":
         task_id = data.get("task_id", "")
@@ -1626,7 +1637,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     cache_file = ""
     try:
-        existing = proposal_store.load(project_path)["tasks"]
+        existing = (await asyncio.to_thread(task_store.load, project_path))["tasks"]
         existing_section = ""
         if existing:
             titles = "\n".join(f"- {t['title']}" for t in existing)
@@ -1655,7 +1666,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
                         stream_text2 + "\n\n===RESULT===\n\n" + result_text2)
             tasks, method = _parse_proposals(stream_text2, result_text2)
 
-        added = proposal_store.add_tasks(project_path, tasks) if tasks else 0
+        added = (await asyncio.to_thread(task_store.add_ai_tasks, project_path, tasks)) if tasks else 0
         print(f"[提案パース] app={app_name} 抽出={method} パース={len(tasks)}件 追加={added}件")
 
         await queue.put({
@@ -1665,11 +1676,7 @@ async def _run_propose(session_id: str, text: str, project_path: str, model: str
             "app_path": project_path,
             "cache_file": cache_file if not tasks else "",
         })
-        if added > 0:
-            # 蓄積を確実に保管（best-effort git commit + push）
-            await gitutil.commit_and_push(
-                [str(proposal_store._file_for(app_name))],
-                f"proposals: {app_name} に{added}件の提案を蓄積")
+        # タスク台帳は Supabase が正。ここでの MD commit は不要
     except Exception as e:
         print(f"[提案生成エラー] session={session_id}: {e}")
         await queue.put({"type": "error", "content": str(e)})

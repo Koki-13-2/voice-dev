@@ -7,8 +7,9 @@ from datetime import datetime
 from pathlib import Path
 
 import gitutil
-import proposal_store
+import proposal_store  # autodev-log（PROPOSALS_DIR）用。タスク台帳は supabase_task_store が正
 import secrets_store
+import supabase_task_store as task_store
 
 CONFIG_FILE = Path.home() / ".voice-dev" / "autodev.json"
 LOG_FILE = proposal_store.PROPOSALS_DIR / "autodev-log.md"
@@ -82,7 +83,7 @@ def _log(app_name: str, task: dict, status: str, detail: str = "") -> None:
 async def _run_task(app_path: str, task: dict, model: str) -> None:
     app_name = Path(app_path).name
     task_key = f"{app_name}#{task['id']}"
-    branch = proposal_store.task_branch_name(app_name, task)
+    branch = task_store.task_branch_name(app_name, task)
     running_tasks[task_key] = {"app": app_name, "id": task["id"], "title": task["title"],
                                "branch": branch,
                                "started": datetime.now().strftime("%H:%M")}
@@ -93,7 +94,7 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
     wt_id = f"task-{task['id']}"
     use_worktree = False
     if gitutil.is_git_repo(app_path):
-        integration = proposal_store.get_branch(app_path) or gitutil.get_current_branch(app_path)
+        integration = task_store.get_branch(app_path) or gitutil.get_current_branch(app_path)
         wt_path, wt_status = await asyncio.to_thread(
             gitutil.create_worktree, app_path, branch, wt_id, integration)
         if wt_path:
@@ -150,7 +151,10 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
         stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=TASK_TIMEOUT_SEC)
         output = stdout.decode(errors="replace")
         if proc.returncode == 0:
-            proposal_store.mark_done(app_name, task["id"])
+            try:
+                task_store.mark_done(app_path, task["id"], task.get("type", "proposal"))
+            except Exception as e:
+                print(f"[autodev] mark_done 失敗（続行）: {e}")
             _log(app_name, task, "✅ 成功", output)
             if use_worktree:
                 await _integrate_branch(app_path, task, branch, wt_id, integration)
@@ -163,9 +167,9 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
         _log(app_name, task, f"⚠ エラー: {e}")
     finally:
         running_tasks.pop(task_key, None)
-        # 提案の完了状態と実行ログを確実に保管（best-effort）
+        # タスク状態は Supabase が正。ここでは実行ログのみ保管（best-effort）
         await gitutil.commit_and_push(
-            [str(proposal_store._file_for(app_name)), str(LOG_FILE)],
+            [str(LOG_FILE)],
             f"autodev: {app_name} #{task['id']} {task['title'][:40]} の実行記録",
         )
 
@@ -264,7 +268,7 @@ def _launch_up_to_limit(cfg: dict) -> int:
     # 対策B: 同一アプリのタスクは共有ファイル（Header.tsx等）で並列マージ競合を
     # 起こすため逐次化する。実行中・本ループで起動予定のアプリ集合で判定する。
     busy_apps = {t["app"] for t in running_tasks.values()}
-    candidates = proposal_store.next_tasks(limit=max_parallel + len(running_tasks))
+    candidates = task_store.next_tasks(limit=max_parallel + len(running_tasks))
     launched = 0
     for app_path, task in candidates:
         app_name = Path(app_path).name
@@ -282,14 +286,14 @@ def _launch_up_to_limit(cfg: dict) -> int:
     return launched
 
 
-def run_now(app_path: str, task_ids: list[int], model: str | None = None) -> dict:
+def run_now(app_path: str, task_ids: list[str], model: str | None = None) -> dict:
     """指定タスクを即時並列起動する（方針E: チャット/UIからの並列タスク指示）"""
     cfg = get_config()
     model = model or cfg["model"]
     max_parallel = int(cfg.get("max_parallel_agents") or 1)
     serialize_per_app = cfg.get("serialize_per_app", True)
     app_name = Path(app_path).name
-    tasks = {t["id"]: t for t in proposal_store.load(app_path)["tasks"]}
+    tasks = {str(t["id"]): t for t in task_store.load(app_path)["tasks"]}
 
     launched: list[dict] = []
     skipped: list[dict] = []
@@ -297,6 +301,7 @@ def run_now(app_path: str, task_ids: list[int], model: str | None = None) -> dic
     # 対策B: 同一アプリは逐次化。実行中 + 本呼び出しで起動したアプリを追跡する
     busy_apps = {t["app"] for t in running_tasks.values()}
     for tid in task_ids:
+        tid = str(tid)
         t = tasks.get(tid)
         if t is None:
             skipped.append({"id": tid, "reason": "見つかりません"})
@@ -316,7 +321,11 @@ def run_now(app_path: str, task_ids: list[int], model: str | None = None) -> dic
         if slots_used >= max_parallel:
             skipped.append({"id": tid, "reason": f"並列上限({max_parallel})超過"})
             continue
-        proposal_store.set_checked(app_path, tid, True)
+        try:
+            task_store.set_checked(app_path, tid, True, t.get("type", "proposal"))
+        except Exception as e:
+            skipped.append({"id": tid, "reason": f"キュー投入失敗: {e}"})
+            continue
         asyncio.create_task(_run_task(app_path, t, model))
         launched.append({"id": tid, "title": t["title"]})
         busy_apps.add(app_name)
@@ -344,7 +353,7 @@ def parse_parallel_request(text: str) -> list[int]:
 
 def status() -> dict:
     cfg = get_config()
-    nxt = proposal_store.next_tasks(limit=3)
+    nxt = task_store.next_tasks(limit=3)
     tasks_list = list(running_tasks.values())
     return {
         **cfg,
