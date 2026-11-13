@@ -241,11 +241,36 @@ A のマージ後検証でデグレは自動検知できるようになったた
   静かに捨てる」クラスのデグレは構造的に発生しなくなる**（これが本課題の主因）。
   残るのは「エージェント自身が意図せず機能を壊す」クラスで、これはテスト/レビューの領域。
 
-### 実装ステータス
+### 実装ステータス（2026-11-13 完了）
 
-- [ ] `gitutil.is_ancestor`
-- [ ] `server/merge_guard.py`（verify + safe_merge）
-- [ ] `autodev.py`: `merge_verify` 設定 + `_integrate_branch` を `safe_merge` に
-- [ ] `main.py`: `/api/autodev/merge` を `safe_merge` に / `/api/autodev/promote` 新設 / 設定受け渡し
-- [ ] `client/index.html`: 「main へ昇格」ボタン
-- [ ] gh_portal: `pre-push` hook 導入
+- [x] `gitutil.is_ancestor`
+- [x] `server/merge_guard.py`（verify + safe_merge）
+- [x] `autodev.py`: `merge_verify` 設定（既定 build）+ `_integrate_branch` を `safe_merge` に（旧 `_post_merge_typecheck` 削除）
+- [x] `main.py`: `/api/autodev/merge` を `safe_merge` に / `/api/autodev/promote` 新設 / 設定受け渡し
+- [x] `client/index.html`: 「⬆ mainへ昇格」ボタン + `promoteToMain()`
+- [x] gh_portal: `pre-push` hook 導入（`scripts/git-hooks/pre-push`、`.git/hooks/` に設置済み）
+
+### 重要な実装上の発見: npm は WSL 上で使えない
+
+`npm` は WSL の PATH 上で Windows 版（`/mnt/c/Program Files/nodejs/npm`）に解決され、
+CMD.EXE を起動して WSL パス（`\\wsl.localhost\...`）を扱えず失敗する。
+そのため検証は `npm run build` ではなく **`node_modules/.bin/tsc --noEmit` → `node_modules/.bin/vite build`**
+をローカルバイナリとして直接実行する（Linux の node shebang で動作、`"build": "tsc && vite build"` と等価）。
+merge_guard・pre-push hook の両方でこの方式を採用。
+
+### 検証結果
+
+- `safe_merge` のコア不変条件を一時 git repo で12項目 PASS:
+  - **「mainより古い stu-ui を main へ昇格しても main の変更が落ちない／履歴消失なし」**（最新化強制の効果）
+  - 検証失敗で main・source とも自動巻き戻し（verify_failed）
+  - 統合先が進行中の task→stu-ui は stale で保留（ドロップし得るマージを実行しない）
+  - 最新 task→stu-ui は正常統合
+- gh_portal で `verify("build")`（tsc+vite build, 約5〜7秒）が実際に緑になることを確認。
+- pre-push hook 設置・構文チェック済み。gh_portal の main への push で実際に発火し正常 push を阻害しないことを確認。
+
+### 申し送り
+
+- サーバー再起動で反映（`merge_verify` 既定 build、`/api/autodev/promote` 有効化）。
+- 検証が重い/遅い場合は `POST /api/autodev` で `merge_verify="tsc"` に下げられる（昇格は安全優先で常に build）。
+- `git push --no-verify` で hook を明示回避した場合、および型/バンドル的に正しい機能削除は
+  自動検知対象外（テスト導入が恒久的な補完策）。
