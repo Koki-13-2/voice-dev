@@ -20,6 +20,7 @@ import autodev
 import chatlog_store
 import gitutil
 import idea_store
+import merge_guard  # 全マージ経路のデグレ防止プリミティブ safe_merge
 import proposal_store  # パース関数（extract_block / parse_generated）用
 import supabase_task_store as task_store  # タスク台帳の正（Supabase）
 import secrets_store
@@ -1207,6 +1208,7 @@ async def set_autodev(data: dict):
         model=data.get("model"),
         max_parallel_agents=data.get("max_parallel_agents"),
         serialize_per_app=data.get("serialize_per_app"),
+        merge_verify=data.get("merge_verify"),
     )
     # ONにした直後は次のtick（60秒以内）で1件目が動くよう last_run をクリア
     if data.get("enabled"):
@@ -1242,28 +1244,74 @@ async def autodev_worktrees(app_path: str):
 
 @app.post("/api/autodev/merge")
 async def autodev_merge(data: dict):
-    """統合待ちブランチを統合先へマージする。成功時はworktreeを削除する（方針D）"""
+    """統合待ちブランチを統合先へ safe_merge で統合する。成功時はworktreeを削除する（方針D）。
+    最新化強制＋検証（build/tsc）＋失敗時自動巻き戻しを merge_guard が担保する。"""
     app_path = data["app_path"]
     branch = data["branch"]
     into = task_store.get_branch(app_path)
-    result = await asyncio.to_thread(gitutil.merge_branch, app_path, branch, into)
-    if result == "merged":
+    if not into:
+        return JSONResponse({"error": "統合先ブランチが未設定です"}, status_code=400)
+    level = autodev.get_config().get("merge_verify", "build")
+    res = await merge_guard.safe_merge(
+        app_path, source=branch, target=into,
+        level=level, push=True, bring_in_if_behind=False)
+    if res["status"] == "merged":
         task_id = data.get("task_id", "")
         if task_id:
             await asyncio.to_thread(gitutil.remove_worktree, app_path, task_id)
-        push_result = await asyncio.to_thread(gitutil.push, app_path)
-        return JSONResponse({"ok": True, "result": "merged", "push": push_result})
-    if result == "conflict":
+        return JSONResponse({"ok": True, "result": "merged",
+                             "push": res.get("pushed", ""), "verified": res.get("verified")})
+    if res["status"] == "conflict":
         return JSONResponse(
-            {"error": "コンフリクトのため自動マージできません。手動で解決してください"},
-            status_code=409)
-    if result.startswith("dirty:"):
+            {"error": "コンフリクトのため自動マージできません。手動で解決してください",
+             "detail": res["detail"]}, status_code=409)
+    if res["status"] == "stale":
         return JSONResponse(
-            {"error": "統合先の作業ツリーに未コミットの変更があるためマージできません。"
-                      "先にコミットまたはstashしてください",
-             "detail": result[6:].strip()},
-            status_code=409)
-    return JSONResponse({"error": result}, status_code=400)
+            {"error": "統合先が進行中です。タスクを再実行（最新の統合先から再分岐）してください",
+             "detail": res["detail"]}, status_code=409)
+    if res["status"] == "verify_failed":
+        return JSONResponse(
+            {"error": f"マージ後の検証({level})に失敗したため取り消しました。デグレの可能性があります",
+             "detail": res["detail"]}, status_code=409)
+    return JSONResponse({"error": res["detail"] or "マージに失敗しました"}, status_code=400)
+
+
+@app.post("/api/autodev/promote")
+async def autodev_promote(data: dict):
+    """統合先ブランチ（例: stu-ui）を main へ safe_merge で昇格する。
+    最新化強制（main を統合先に取り込んでから昇格）＋ build 検証＋失敗時自動巻き戻し。
+    これにより「統合先が main より古い状態での昇格」でもデグレが起こらない。"""
+    app_path = data["app_path"]
+    source = (data.get("source") or task_store.get_branch(app_path)).strip()
+    target = (data.get("target") or "main").strip()
+    if not source:
+        return JSONResponse({"error": "昇格元ブランチ（統合先）が未設定です"}, status_code=400)
+    if source == target:
+        return JSONResponse({"error": f"昇格元と昇格先が同じです（{source}）"}, status_code=400)
+    if not gitutil.is_git_repo(app_path):
+        return JSONResponse({"error": "git リポジトリではありません"}, status_code=400)
+    # 昇格は高リスクのため常に build 検証（設定が off でも build に引き上げる）
+    level = autodev.get_config().get("merge_verify", "build")
+    if level == "off":
+        level = "build"
+    res = await merge_guard.safe_merge(
+        app_path, source=source, target=target,
+        level=level, push=True, bring_in_if_behind=True)
+    if res["status"] == "merged":
+        return JSONResponse({
+            "ok": True, "result": "promoted",
+            "brought_in": res.get("brought_in"),
+            "push": res.get("pushed", ""),
+            "push_source": res.get("pushed_source", ""),
+            "verified": res.get("verified"),
+        })
+    code = 409 if res["status"] in ("conflict", "verify_failed", "stale") else 400
+    label = {
+        "conflict": "コンフリクトのため昇格できません。手動で解決してください",
+        "verify_failed": f"昇格時の検証({level})に失敗したため取り消しました。デグレの可能性があります",
+        "stale": "最新化に失敗しました",
+    }.get(res["status"], "昇格に失敗しました")
+    return JSONResponse({"error": label, "detail": res.get("detail", "")}, status_code=code)
 
 
 # ── セッションストア ─────────────────────────────────

@@ -3482,6 +3482,7 @@ async function showProposalScreen(projPath, projName) {
     <button class="btn-new-file" onclick="generateProposals()">🤖 提案を生成</button>
     <button class="btn-new-file" onclick="runCheckedProposals()" title="チェック済みタスクをworktree分離で即時並列実行">▶ 並列実行</button>
     <button class="btn-new-file" onclick="importUserFeedback()" title="Supabase からユーザー投稿の改善提案・フィードバックを取り込む">👤 意見取込</button>
+    <button class="btn-new-file" onclick="promoteToMain()" title="統合先ブランチをmainへ昇格（最新化+build検証付き・デグレ防止）">⬆ mainへ昇格</button>
   </div>
   ${branchBarHtml}
   <div class="autodev-bar" id="autodev-bar">${autodevBarHtml(ad)}</div>
@@ -3522,6 +3523,27 @@ function proposalRowHtml(t, variant) {
 async function importUserFeedback() {
   if (!projectPath) return;
   await openFeedbackModal();
+}
+
+async function promoteToMain() {
+  if (!projectPath) { showToast('先にプロジェクトを選択してください', 'error'); return; }
+  if (!confirm('統合先ブランチを main へ昇格します。\nmainを取り込んで最新化し、build検証に通った場合のみ反映・pushします。\n（検証に失敗した場合は自動で巻き戻します）\n実行しますか？')) return;
+  showToast('昇格中… main取込→build検証（数十秒かかる場合があります）', 'info');
+  try {
+    const res = await fetch('/api/autodev/promote', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_path: projectPath }),
+    }).then(r => r.json());
+    if (res.error) {
+      showToast('昇格中止: ' + res.error, 'error');
+      if (res.detail) console.warn('[promote]', res.detail);
+      return;
+    }
+    const ff = res.brought_in ? '（main取込後）' : '';
+    showToast(`✅ mainへ昇格完了${ff} push=${res.push || ''}`, 'success');
+  } catch (e) {
+    showToast('昇格に失敗しました', 'error');
+  }
 }
 
 async function switchBranch(branch) {

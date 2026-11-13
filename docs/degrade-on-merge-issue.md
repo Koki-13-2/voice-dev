@@ -178,3 +178,74 @@ export const HEADER_ICONS: HeaderIconDef[] = [
 
 gh_portal アプリ側の `Header.tsx` 構造変更であり、本 voice-dev リポジトリの範囲外。
 A のマージ後検証でデグレは自動検知できるようになったため、Cは恒久策として別タスクに委ねる。
+
+---
+
+## 全マージ経路のデグレ防止機構（2026-11-13 着手）
+
+### 背景: 対策A/Bの穴
+
+対策A/Bは **autodev の task→stu-ui 自動統合**しか守っていなかった。以下は無防備だった:
+
+- UI「統合」ボタン（`/api/autodev/merge`、task→stu-ui）に検証が無い。
+- **stu-ui→main 昇格**は voice-dev 外の手動 git で行われ、完全に無防備。
+- 「stu-ui が main より古い状態での stu-ui→main」は、古いベースが main の変更を静かに捨てる
+  典型的デグレ経路だが、どの経路でも検知されない。
+
+### 設計: 共通プリミティブ `safe_merge`（全経路が必ず経由）
+
+`server/merge_guard.py` に `safe_merge(app_path, source, target, *, level, push, bring_in_if_behind)`:
+
+1. **最新化強制（静かなドロップの構造的根絶）**:
+   `target` が `source` の祖先でなければ（source が target より遅れている）、
+   先に **target を source に取り込み**（`merge target→source`）、検証を通してから
+   `source→target` を行う。こうすると最終マージは fast-forward 相当になり、
+   target の変更が 3-way マージで静かに捨てられることが構造的に起こり得なくなる。
+   - task→stu-ui は `bring_in_if_behind=False`（worktree都合）。stu-ui が進んでいたら
+     `stale` として保留（＝ドロップし得るマージは実行しない）。逐次化(B)により通常は発生しない。
+   - stu-ui→main は `bring_in_if_behind=True`（main を stu-ui に取り込んでから昇格）。
+2. `source→target` をマージ。
+3. **検証** `verify(app_path, level)`:
+   - `build`（既定）= `npm run build`（= `tsc && vite build`、型+バンドル）。gh_portal は
+     `tsconfig.noEmit=true` で `tsc` は出力せず型検査のみ、`dist/` は gitignore 済みのため
+     作業ツリーを汚さない。
+   - `tsc` = `node_modules/.bin/tsc --noEmit`。`off` = スキップ。対象構成でなければ skip。
+4. **失敗時**: `gitutil.undo_merge`（`reset --hard ORIG_HEAD`）で巻き戻し、ブランチは保持、
+   `push` しない。取り込み(1)の検証失敗時はその取り込みを巻き戻す（stu-ui を汚さない）。
+5. **成功時のみ push**（bring_in した場合は source ブランチも push）。
+
+検証レベルは常に `build` を既定とする（複数 task を stu-ui 経由で main にまとめる際も、
+各マージで型+バンドルを通すことで「全 task の変更が壊れない」ことを担保するため。
+`tsc` のみでは bundler 固有エラーを見逃す可能性があり安全を保証できない）。
+
+### カバー範囲（全経路 + CLI）
+
+| 経路 | 実装 |
+|---|---|
+| autodev task→stu-ui 自動統合 | `_integrate_branch` → `safe_merge`（bring_in=False, level=cfg） |
+| UI「統合」ボタン task→stu-ui | `/api/autodev/merge` → `safe_merge`（同上） |
+| **stu-ui→main 昇格（新）** | `/api/autodev/promote` + UIボタン → `safe_merge`（bring_in=True, level=build） |
+| **CLI 手動マージ（voice-dev外）** | gh_portal に `pre-push` git hook を導入し `npm run build` を強制（失敗で push 拒否） |
+
+### 設定
+
+`server/autodev.py` の `DEFAULT_CONFIG` に `merge_verify`（既定 `"build"`、`"tsc"`/`"off"` 可）。
+`POST /api/autodev` で変更可能。
+
+### 正直な限界（「絶対」の範囲）
+
+- 本機構がカバーするのは **voice-dev を介したマージ + CLI push（hook経由）**。
+  `git push --no-verify` 等で hook を明示的に回避した場合は対象外。
+- `build` が通っても検知できないデグレ（型・バンドル的に正しいが機能削除・CSS削除など）は
+  テストが無い限り自動では捕捉できない。ただし **最新化強制により「他ブランチの変更を
+  静かに捨てる」クラスのデグレは構造的に発生しなくなる**（これが本課題の主因）。
+  残るのは「エージェント自身が意図せず機能を壊す」クラスで、これはテスト/レビューの領域。
+
+### 実装ステータス
+
+- [ ] `gitutil.is_ancestor`
+- [ ] `server/merge_guard.py`（verify + safe_merge）
+- [ ] `autodev.py`: `merge_verify` 設定 + `_integrate_branch` を `safe_merge` に
+- [ ] `main.py`: `/api/autodev/merge` を `safe_merge` に / `/api/autodev/promote` 新設 / 設定受け渡し
+- [ ] `client/index.html`: 「main へ昇格」ボタン
+- [ ] gh_portal: `pre-push` hook 導入

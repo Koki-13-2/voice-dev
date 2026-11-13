@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 import gitutil
+import merge_guard
 import proposal_store  # autodev-log（PROPOSALS_DIR）用。タスク台帳は supabase_task_store が正
 import secrets_store
 import supabase_task_store as task_store
@@ -20,13 +21,13 @@ DEFAULT_CONFIG = {
     "model": "claude-sonnet-4-6",
     "max_parallel_agents": 3,  # 同時に動かすAIエージェント数の上限
     "serialize_per_app": True,  # 同一アプリのタスクは逐次実行（共有ファイルの並列マージ競合を防ぐ・対策B）
+    "merge_verify": "build",    # マージ時の検証レベル: "build"（tsc && vite build）/ "tsc" / "off"
     "last_run": "",
     "claim": None,  # 実行中タスクのクレーム {app, id, at} — プロセス跨ぎの多重実行防止
 }
 
 TASK_TIMEOUT_SEC = 25 * 60       # 1タスクの最大実行時間
 CLAIM_TTL_SEC = 30 * 60          # クレームの有効期間（プロセス死亡時の自動解放）
-TYPECHECK_TIMEOUT_SEC = 5 * 60   # マージ後 tsc --noEmit の最大実行時間（対策A）
 
 # 実行中タスク情報（UI表示用）— 複数タスクの並行実行に対応
 running_tasks: dict[str, dict] = {}  # key = "app#id"
@@ -45,7 +46,7 @@ def get_config() -> dict:
 def set_config(**kwargs) -> dict:
     cfg = get_config()
     for k in ("enabled", "interval_min", "model", "max_parallel_agents",
-              "serialize_per_app", "last_run"):
+              "serialize_per_app", "merge_verify", "last_run"):
         if k in kwargs and kwargs[k] is not None:
             cfg[k] = kwargs[k]
     if "claim" in kwargs:  # None を渡すとクレーム解除
@@ -174,64 +175,35 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
         )
 
 
-async def _post_merge_typecheck(app_path: str) -> str | None:
-    """マージ後の統合先ワークツリーで tsc --noEmit を実行する（対策A）。
-    import消失などのデグレは必ず型エラーになるため、コンフリクトなしで静かに壊れた
-    マージを検出できる。戻り値: None=問題なし（またはTS構成でないためスキップ）、
-    文字列=型エラー出力。
-    """
-    tsc = Path(app_path) / "node_modules" / ".bin" / "tsc"
-    if not tsc.exists():
-        return None  # 非TypeScript構成 / 未インストール → チェック対象外
-    proc = None
-    try:
-        proc = await asyncio.create_subprocess_exec(
-            str(tsc), "--noEmit",
-            cwd=app_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
-        )
-        stdout, _ = await asyncio.wait_for(
-            proc.communicate(), timeout=TYPECHECK_TIMEOUT_SEC)
-        if proc.returncode == 0:
-            return None
-        return stdout.decode(errors="replace")
-    except asyncio.TimeoutError:
-        if proc:
-            proc.kill()
-        return "tsc タイムアウト（5分）"
-    except Exception as e:
-        return f"tsc 実行エラー: {e}"
-
-
 async def _integrate_branch(app_path: str, task: dict, branch: str,
                             wt_id: str, integration: str) -> None:
-    """完了したタスクブランチを統合先へマージする（方針D）。
-    コンフリクト時はworktree・ブランチを保持したまま「要確認」として記録する。
-    マージ後は tsc で正当性を検証し、型エラーがあればマージを取り消す（対策A）。
+    """完了したタスクブランチを統合先へ safe_merge で統合する（方針D）。
+    最新化強制＋検証（build/tsc）＋失敗時自動巻き戻しは merge_guard が担う。
+    成功時のみ worktree を削除し、それ以外は worktree・ブランチを保持して「要確認」記録。
     """
     app_name = Path(app_path).name
-    result = await asyncio.to_thread(gitutil.merge_branch, app_path, branch, integration)
-    if result == "merged":
-        # マージ後の型チェック。import消失等のデグレをコンフリクトなしでも検知する
-        tsc_err = await _post_merge_typecheck(app_path)
-        if tsc_err is not None:
-            # マージを取り消し、worktree・ブランチは保持して人間の判断に委ねる
-            undo = await asyncio.to_thread(gitutil.undo_merge, app_path)
-            _log(app_name, task,
-                 f"⚠ マージ後 tsc エラー（マージ取消し={undo}・手動確認が必要）: "
-                 f"{branch} → {integration}。worktreeとブランチは保持",
-                 tsc_err[-1200:])
-            return
+    level = get_config().get("merge_verify", "build")
+    res = await merge_guard.safe_merge(
+        app_path, source=branch, target=integration,
+        level=level, push=True, bring_in_if_behind=False)
+    status = res["status"]
+    if status == "merged":
         await asyncio.to_thread(gitutil.remove_worktree, app_path, wt_id)
-        push_result = await asyncio.to_thread(gitutil.push, app_path)
-        _log(app_name, task, f"🔀 統合完了: {branch} → {integration}（{push_result}）")
-    elif result == "conflict":
         _log(app_name, task,
-             f"⚠ コンフリクト（要確認）: {branch} → {integration}。"
-             "worktreeとブランチは保持。提案画面の「統合待ちブランチ」から解決後にマージしてください")
+             f"🔀 統合完了: {branch} → {integration}（push={res.get('pushed','')}, 検証={level}）")
+    elif status == "stale":
+        _log(app_name, task,
+             f"⚠ 統合先が進行中のため中止（要確認）: {res['detail']}。worktree・ブランチは保持")
+    elif status == "conflict":
+        _log(app_name, task,
+             f"⚠ コンフリクト（要確認）: {branch} → {integration}。worktree・ブランチは保持。"
+             "提案画面の「統合待ちブランチ」から解決後にマージしてください")
+    elif status == "verify_failed":
+        _log(app_name, task,
+             f"⚠ マージ後検証({level})に失敗（マージ取消し・手動確認が必要）: "
+             f"{branch} → {integration}。worktree・ブランチは保持", res.get("detail", ""))
     else:
-        _log(app_name, task, f"⚠ マージ失敗: {branch} → {integration}: {result}")
+        _log(app_name, task, f"⚠ マージ失敗: {branch} → {integration}: {res.get('detail','')}")
 
 
 async def autodev_loop() -> None:

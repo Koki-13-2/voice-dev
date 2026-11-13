@@ -176,6 +176,17 @@ def merge_branch(repo_path: str, branch: str, into: str = "") -> str:
         return f"error: {e}"
 
 
+def is_ancestor(repo_path: str, ancestor: str, descendant: str) -> bool:
+    """ancestor が descendant の祖先か（= descendant が ancestor の全コミットを含むか）。
+    safe_merge の「最新化強制」判定に使う。エラー時は False（安全側＝遅れているとみなす）。
+    """
+    try:
+        r = _run_git(["merge-base", "--is-ancestor", ancestor, descendant], repo_path)
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
 def undo_merge(repo_path: str) -> str:
     """直前のマージを取り消して統合先ブランチをマージ前の状態に戻す。
     `--no-ff` マージ直後の呼び出しを想定（merge が設定する ORIG_HEAD がマージ前を指す）。
