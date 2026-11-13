@@ -18,12 +18,14 @@ DEFAULT_CONFIG = {
     "interval_min": 30,
     "model": "claude-sonnet-4-6",
     "max_parallel_agents": 3,  # 同時に動かすAIエージェント数の上限
+    "serialize_per_app": True,  # 同一アプリのタスクは逐次実行（共有ファイルの並列マージ競合を防ぐ・対策B）
     "last_run": "",
     "claim": None,  # 実行中タスクのクレーム {app, id, at} — プロセス跨ぎの多重実行防止
 }
 
-TASK_TIMEOUT_SEC = 25 * 60  # 1タスクの最大実行時間
-CLAIM_TTL_SEC = 30 * 60     # クレームの有効期間（プロセス死亡時の自動解放）
+TASK_TIMEOUT_SEC = 25 * 60       # 1タスクの最大実行時間
+CLAIM_TTL_SEC = 30 * 60          # クレームの有効期間（プロセス死亡時の自動解放）
+TYPECHECK_TIMEOUT_SEC = 5 * 60   # マージ後 tsc --noEmit の最大実行時間（対策A）
 
 # 実行中タスク情報（UI表示用）— 複数タスクの並行実行に対応
 running_tasks: dict[str, dict] = {}  # key = "app#id"
@@ -41,7 +43,8 @@ def get_config() -> dict:
 
 def set_config(**kwargs) -> dict:
     cfg = get_config()
-    for k in ("enabled", "interval_min", "model", "max_parallel_agents", "last_run"):
+    for k in ("enabled", "interval_min", "model", "max_parallel_agents",
+              "serialize_per_app", "last_run"):
         if k in kwargs and kwargs[k] is not None:
             cfg[k] = kwargs[k]
     if "claim" in kwargs:  # None を渡すとクレーム解除
@@ -167,14 +170,55 @@ async def _run_task(app_path: str, task: dict, model: str) -> None:
         )
 
 
+async def _post_merge_typecheck(app_path: str) -> str | None:
+    """マージ後の統合先ワークツリーで tsc --noEmit を実行する（対策A）。
+    import消失などのデグレは必ず型エラーになるため、コンフリクトなしで静かに壊れた
+    マージを検出できる。戻り値: None=問題なし（またはTS構成でないためスキップ）、
+    文字列=型エラー出力。
+    """
+    tsc = Path(app_path) / "node_modules" / ".bin" / "tsc"
+    if not tsc.exists():
+        return None  # 非TypeScript構成 / 未インストール → チェック対象外
+    proc = None
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            str(tsc), "--noEmit",
+            cwd=app_path,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+        stdout, _ = await asyncio.wait_for(
+            proc.communicate(), timeout=TYPECHECK_TIMEOUT_SEC)
+        if proc.returncode == 0:
+            return None
+        return stdout.decode(errors="replace")
+    except asyncio.TimeoutError:
+        if proc:
+            proc.kill()
+        return "tsc タイムアウト（5分）"
+    except Exception as e:
+        return f"tsc 実行エラー: {e}"
+
+
 async def _integrate_branch(app_path: str, task: dict, branch: str,
                             wt_id: str, integration: str) -> None:
     """完了したタスクブランチを統合先へマージする（方針D）。
     コンフリクト時はworktree・ブランチを保持したまま「要確認」として記録する。
+    マージ後は tsc で正当性を検証し、型エラーがあればマージを取り消す（対策A）。
     """
     app_name = Path(app_path).name
     result = await asyncio.to_thread(gitutil.merge_branch, app_path, branch, integration)
     if result == "merged":
+        # マージ後の型チェック。import消失等のデグレをコンフリクトなしでも検知する
+        tsc_err = await _post_merge_typecheck(app_path)
+        if tsc_err is not None:
+            # マージを取り消し、worktree・ブランチは保持して人間の判断に委ねる
+            undo = await asyncio.to_thread(gitutil.undo_merge, app_path)
+            _log(app_name, task,
+                 f"⚠ マージ後 tsc エラー（マージ取消し={undo}・手動確認が必要）: "
+                 f"{branch} → {integration}。worktreeとブランチは保持",
+                 tsc_err[-1200:])
+            return
         await asyncio.to_thread(gitutil.remove_worktree, app_path, wt_id)
         push_result = await asyncio.to_thread(gitutil.push, app_path)
         _log(app_name, task, f"🔀 統合完了: {branch} → {integration}（{push_result}）")
@@ -216,16 +260,24 @@ def _launch_up_to_limit(cfg: dict) -> int:
     free = max_parallel - len(running_tasks)
     if free <= 0:
         return 0
+    serialize_per_app = cfg.get("serialize_per_app", True)
+    # 対策B: 同一アプリのタスクは共有ファイル（Header.tsx等）で並列マージ競合を
+    # 起こすため逐次化する。実行中・本ループで起動予定のアプリ集合で判定する。
+    busy_apps = {t["app"] for t in running_tasks.values()}
     candidates = proposal_store.next_tasks(limit=max_parallel + len(running_tasks))
     launched = 0
     for app_path, task in candidates:
-        task_key = f"{Path(app_path).name}#{task['id']}"
+        app_name = Path(app_path).name
+        task_key = f"{app_name}#{task['id']}"
         if task_key in running_tasks:
             continue
+        if serialize_per_app and app_name in busy_apps:
+            continue  # 同一アプリの先行タスク完了（マージ）まで待つ
         if launched >= free:
             break
-        print(f"[autodev] タスク実行: {Path(app_path).name} #{task['id']} {task['title']}")
+        print(f"[autodev] タスク実行: {app_name} #{task['id']} {task['title']}")
         asyncio.create_task(_run_task(app_path, task, cfg["model"]))
+        busy_apps.add(app_name)
         launched += 1
     return launched
 
@@ -235,12 +287,15 @@ def run_now(app_path: str, task_ids: list[int], model: str | None = None) -> dic
     cfg = get_config()
     model = model or cfg["model"]
     max_parallel = int(cfg.get("max_parallel_agents") or 1)
+    serialize_per_app = cfg.get("serialize_per_app", True)
     app_name = Path(app_path).name
     tasks = {t["id"]: t for t in proposal_store.load(app_path)["tasks"]}
 
     launched: list[dict] = []
     skipped: list[dict] = []
     slots_used = len(running_tasks)
+    # 対策B: 同一アプリは逐次化。実行中 + 本呼び出しで起動したアプリを追跡する
+    busy_apps = {t["app"] for t in running_tasks.values()}
     for tid in task_ids:
         t = tasks.get(tid)
         if t is None:
@@ -255,12 +310,16 @@ def run_now(app_path: str, task_ids: list[int], model: str | None = None) -> dic
         if f"{app_name}#{tid}" in running_tasks:
             skipped.append({"id": tid, "reason": "実行中"})
             continue
+        if serialize_per_app and app_name in busy_apps:
+            skipped.append({"id": tid, "reason": "同一アプリ実行中（逐次化）"})
+            continue
         if slots_used >= max_parallel:
             skipped.append({"id": tid, "reason": f"並列上限({max_parallel})超過"})
             continue
         proposal_store.set_checked(app_path, tid, True)
         asyncio.create_task(_run_task(app_path, t, model))
         launched.append({"id": tid, "title": t["title"]})
+        busy_apps.add(app_name)
         slots_used += 1
     return {"launched": launched, "skipped": skipped}
 

@@ -176,6 +176,20 @@ def merge_branch(repo_path: str, branch: str, into: str = "") -> str:
         return f"error: {e}"
 
 
+def undo_merge(repo_path: str) -> str:
+    """直前のマージを取り消して統合先ブランチをマージ前の状態に戻す。
+    `--no-ff` マージ直後の呼び出しを想定（merge が設定する ORIG_HEAD がマージ前を指す）。
+    マージ後の tsc エラー検知時（対策A）に使用する。
+    """
+    try:
+        r = _run_git(["reset", "--hard", "ORIG_HEAD"], repo_path, timeout=30)
+        if r.returncode == 0:
+            return "undone"
+        return f"error: {r.stderr.strip()[:200]}"
+    except Exception as e:
+        return f"error: {e}"
+
+
 def push(repo_path: str) -> str:
     """best-effortのgit push（リモート未設定・失敗でも本処理は止めない）"""
     try:

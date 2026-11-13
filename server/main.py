@@ -1192,6 +1192,7 @@ async def set_autodev(data: dict):
         interval_min=data.get("interval_min"),
         model=data.get("model"),
         max_parallel_agents=data.get("max_parallel_agents"),
+        serialize_per_app=data.get("serialize_per_app"),
     )
     # ONにした直後は次のtick（60秒以内）で1件目が動くよう last_run をクリア
     if data.get("enabled"):
