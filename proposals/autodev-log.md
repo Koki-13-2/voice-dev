@@ -26681,3 +26681,48 @@ TypeScript チェック・Vite ビルドともにエラーなし確認済み。
 
 - 結果: ⚠ マージ失敗: task/gh_portal/252 → stu-ui: error: fatal: a branch named 'stu-ui' already exists
 
+## 2026-11-17 12:35 — gh_portal #d753b375-e342-467a-a8ea-d1e69ca2a969 ダッシュボードの週単位ナビゲーション実装
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+コミットとpushが完了しました。
+
+## 実装内容
+
+`src/pages/Dashboard.tsx` に以下を実装しました。
+
+**変更点:**
+
+1. **`getWeekMonday(weekOffset)` ヘルパー関数を追加**  
+   指定した週オフセット（0=今週）から月曜日の Date を返す。
+
+2. **`weekOffset` / `showWeekPicker` state を追加**  
+   Dashboard コンポーネント内で週単位のナビゲーション状態を管理。
+
+3. **日付ストリップを7日表示（月〜日）に変更**  
+   `[-1, 0, 1, 2, 3]` → `getWeekMonday(weekOffset)` から生成した7要素の配列に変更。
+
+4. **週ナビゲーション行を追加**  
+   - `◀` / `▶` ボタンで前週・翌週へ移動
+   - 週範囲ラベル（例: `11/18（月）〜11/24（日）`）を中央表示
+   - カレンダーアイコンボタンでピッカーを開く
+   - 週移動時に現在選択日が新しい週外なら月曜日に自動補正
+
+5. **`WeekCalendarPicker` コンポーネントを新規実装（約130行）**  
+   - ボトムシート形式のモーダル
+   - 月単位のカレンダー表示（6週まで）
+   - 週行をタップすると `weekOffset` が更新されて直接ジャンプ
+   - 今日の日付にドット表示、選択中の週を `--color-primary` でハイライト
+   - 土曜（青）・日曜（赤）の色分け、月をまたぐ日はグレーアウト
+
+**既存機能への影響なし:**  
+`useDailySchedule` の `selectedOffset`（今日からの日数差）はそのまま維持しており、データ取得ロジックへの変更はありません。
+
+```
+
+## 2026-11-17 12:36 — gh_portal #d753b375-e342-467a-a8ea-d1e69ca2a969 ダッシュボードの週単位ナビゲーション実装
+
+- 結果: 🔀 統合完了: task/gh_portal/d753b375 → stu-ui（push=pushed, 検証=build）
+
