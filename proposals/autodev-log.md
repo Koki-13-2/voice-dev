@@ -26759,3 +26759,23 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/3dbd13b5 → stu-ui（push=pushed, 検証=build）
 
+## 2026-11-17 12:46 — gh_portal #d704edb5-14ba-44f2-83b3-292624bbccf8 admin数値入力モーダルの表示崩れ修正
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。
+
+**修正内容:**
+
+- **根本原因**: `.admin-shell`に`transform: translateX(-50%)`が設定されており、CSS仕様上これが`position: fixed`の子要素の含有ブロックになってしまい、モーダルがviewportではなく`.admin-shell`基準で配置されていた
+- **対応**: `AdminEnrollmentCodes.tsx`のインラインモーダルを、既存の`FocusTrapDialog`コンポーネントに置き換えた。`FocusTrapDialog`は`createPortal`で`document.body`直下にマウントするため、`.admin-shell`のスタッキングコンテキスト・`overflow: hidden`の影響を受けない
+- **副次効果**: フォーカストラップ（Tabキー循環）とEscキー閉じる機能も自動的に付与された
+
+```
+
+## 2026-11-17 12:47 — gh_portal #d704edb5-14ba-44f2-83b3-292624bbccf8 admin数値入力モーダルの表示崩れ修正
+
+- 結果: 🔀 統合完了: task/gh_portal/d704edb5-admin → stu-ui（push=pushed, 検証=build）
+
