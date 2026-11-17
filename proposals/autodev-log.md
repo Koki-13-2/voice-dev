@@ -26779,3 +26779,26 @@ Warning: no stdin data received in 3s, proceeding without it. If piping from a s
 
 - 結果: 🔀 統合完了: task/gh_portal/d704edb5-admin → stu-ui（push=pushed, 検証=build）
 
+## 2026-11-17 12:53 — gh_portal #1ca87649-d367-49fe-acef-d9d8d0bdace9 講師ダッシュボードの宿題タブ追加と視聴進捗タブ削除
+
+- 結果: ✅ 成功
+
+```
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+完了しました。実装内容：
+
+**変更点（`src/pages/Dashboard.tsx`）**
+- `DetailTab` 型: `'contents'` → `'homework'` に変更
+- タブバー: `視聴進捗` ボタンを削除し、`宿題` タブを追加（生徒側に合わせてデイリーの直後に配置）
+- タブ順: デイリー → **宿題** → 全体進捗 → 面談記録 → 解放条件
+- `TeacherHomeworkPanel` コンポーネント新規実装：
+  - `homework_tickets` を `student_id` で取得（既存の `teacher_all_assigned` RLSポリシーで講師ロールは参照権限あり）
+  - 教材別にグループ化し、完了率・プログレスバーを表示
+  - 各教材行をタップすると展開し、チケット個別の完了状態・期限を表示
+
+```
+
+## 2026-11-17 12:54 — gh_portal #1ca87649-d367-49fe-acef-d9d8d0bdace9 講師ダッシュボードの宿題タブ追加と視聴進捗タブ削除
+
+- 結果: 🔀 統合完了: task/gh_portal/1ca87649 → stu-ui（push=pushed, 検証=build）
+
